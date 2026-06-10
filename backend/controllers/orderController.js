@@ -12,7 +12,7 @@ const getStripe = () => {
 // This API will be called by the frontend when the user places an order. It will create a new order in the database and then create a checkout session with Stripe and return the session url to the frontend to redirect the user to the Stripe checkout page
 
 const placeOrder = async(req,res)=>{
- const frontend_url = "https://shop-test-amber.vercel.app"    
+  const frontend_url = "https://shop-test-amber.vercel.app"   
     try{
         // Transform address data to include all fields clearly
         const addressData = {
