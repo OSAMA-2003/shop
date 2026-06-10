@@ -1,0 +1,34 @@
+import 'dotenv/config' // Load env variables immediately before anything else
+import express from 'express'
+import cors from 'cors'
+import connectDB from './config/db.js'
+import userRouter from './routes/userRoutes.js'
+import orderRouter from './routes/orderRoutes.js'
+import productRouter from './routes/productRoutes.js'
+import cartRouter from './routes/cartRoutes.js'
+import adminRouter from './routes/adminRoutes.js'
+import notificationsRouter from './routes/notificationsRoutes.js'
+
+const app = express()
+const PORT = process.env.PORT || 4000
+app.use(express.json())
+app.use(cors())
+
+
+app.use('/images',express.static("uploads"))
+app.use('/api/user',userRouter)
+app.use('/api/order',orderRouter)
+app.use('/api/product',productRouter)
+app.use('/api/cart', cartRouter)
+app.use('/api/admin', adminRouter)
+app.use('/api/notifications', notificationsRouter)
+
+
+app.get('/',(req,res)=>{
+    res.send("API is working")
+})
+
+app.listen(PORT, async()=>{
+    connectDB()
+    console.log(`Server is running ${PORT}`)
+})
