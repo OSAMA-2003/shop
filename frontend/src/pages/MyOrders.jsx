@@ -19,6 +19,7 @@ const MyOrders = () => {
     } catch (err) {
       console.error(err)
       setOrders([])
+      setLoading(false)
     }
   }
 

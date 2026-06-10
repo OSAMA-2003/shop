@@ -1,19 +1,18 @@
-import notificationsModel from "../models/notificationsModel.js";
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
+import notificationsModel from "../models/notificationsModel.js";
 import Stripe from "stripe";
 
-
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+const getStripe = () => {
+    return new Stripe(process.env.STRIPE_SECRET_KEY)
+}
 
 
 
 // This API will be called by the frontend when the user places an order. It will create a new order in the database and then create a checkout session with Stripe and return the session url to the frontend to redirect the user to the Stripe checkout page
 
 const placeOrder = async(req,res)=>{
-    // Get frontend URL from request headers or environment variable
-    const frontend_url = req.headers.origin || process.env.FRONTEND_URL || "https://shop-test-amber.vercel.app"
+    const frontend_url = "http://localhost:5173"
     
     try{
         // Transform address data to include all fields clearly
@@ -60,7 +59,7 @@ const placeOrder = async(req,res)=>{
             quantity:1
         })
 
-        const session = await stripe.checkout.sessions.create({
+        const session = await getStripe().checkout.sessions.create({
             line_items:line_items,
             mode:"payment",
             success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
@@ -86,15 +85,17 @@ const verifyOrder = async(req,res)=>{
 
             const order = await orderModel.findById(orderId).populate('userId','name email')
             await notificationsModel.create({
-                message: `The order with id ${order?._id} has been placed successfully from  ${order?.userId?.name} with email ${order?.userId?.email}`,
+                message: `The order with id ${order?._id} has been placed successfully from user ${order?.userId?.name}`,
                 orderId:order._id,
                 user:order?.userId?.name || "unknown"
             })
 
+
+
             res.status(200).json({success:true, message: "Payment successful"})
         }else{
-            await orderModel.findByIdAndUpdate(orderId, {payment:false, status:"Failed"})
-            res.status(200).json({success:false, message: "Payment failed"})
+            await orderModel.findByIdAndUpdate(orderId, {payment:false, status:"Failed"}) // Added update object
+            res.status(400).json({success:false, message: "Payment failed"})
         }
     }catch(err){
         console.log(err)
