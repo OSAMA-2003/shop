@@ -12,7 +12,7 @@ const getStripe = () => {
 // This API will be called by the frontend when the user places an order. It will create a new order in the database and then create a checkout session with Stripe and return the session url to the frontend to redirect the user to the Stripe checkout page
 
 const placeOrder = async(req,res)=>{
-    const frontend_url = "https://shop-test-amber.vercel.app"
+    const frontend_url = process.env.FRONTEND_URL || "https://shop-test-amber.vercel.app"
     
     try{
         // Transform address data to include all fields clearly
@@ -36,7 +36,6 @@ const placeOrder = async(req,res)=>{
         })
 
         await newOrder.save()
-        await userModel.findByIdAndUpdate(req.userId,{cartData:{}}) // Use req.userId from authMiddleware
         const line_items = req.body.items.map((item)=>({
             price_data:{
                 currency:"usd",
@@ -82,15 +81,16 @@ const verifyOrder = async(req,res)=>{
     try{
         if(success == "true"){
             await orderModel.findByIdAndUpdate(orderId,{payment:true})
+            
+            // Clear user's cart only after payment is verified
+            await userModel.findByIdAndUpdate(req.userId, { cartData: {} })
 
             const order = await orderModel.findById(orderId).populate('userId','name email')
             await notificationsModel.create({
                 message: `The order with id ${order?._id} has been placed successfully from user ${order?.userId?.name}`,
-                orderId:order._id,
+                orderId: order?._id,
                 user:order?.userId?.name || "unknown"
             })
-
-
 
             res.status(200).json({success:true, message: "Payment successful"})
         }else{

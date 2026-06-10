@@ -79,7 +79,7 @@ export const getAllUsers = async(req,res)=>{
 }
 
 
-export const deletdUser = async(req,res)=>{
+export const deleteUser = async(req,res)=>{
     try{
         const {id} = req.params
         const deleteUser = await userModel.findByIdAndDelete(id)
@@ -113,7 +113,7 @@ export const makeAdmin = async(req,res)=>{
 
 
 export const makeUser = async(req,res)=>{
-   try {
+    try {
         const { id } = req.params;
         const user = await userModel.findById(id);
         if (!user) {
@@ -126,12 +126,11 @@ export const makeUser = async(req,res)=>{
         user.role = "user";
         await user.save();
 
-res.json ({success: true, message: "User has been successfully demoted to a regular user", user });
+        res.json({ success: true, message: "User has been successfully demoted to a regular user", user });
     } catch (error) {
-     res.status(500).json({ success: false, message:error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
-
 
 
 
