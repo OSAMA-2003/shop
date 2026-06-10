@@ -7,53 +7,89 @@ const Verify = () => {
     const [searchParams] = useSearchParams();
     const success = searchParams.get("success");
     const orderId = searchParams.get("orderId");
-    
+
     const { url, token: contextToken } = useContext(ShopContext);
     const navigate = useNavigate();
+
     const [verified, setVerified] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const verifyPayment = async (authToken) => {
+        if (!url) return;
+
         try {
-            const response = await axios.post(`${url}/api/order/verify`, { success, orderId }, { headers: { token: authToken } });
-            if (response.data.success) {
+            const response = await axios.post(
+                `${url}/api/order/verify`,
+                { success, orderId },
+                { headers: { token: authToken } }
+            );
+
+            if (response.data?.success === true) {
                 setVerified(true);
-                setTimeout(() => navigate("/myorders"), 1000); // Give a moment to show success
+                setLoading(false);
+
+                setTimeout(() => navigate("/myorders"), 1200);
             } else {
-                setTimeout(() => navigate("/"), 1000);
+                setLoading(false);
+                setError("Payment verification failed");
+
+                setTimeout(() => navigate("/"), 1500);
             }
-        } catch (error) {
-            console.log(error);
-            setTimeout(() => navigate("/"), 1000);
+        } catch (err) {
+            console.log(err);
+            setLoading(false);
+            setError("Something went wrong");
+
+            setTimeout(() => navigate("/"), 1500);
         }
     };
 
     useEffect(() => {
-        // Try to get token from context or localStorage
-        const token = contextToken || localStorage.getItem('token');
-        
-        if (token && orderId) {
-            verifyPayment(token);
-        } else if (!token) {
-            // If no token available, redirect to login
+        const token = contextToken || localStorage.getItem("token");
+
+        if (!token) {
             navigate("/login");
+            return;
         }
-    }, [orderId, contextToken]); // Run when orderId or contextToken changes
+
+        if (!orderId) {
+            navigate("/");
+            return;
+        }
+
+        verifyPayment(token);
+    }, [orderId, contextToken, success, url]);
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-indigo-900">
-            {verified ? (
-                <div className="text-center">
-                    <h2 className="text-3xl font-bold text-green-400 mb-4">Payment Verified!</h2>
-                    <p className="text-white">Redirecting to your orders...</p>
-                </div>
-            ) : (
+            
+            {loading && (
                 <div className="text-center">
                     <div className="w-16 h-16 border-4 border-t-cyan-400 border-white/20 rounded-full animate-spin mx-auto mb-4"></div>
                     <p className="text-white">Verifying your payment...</p>
                 </div>
             )}
+
+            {!loading && verified && (
+                <div className="text-center">
+                    <h2 className="text-3xl font-bold text-green-400 mb-4">
+                        Payment Verified!
+                    </h2>
+                    <p className="text-white">Redirecting to your orders...</p>
+                </div>
+            )}
+
+            {!loading && error && (
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold text-red-400 mb-4">
+                        {error}
+                    </h2>
+                    <p className="text-white">Redirecting...</p>
+                </div>
+            )}
         </div>
     );
-}
+};
 
 export default Verify;
