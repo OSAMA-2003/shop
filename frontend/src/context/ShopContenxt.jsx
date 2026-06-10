@@ -13,7 +13,7 @@ const ShopContextProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState({}) 
     const [token,setToken] = useState()
     const [loading, setLoading] = useState(true); 
-    const url = "https://shop-7zcz.onrender.com" 
+    const url = "https://shop-1-tvsw.onrender.com" 
 
 
 useEffect(()=>{
