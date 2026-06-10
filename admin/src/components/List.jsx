@@ -6,7 +6,7 @@ import axios from 'axios'
 function List() {
 
     const [products , setProducts] = useState([])
-    const url = 'http://localhost:5000'
+    const url = 'https://shop-2-ms77.onrender.com'
 
     const fetchProducts = async()=>{
         const res = await axios.get(`${url}/api/product/list`)

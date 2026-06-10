@@ -4,7 +4,7 @@ import axios from 'axios';
 import { User, Shield, Trash2 } from "lucide-react";
 
 const Users = () => {
-    const url = "http://localhost:5000"
+    const url = "https://shop-2-ms77.onrender.com"
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(true)
     const demoteToUser = async (id) => {

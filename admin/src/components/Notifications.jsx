@@ -4,7 +4,7 @@ import { Bell, Trash2, CheckCheck, Loader2, X } from "lucide-react";
 
 function Notifications() {
 
-    const url = 'http://localhost:5000'
+    const url = 'https://shop-2-ms77.onrender.com'
     const [notifications, setNotifications] = useState([])
     const [loading, setLoading] = useState(true)
 

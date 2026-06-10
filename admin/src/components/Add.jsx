@@ -6,7 +6,7 @@ import { useState } from 'react'
 const Add = () => {
 
 
-    const url = 'http://localhost:5000'
+    const url = 'https://shop-2-ms77.onrender.com'
     const [image, setImage] = useState(null)
     const [data, setData] = useState({
         name: '',

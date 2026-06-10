@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const AdminLogin = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const url = "http://localhost:5000/api/admin/login";
+    const url = "https://shop-2-ms77.onrender.com/api/admin/login";
     const navigate = useNavigate()
     useEffect(() => {
         const token = localStorage.getItem('adminToken')

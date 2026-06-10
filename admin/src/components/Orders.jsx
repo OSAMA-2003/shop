@@ -5,14 +5,14 @@ import toast, { Toaster } from "react-hot-toast";
 
 const Orders = () => {
 
-    const URL = "http://localhost:5000"
+    const url = "https://shop-2-ms77.onrender.com"
 
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(true)
 
     const fetchOrders = async () => {
         try {
-            const res = await axios.get(`${URL}/api/order/list`)
+            const res = await axios.get(`${url}/api/order/list`)
             if (res.data.success) {
                 setOrders(res.data.data)
             } else {
@@ -28,7 +28,7 @@ const Orders = () => {
 
     const updateStatus = async (orderId, newStatus) => {
         try {
-            const res = await axios.post(`${URL}/api/order/status`, {
+            const res = await axios.post(`${url}/api/order/status`, {
                 orderId,
                 status: newStatus
             })
@@ -122,7 +122,7 @@ const Orders = () => {
                                                         <div className='flex items-center gap-2'>
                                                             {item.image && (
                                                                 <img
-                                                                    src={`${URL}/images/${item.image}`}
+                                                                    src={`${url}/images/${item.image}`}
                                                                     className='w-10 h-10 object-cover'
                                                                     alt={item.name}
                                                                 />

@@ -12,7 +12,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 // This API will be called by the frontend when the user places an order. It will create a new order in the database and then create a checkout session with Stripe and return the session url to the frontend to redirect the user to the Stripe checkout page
 
 const placeOrder = async(req,res)=>{
-    const frontend_url = "https://shop-test-amber.vercel.app"
+    // Get frontend URL from request headers or environment variable
+    const frontend_url = req.headers.origin || process.env.FRONTEND_URL || "https://shop-test-amber.vercel.app"
     
     try{
         // Transform address data to include all fields clearly
@@ -90,12 +91,10 @@ const verifyOrder = async(req,res)=>{
                 user:order?.userId?.name || "unknown"
             })
 
-
-
             res.status(200).json({success:true, message: "Payment successful"})
         }else{
-            await orderModel.findByIdAndUpdate(orderId, {payment:false, status:"Failed"}) // Added update object
-            res.status(400).json({success:false, message: "Payment failed"})
+            await orderModel.findByIdAndUpdate(orderId, {payment:false, status:"Failed"})
+            res.status(200).json({success:false, message: "Payment failed"})
         }
     }catch(err){
         console.log(err)
