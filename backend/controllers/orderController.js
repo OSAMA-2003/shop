@@ -12,7 +12,8 @@ const getStripe = () => {
 // This API will be called by the frontend when the user places an order. It will create a new order in the database and then create a checkout session with Stripe and return the session url to the frontend to redirect the user to the Stripe checkout page
 
 const placeOrder = async(req,res)=>{
-    const frontend_url = "https://shop-test-amber.vercel.app/"
+    // Use environment variable for flexibility between local and production
+    const frontend_url = process.env.FRONTEND_URL || "http://localhost:5173"
     
     try{
         // Transform address data to include all fields clearly
@@ -36,7 +37,8 @@ const placeOrder = async(req,res)=>{
         })
 
         await newOrder.save()
-        await userModel.findByIdAndUpdate(req.userId,{cartData:{}}) // Use req.userId from authMiddleware
+        // Note: Cart is now cleared in verifyOrder only after successful payment
+        
         const line_items = req.body.items.map((item)=>({
             price_data:{
                 currency:"usd",
@@ -81,21 +83,26 @@ const verifyOrder = async(req,res)=>{
 
     try{
         if(success == "true"){
-            await orderModel.findByIdAndUpdate(orderId,{payment:true})
+            // Update and get the order in one go
+            const order = await orderModel.findByIdAndUpdate(orderId, { payment: true }, { new: true }).populate('userId', 'name email');
+            
+            if (!order) {
+                return res.status(404).json({ success: false, message: "Order not found" });
+            }
 
-            const order = await orderModel.findById(orderId).populate('userId','name email')
+            // Clear user cart now that payment is confirmed
+            await userModel.findByIdAndUpdate(order.userId._id || order.userId, { cartData: {} });
+
             await notificationsModel.create({
-                message: `The order with id ${order?._id} has been placed successfully from user ${order?.userId?.name}`,
+                message: `The order with id ${order._id} has been placed successfully from user ${order.userId?.name || 'Customer'}`,
                 orderId:order._id,
-                user:order?.userId?.name || "unknown"
+                user:order.userId?.name || "unknown"
             })
-
-
 
             res.status(200).json({success:true, message: "Payment successful"})
         }else{
-            await orderModel.findByIdAndUpdate(orderId, {payment:false, status:"Failed"}) // Added update object
-            res.status(400).json({success:false, message: "Payment failed"})
+            await orderModel.findByIdAndUpdate(orderId, { payment: false, status: "Failed" });
+            res.status(200).json({ success: false, message: "Payment failed or cancelled" });
         }
     }catch(err){
         console.log(err)

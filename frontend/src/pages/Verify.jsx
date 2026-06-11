@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContenxt';
 import axios from 'axios';
@@ -14,6 +14,7 @@ const Verify = () => {
     const [verified, setVerified] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const hasCalledVerify = useRef(false);
 
     const verifyPayment = async (authToken) => {
         if (!url) return;
@@ -46,20 +47,28 @@ const Verify = () => {
     };
 
     useEffect(() => {
-        const token = contextToken || localStorage.getItem("token");
+        // Ensure backend URL is loaded from context
+        if (!url) return;
 
-        if (!token) {
-            navigate("/login");
-            return;
-        }
+        const token = contextToken || localStorage.getItem("token");
 
         if (!orderId) {
             navigate("/");
             return;
         }
 
-        verifyPayment(token);
-    }, [orderId, contextToken, success, url]);
+        if (!token) {
+            setError("Session lost. Please login to verify payment.");
+            setLoading(false);
+            setTimeout(() => navigate("/login"), 2000);
+            return;
+        }
+
+        if (!hasCalledVerify.current) {
+            hasCalledVerify.current = true;
+            verifyPayment(token);
+        }
+    }, [orderId, contextToken, success, url, navigate]);
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-indigo-900">
