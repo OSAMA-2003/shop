@@ -71,7 +71,7 @@ const registerUser = async(req,res)=>{
 export const getAllUsers = async(req,res)=>{
     try{
         const users = await userModel.find().select("-password")
-        res.json({success:true , data:users})
+        res.status(200).json({success:true , data:users})
     }catch(err){
         console.log(err)
         res.status(500).json({success:false, message: err.message})
@@ -86,7 +86,7 @@ export const deleteUser = async(req,res)=>{
         if(!deleteUser){
             return res.status(404).json({success:false, message: "User not found"})
          }
-         res.json({success:true, message: "User deleted successfully"})
+         res.status(200).json({success:true, message: "User deleted successfully"})
     }catch(err){
         console.log(err)
         res.status(500).json({success:false, message: err.message})

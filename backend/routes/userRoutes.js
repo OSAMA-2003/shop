@@ -1,5 +1,5 @@
 import express from "express";
-import { registerUser, loginUser , getAllUsers ,deletdUser , makeAdmin , makeUser } from "../controllers/userController.js";
+import { registerUser, loginUser , getAllUsers ,deleteUser , makeAdmin , makeUser } from "../controllers/userController.js";
 
 
 
@@ -10,7 +10,7 @@ userRouter.post('/login',loginUser)
 userRouter.get('/users',getAllUsers)
 userRouter.put('/make-admin/:id',makeAdmin)
 userRouter.put('/make-user/:id',makeUser)
-userRouter.delete('/delete/:id',deletdUser)
+userRouter.delete('/delete/:id',deleteUser)
 
 
 export default userRouter
