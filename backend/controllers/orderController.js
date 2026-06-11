@@ -123,20 +123,13 @@ const userOrders = async(req,res)=>{
 
 const listOrders = async(req,res)=>{
     try{
-        const orders = await orderModel.find({})
-        
-        // Populate user information for each order
-        const ordersWithUserData = await Promise.all(
-            orders.map(async (order) => {
-                const user = await userModel.findById(order.userId)
-                return {
-                    ...order.toObject(),
-                    user: user ? { name: user.name, email: user.email } : { name: 'Unknown', email: 'N/A' }
-                }
-            })
-        )
-        
-        res.status(200).json({success:true, data:ordersWithUserData})
+        // Use populate to get user data in a single query for better performance
+        const orders = await orderModel.find({}).populate({
+            path: 'userId',
+            select: 'name email'
+        });
+
+        res.status(200).json({success:true, data:orders})
     }catch(err){
         console.log(err)
         res.status(500).json({success:false, message:err.message}) 

@@ -19,14 +19,12 @@ const addProduct = async(req,res)=>{
         return res.status(400).json({ success: false, message: "All product fields are required." });
     }
 
-    let image_filename = `${req.file.buffer.toString("base64")}`
-
     const product = new productModel({
         name: name,
         description: description,
         price: Number(price), // 3. Ensure price is a number
         category: category,
-        image:image_filename,
+        image: req.file.filename, // Store filename for disk storage
         color: color,
     })
 

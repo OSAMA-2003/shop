@@ -126,7 +126,7 @@ export const makeUser = async(req,res)=>{
         user.role = "user";
         await user.save();
 
-        res.json({ success: true, message: "User has been successfully demoted to a regular user", user });
+        res.status(200).json({ success: true, message: "User has been successfully demoted to a regular user", user });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

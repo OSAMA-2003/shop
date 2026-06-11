@@ -42,7 +42,7 @@ export const clearAllNotifications = async(req,res)=>{
 export const markAsRead = async(req,res)=>{
     try{
         const {id} = req.params
-        await notificationsModel.findByIdAndDelete(id,{isRead:true})
+        await notificationsModel.findByIdAndUpdate(id,{isRead:true})
         res.status(200).json({success:true, message:"Notification marked as read successfully"})
     }catch(err){
         console.log(err)
@@ -66,20 +66,3 @@ export const creatNotificationForOrder = async(orderData)=>{
     }
 }
         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
