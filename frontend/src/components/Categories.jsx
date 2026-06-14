@@ -1,111 +1,116 @@
 import React, { useContext, useState } from 'react'
-import {  categories } from "../assets/data";
-import { ShoppingBag } from 'lucide-react';
+import { categories } from "../assets/data";
 import { ShopContext } from '../context/ShopContenxt';
 import { useNavigate } from 'react-router-dom';
 
 const Categories = () => {
-
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [displayCount, setDisplayCount] = useState(8); // State to manage number of displayed products
-  const { addToCart , url , all_products } = useContext(ShopContext)
+  // Set to 6 to load complete grid blocks (each block is 3 items)
+  const [displayCount, setDisplayCount] = useState(6); 
+  const { url, all_products } = useContext(ShopContext);
+  const navigate = useNavigate();
 
-
-  const navigate = useNavigate(); // Add this line
   const filteredProducts =
     selectedCategory === "All"
       ? all_products
-      : all_products.filter((p) => p.category === selectedCategory)
+      : all_products.filter((p) => p.category === selectedCategory);
 
   return (
-    <section className='relative w-full min-h-screen bg-linear-to-r from-indigo-900 via-purple-900
-                      to-pink-900 text-white py-24 px-6 sm:px-10'>
-      <div className='absolute inset-0 bg-black/30 backdrop-blur-sm'>
-      </div>
-      <div className='relative z-10 max-w-7xl mx-auto text-center'>
-        <h2 className='text-4xl-wrap justify-center gap-6 mb-16'>
-          Shop by Category
-
+    <section className='relative w-full min-h-screen bg-[#f4f6f8] py-24 px-6 sm:px-10'>
+      <div className='max-w-6xl mx-auto'>
+        
+        {/* Heading matching the image */}
+        <h2 className='text-4xl md:text-5xl font-black text-center uppercase tracking-tight text-[#0a192f] mb-12'>
+          New Arrivals
         </h2>
+
+        {/* Clean, Minimal Filter Buttons */}
         <div className="flex flex-wrap justify-center gap-6 mb-16">
           <button
             onClick={() => setSelectedCategory("All")}
-            className={`px-6 py-3 rounded-2xl 
-                    font-semibold text-lg transition-all shadow-lg
-                    ${selectedCategory === "All"
-                ? "bg-linear-to-r from-cyan-400 to-blue-500 text-white shadow-cyan-400/50 scale-105"
-                : "bg-white/10 hover:bg-white/20 text-gray-200"
-              }`}>
+            className={`pb-1 text-sm font-bold uppercase tracking-widest transition-all border-b-2 ${
+              selectedCategory === "All" 
+                ? "border-black text-black" 
+                : "border-transparent text-gray-400 hover:text-black"
+            }`}
+          >
             All
           </button>
-         
-         {categories.map((cat) => (
-            <button key={cat.name} onClick={() => setSelectedCategory(cat.name)}
-              className={`px-6 py-3 rounded-2xl 
-                        font-semibold text-lg transition-all shadow-lg
-                        ${selectedCategory === cat.name
-                    ? "bg-linear-to-r from-cyan-400 to-blue-500 text-white shadow-cyan-400/50 scale-105"
-                    : "bg-white/10 hover:bg-white/20 text-gray-200"
-                  }`}>
-                    {cat.name}
+          
+          {categories.map((cat) => (
+            <button 
+              key={cat.name} 
+              onClick={() => setSelectedCategory(cat.name)}
+              className={`pb-1 text-sm font-bold uppercase tracking-widest transition-all border-b-2 ${
+                selectedCategory === cat.name 
+                  ? "border-black text-black" 
+                  : "border-transparent text-gray-400 hover:text-black"
+              }`}
+            >
+              {cat.name}
             </button>
-         ))}
-
-
-        </div>
-        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mb-10'>
-          {filteredProducts.slice(0, displayCount).map((product) => (
-            <div key={product._id}
-                 onClick={() => navigate(`/product/${product._id}`)} // Added onClick here
-                 className='bg-white/10 backdrop-blur-md border-white/20 rounded-3xl overflow-hidden shadow-2xl hover:scale-105 hover:shadow-cyan-400/30
-      transition-all duration-500'>
-              <div className='relative w-full h-64 flex items-center justify-center bg-linear-to-b
-        from-purple-800/40 to-transparent cursor-pointer'> {/* Removed onClick from here */}
-                <img src={url + '/images/' + product.image}
-                  className='object-contain w-56 h-56 hover:scale-105 
-          transition-transform duration-500 '/>
-              </div>
-              <div className='p-5 text-left'>
-                <h3 className='text-lg font-semibold mb-2 truncate'>
-                  {product.name}  </h3>
-                <p className='text-gray-300 text-sm mb-4 line-clamp-2'>
-                  {product.description}
-                </p>
-                <div className='flex justify-between items-center '>
-                  <span className='text-xl font-bold text-cyan-400'>
-                    ${product.price.toFixed(2)}
-                  </span>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent click from bubbling to parent div
-                      addToCart(product._id);}} className='flex items-center gap-2 bg-linear-to-r
-  from-indigo-500 via-purple-500 to-pink-500 px-4 py-2 rounded-xl font-semibold 
-  hover:opacity-90 transition-all text-white shadow-lg '>
-                    <ShoppingBag className='w-5 h-5 ' />
-
-
-                  </button>
-
-                </div>
-
-              </div>
-            </div>
-
           ))}
-
         </div>
 
+        {/* Editorial Grid Layout */}
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-12 auto-rows-[350px] md:auto-rows-[350px] lg:auto-rows-[400px]'>
+          {filteredProducts.slice(0, displayCount).map((product, index) => {
+            
+            // This logic creates the specific layout: Every 1st item out of 3 is large.
+            const isLarge = index % 3 === 0;
+
+            return (
+              <div 
+                key={product._id}
+                onClick={() => navigate(`/product/${product._id}`)}
+                className={`group relative overflow-hidden bg-gray-200 cursor-pointer ${
+                  isLarge ? "md:row-span-2" : ""
+                }`}
+              >
+                {/* Full coverage image */}
+                <img 
+                  src={url + '/images/' + product.image}
+                  alt={product.name}
+                  className='w-full h-full object-cover transition-transform duration-700 group-hover:scale-105'
+                />
+                
+                {/* Dark Gradient Overlay for text readability */}
+                <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100'></div>
+                
+                {/* Overlay Text Content */}
+                <div className='absolute bottom-0 left-0 p-6 md:p-8 w-full text-white'>
+                  <p className='text-xs font-bold uppercase tracking-widest text-gray-300 mb-1'>
+                    {product.category}
+                  </p>
+                  
+                  {/* Title scales based on whether it is the large card or small card */}
+                  <h3 className={`font-black uppercase tracking-tight mb-2 leading-none ${
+                    isLarge ? 'text-3xl md:text-4xl lg:text-5xl' : 'text-xl md:text-2xl lg:text-3xl'
+                  }`}>
+                    {product.name}
+                  </h3>
+                  
+                  <p className='text-sm md:text-base font-medium text-gray-200'>
+                    ${product.price.toFixed(2)}
+                  </p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Load More Logic (Updates by 6 to maintain grid balance) */}
         {displayCount < filteredProducts.length && (
-          <div className='text-center mt-10'>
+          <div className='text-center mt-12'>
             <button
-              onClick={() => setDisplayCount(prevCount => Math.min(prevCount + 8, filteredProducts.length))}
-              className='px-8 py-3 bg-cyan-400 hover:bg-cyan-500 text-white font-bold rounded-2xl shadow-xl transition-transform transform hover:scale-105'
+              onClick={() => setDisplayCount(prev => Math.min(prev + 6, filteredProducts.length))}
+              className='px-10 py-4 bg-[#0a192f] text-white font-bold uppercase tracking-widest text-sm hover:bg-black transition-colors duration-300'
             >
               Load More
             </button>
           </div>
         )}
+
       </div>
     </section>
   )

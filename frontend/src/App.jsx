@@ -12,6 +12,11 @@ import ShopContextProvider from './context/ShopContenxt'
 import Footer from './components/Footer'
 import Order from './pages/Order'
 
+// Mockup generator pages
+import Mockups from './pages/Mockups'
+import MockupCustomizer from './pages/MockupCustomizer'
+import Profile from './pages/Profile'
+
 
 function App() {
 
@@ -30,6 +35,9 @@ function App() {
         <Route path='/myorders' element={<MyOrders />} />
         <Route path='/order' element={<Order />} />
         <Route path='/product/:id' element={<Product />} />
+        <Route path='/profile' element={<Profile />} />
+        <Route path='/mockups' element={<Mockups />} />
+        <Route path='/mockups/:id' element={<MockupCustomizer />} />
       </Routes>
     </ShopContextProvider>
    

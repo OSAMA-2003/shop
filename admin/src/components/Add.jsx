@@ -40,7 +40,10 @@ const Add = () => {
         if (image) formData.append('image', image)
 
         try {
-            const res = await axios.post(`${url}/api/product/add`, formData)
+            const token = localStorage.getItem('adminToken')
+            const res = await axios.post(`${url}/api/product/add`, formData, {
+                headers: { token }
+            })
             if (res.data.success) {
                 setData({
                     name: '',
@@ -50,13 +53,16 @@ const Add = () => {
                     color: 'Black',
                 })
                 setImage(null)
+                document.getElementById('imageInput').value = ''
                 alert("Product Added Successfully")
             } else {
                 alert(res.data.message)
             }
         } catch (err) {
             console.log(err)
-            alert("Something went wrong")
+            // Extract and show the actual error message from the backend
+            const errorMessage = err.response?.data?.message || err.message || "Something went wrong"
+            alert(`Error: ${errorMessage}`)
         }
 
 
@@ -79,6 +85,7 @@ const Add = () => {
                             placeholder='Product Name'
                             value={data.name}
                             onChange={onChangeHandler}
+                            required
                             className="w-full px-4 py-3 rounded-xl bg-white/15 text-white
          placeholder-gray-300 focus:ring-2 focus:ring-cyan-400 outline-none"
                         />
@@ -88,6 +95,7 @@ const Add = () => {
                             placeholder='Product Description'
                             value={data.description}
                             onChange={onChangeHandler}
+                            required
                             className="w-full px-4 py-3 rounded-xl bg-white/15 text-white
          placeholder-gray-300 focus:ring-2 focus:ring-cyan-400 outline-none "
                         />
@@ -97,6 +105,8 @@ const Add = () => {
                             placeholder='Price'
                             value={data.price}
                             onChange={onChangeHandler}
+                            required
+                            min="0"
                             className="w-full px-4 py-3 rounded-xl bg-white/15 text-white
          placeholder-gray-300 focus:ring-2 focus:ring-cyan-400 outline-none "
                         />
@@ -129,7 +139,9 @@ const Add = () => {
 
                         <input type='file'
                             accept='image/*'
+                            id='imageInput'
                             onChange={onImageChange}
+                            required
                             className='w-full text-white'
                         /> Add image
                         {image && (

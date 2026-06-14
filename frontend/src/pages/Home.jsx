@@ -4,6 +4,7 @@ import Features from "../components/Features.jsx" ;
 import Categories from "../components/Categories.jsx";
 import Offer from "../components/Offer.jsx" ;
 import Footer from "../components/Footer.jsx" ;
+import MockupSection from "../components/MockupSection.jsx";
 
 const Home = () => {
   return (
@@ -20,6 +21,10 @@ const Home = () => {
       <section id="categories">
             <Categories/>
                 </section>
+                
+      <section id="mockups">
+            <MockupSection/>
+      </section>
 
           <section id="shop">
             <Offer/>

@@ -23,7 +23,7 @@ function List() {
 
 
     const handleDelete = async(id)=>{
-        const res = await axios.get(`${url}/api/product/remove` , {id:id})
+        const res = await axios.delete(`${url}/api/product/remove/${id}`);
         await fetchProducts()
         if(res.data.success){
             console.log("Success")

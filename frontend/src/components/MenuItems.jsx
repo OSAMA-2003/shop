@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, FolderOpen, ShoppingBag, Mail, ShoppingCart, User } from "lucide-react";
+import { Home, FolderOpen, ShoppingBag, Mail, ShoppingCart, User, Shirt } from "lucide-react";
 import { useState, useContext } from 'react';
 import { Link as ScrollLink } from "react-scroll";
 import { ShopContext } from '../context/ShopContenxt';
@@ -8,7 +8,9 @@ import { ShopContext } from '../context/ShopContenxt';
 
 export const menuItemsData = [
     { to: "home", label: "Home", Icon: Home },
-    { to: "categories", label: "categories", Icon: FolderOpen },
+    { to: "categories", label: "Categories", Icon: FolderOpen },
+    { to: "mockups", label: "Mockups", Icon:Shirt },
+
     { to: "shop", label: "Shop", Icon: ShoppingBag },
     { to: "contact", label: "Contact", Icon: Mail },
 ];
@@ -46,8 +48,8 @@ const MenuItems = ({ setSideBarOPen, isMobile }) => {
                             offset={-80}
                             spy={true}
                             onClick={() => setSideBarOPen && setSideBarOPen(false)}
-                            className="flex items-center gap-3 px-4 py-3 rounded-lg h-[35px] transition-all shrink-0 w-auto min-w-[80px] text-gray-200 hover:bg-white/10 hover:text-white hover:shadow-md cursor-pointer"
-                            activeClass="bg-gradient-to-r from-indigo-500 to-pink-500 text-white shadow-lg"
+                            className="flex items-center gap-3 px-4 py-3 rounded-lg h-[35px] transition-all shrink-0 w-auto min-w-[80px] text-text-muted hover:bg-surface hover:text-primary cursor-pointer"
+                            activeClass="bg-surface text-primary shadow-sm border border-border-light font-bold"
                         >
                             <Icon className="w-5 h-5" />
                             <span className='font-semibold text-base'>{label}</span>
@@ -60,7 +62,7 @@ const MenuItems = ({ setSideBarOPen, isMobile }) => {
                                 setSideBarOPen && setSideBarOPen(false);
                             }}
                             className="flex items-center gap-3 px-4 py-3 rounded-lg h-[35px] transition-all 
-      shrink-0 w-auto min-w-[80px] text-gray-200 hover:bg-white/10 hover:shadow-md"
+      shrink-0 w-auto min-w-[80px] text-text-muted hover:bg-surface hover:text-primary"
                         >
                             <Icon className="w-6 h-6" />
                             <span className="font-semibold text-base">{label}</span>
@@ -73,7 +75,7 @@ const MenuItems = ({ setSideBarOPen, isMobile }) => {
                 setSideBarOPen && setSideBarOPen(false)
             }}
                 className=" relative flex items-center gap-3 px-4 py-3 rounded-lg h-[35px] transition-all 
-                     text-gray-200 hover:bg-white/10 hover:shadow-md" >
+                     text-text-muted hover:bg-surface hover:text-primary" >
                 <ShoppingCart className='w-6 h-6' />
                 {
                     totalItems > 0 && (
@@ -91,15 +93,17 @@ const MenuItems = ({ setSideBarOPen, isMobile }) => {
                         setSideBarOPen && setSideBarOPen(false);
                     }}
                     className="flex items-center gap-2 px-4 py-3 rounded-lg h-[35px]
-                                 bg-cyan-400 text-white font-semibold hover:bg-cyan-500 transition-all" >
+                                 bg-primary text-white font-semibold hover:bg-[#d94f15] shadow-soft hover:shadow-md transition-all" >
                     Login
                 </button>
             ) : (
                 <div className='flex items-center gap-4'>
-                    <User className='w-6 h-6 text-white' />
+                    <button onClick={() => { navigate("/profile"); setSideBarOPen && setSideBarOPen(false); }} className="text-text-muted hover:text-primary transition-colors" title="My Profile">
+                        <User className='w-6 h-6' />
+                    </button>
                     <button onClick={handleLogout}
                         className='flex items-center gap-2 px-4 py-3 rounded-lg
-      h-[35px] bg-red-500 text-white font-semibold hover:bg-red-600 transition-all'>
+      h-[35px] bg-surface border border-border-light text-text-main font-semibold hover:bg-gray-200 transition-all shadow-sm'>
                         Log Out
                     </button>
 
