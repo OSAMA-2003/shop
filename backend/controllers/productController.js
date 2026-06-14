@@ -1,5 +1,4 @@
 import productModel from "../models/productModel.js";
-import fs from "fs"
 
 
 const addProduct = async(req,res)=>{
@@ -12,19 +11,18 @@ const addProduct = async(req,res)=>{
     // 2. Validate required body fields
     const { name, description, price, category, color } = req.body;
     if (!name || !description || !price || !category || !color) {
-        // If validation fails, delete the uploaded file to prevent orphaned files
-        fs.unlink(`uploads/${req.file.filename}`, (err) => {
-            if (err) console.log("Error deleting orphaned file:", err);
-        });
         return res.status(400).json({ success: false, message: "All product fields are required." });
     }
+
+    // Convert the image buffer to a Base64 string to store directly in the database
+    const imageBase64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
 
     const product = new productModel({
         name: name,
         description: description,
         price: Number(price), // 3. Ensure price is a number
         category: category,
-        image: req.file.filename, // Store filename for disk storage
+        image: imageBase64, // Store Base64 string in DB
         color: color,
     })
 
@@ -32,10 +30,6 @@ const addProduct = async(req,res)=>{
         await product.save()
         res.status(200).json({success:true, message: "Product added successfully"})
     } catch (err) {
-        // If database save fails, also remove the uploaded image
-        if (req.file) {
-            fs.unlink(`uploads/${req.file.filename}`, (unlinkErr) => { if (unlinkErr) console.log("Error deleting file on DB save fail:", unlinkErr); });
-        }
         console.log(err)
         res.status(400).json({success:false, message:err.message})
     }
@@ -62,9 +56,6 @@ const removeProduct = async(req,res)=>{
         if (!product) {
             return res.status(404).json({success:false, message: "Product not found"})
         }
-
-        // Delete the associated image file from the 'uploads' folder
-        fs.unlink(`uploads/${product.image}`,()=>{})
 
         await productModel.findByIdAndDelete(req.params.id) 
         res.status(200).json({success:true, message: "Product removed successfully"})
