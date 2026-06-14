@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContenxt'
 
 const Product = () => {
-  const { addToCart, all_products ,URL} = useContext(ShopContext)
+  const { addToCart, all_products } = useContext(ShopContext)
   const { productId } = useParams()
   const product = all_products.find((p) => p._id === productId)
 

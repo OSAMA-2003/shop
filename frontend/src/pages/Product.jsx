@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContenxt'
 
 const Product = () => {
-  const { addToCart, all_products, url } = useContext(ShopContext)
+  const { addToCart, all_products } = useContext(ShopContext)
   const { id } = useParams() 
   const product = all_products.find((p) => p._id === id) 
 
@@ -38,7 +38,7 @@ const Product = () => {
           </div>
 
           <img
-            src={url + '/images/' + product.image}
+            src={product.image}
             alt={product.name}
             className="w-full h-full object-cover mix-blend-multiply transition-transform duration-500 group-hover:scale-125"
           />

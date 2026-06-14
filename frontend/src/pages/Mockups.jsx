@@ -52,10 +52,10 @@ const mockups = [
 
 export default function Mockups() {
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className="min-h-screen bg-gray-50 p-4 py-30 ">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter mb-2 leading-none">
             Design Your Product
           </h1>
           <p className="text-gray-600">Choose a product and customize it with your design</p>

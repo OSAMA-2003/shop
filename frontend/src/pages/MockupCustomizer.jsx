@@ -32,7 +32,7 @@ function TransformControls() {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow space-y-3">
+    <div className="bg-white p-4 py-30 rounded-lg shadow space-y-3">
       <h3 className="font-semibold text-gray-700 border-b pb-2">Precise Controls</h3>
       <div className="grid grid-cols-2 gap-4">
         <div>

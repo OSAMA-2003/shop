@@ -26,9 +26,9 @@ const Home = () => {
             <MockupSection/>
       </section>
 
-          <section id="shop">
+          {/* <section id="shop">
             <Offer/>
-               </section>
+               </section> */}
 
       <section id="contact">
             <Footer/>

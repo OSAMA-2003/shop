@@ -7,7 +7,7 @@ const Categories = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   // Set to 6 to load complete grid blocks (each block is 3 items)
   const [displayCount, setDisplayCount] = useState(6); 
-  const { url, all_products } = useContext(ShopContext);
+  const { all_products } = useContext(ShopContext);
   const navigate = useNavigate();
 
   const filteredProducts =
@@ -69,7 +69,7 @@ const Categories = () => {
               >
                 {/* Full coverage image */}
                 <img 
-                  src={url + '/images/' + product.image}
+                  src={product.image}
                   alt={product.name}
                   className='w-full h-full object-cover transition-transform duration-700 group-hover:scale-105'
                 />

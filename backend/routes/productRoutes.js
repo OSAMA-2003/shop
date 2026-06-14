@@ -1,29 +1,28 @@
 import express from "express";
 import multer from "multer";
-import fs from "fs";
-import { addProduct , removeProduct , listProducts } from "../controllers/productController.js";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "./cloudinary.js";
 
-const productRouter = express.Router()
+import {
+  addProduct,
+  removeProduct,
+  listProducts,
+} from "../controllers/productController.js";
 
-// Ensure the uploads directory exists
-const dir = './uploads';
-if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
-}
+const productRouter = express.Router();
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, `${Date.now()}_${file.originalname}`);
-    }
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "ecommerce",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+  },
 });
 
-const upload = multer({storage:storage})
+const upload = multer({ storage });
 
-productRouter.post('/add', upload.single('image'), addProduct)
-productRouter.delete('/remove/:id', removeProduct)
-productRouter.get('/list', listProducts)
+productRouter.post("/add", upload.single("image"), addProduct);
+productRouter.delete("/remove/:id", removeProduct);
+productRouter.get("/list", listProducts);
 
-export default productRouter
+export default productRouter;
