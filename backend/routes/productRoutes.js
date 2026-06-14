@@ -1,11 +1,24 @@
 import express from "express";
 import multer from "multer";
+import fs from "fs";
 import { addProduct , removeProduct , listProducts } from "../controllers/productController.js";
 
 const productRouter = express.Router()
 
-// Use memoryStorage so the file buffer is available to be converted to Base64
-const storage = multer.memoryStorage();
+// Ensure the uploads directory exists
+const dir = './uploads';
+if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+}
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, `${Date.now()}_${file.originalname}`);
+    }
+});
 
 const upload = multer({storage:storage})
 
