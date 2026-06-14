@@ -145,8 +145,11 @@ const Add = () => {
                             className='w-full text-white'
                         /> Add image
                         {image && (
-                            <img src={URL.createObjectURL(image)} className='w-full h-64 object-cover rounded-2xl mt-2' />
-                        )}
+                            <img
+                            src={URL.createObjectURL(image)}
+                            alt="Preview"
+                            className='w-full h-64 object-cover rounded-2xl mt-2'
+                            />                        )}
 
                         <button type='submit'
                             className='w-full bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500

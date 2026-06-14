@@ -43,7 +43,8 @@ function List() {
     border-white/20 rounded-3xl p-6 flex flex-col justify-between shadow-lg'>
 
    <img 
-  src={`${url}/images/${product.image}`}
+  src={product.image}
+  alt={product.name}
   className='w-full h-48 object-contain mb-4 rounded-xl'
 />
 

@@ -122,7 +122,7 @@ const Orders = () => {
                                                         <div className='flex items-center gap-2'>
                                                             {item.image && (
                                                                 <img
-                                                                    src={`${url}/images/${item.image}`}
+                                                                    src={item.image}
                                                                     className='w-10 h-10 object-cover'
                                                                     alt={item.name}
                                                                 />

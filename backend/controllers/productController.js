@@ -61,6 +61,15 @@ const listProducts = async (req, res) => {
 
     } catch (err) {
         console.log(err);
+        
+        // Cleanup: If database save fails, remove the newly uploaded image from Cloudinary
+        if (req.file && req.file.filename) {
+            try {
+                await cloudinary.uploader.destroy(req.file.filename);
+            } catch (cloudinaryErr) {
+                console.log("Failed to clean up Cloudinary image:", cloudinaryErr);
+            }
+        }
 
         res.status(400).json({
             success: false,
@@ -86,15 +95,15 @@ const removeProduct = async (req, res) => {
 
         // حذف الصورة من Cloudinary
         if (product.image) {
-
-            const publicId = product.image
-                .split("/")
-                .pop()
-                .split(".")[0];
-
-            await cloudinary.uploader.destroy(
-                `ecommerce/${publicId}`
-            );
+            // Safely extract filename even if it contains multiple dots (e.g., "my.shirt.img.jpg")
+            const filename = product.image.split("/").pop(); 
+            const publicIdWithoutExt = filename.substring(0, filename.lastIndexOf('.')) || filename;
+            
+            try {
+                await cloudinary.uploader.destroy(`ecommerce/${publicIdWithoutExt}`);
+            } catch (cloudinaryErr) {
+                console.log("Failed to delete Cloudinary image:", cloudinaryErr);
+            }
         }
 
         await productModel.findByIdAndDelete(req.params.id);
