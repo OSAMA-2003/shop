@@ -20,7 +20,10 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage });
 
-mockupRouter.post("/add", upload.single("image"), addMockup);
+mockupRouter.post("/add", upload.fields([
+  { name: "imageFront", maxCount: 1 },
+  { name: "imageBack", maxCount: 1 }
+]), addMockup);
 mockupRouter.delete("/remove/:id", removeMockup);
 mockupRouter.get("/list", listMockups);
 

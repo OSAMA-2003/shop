@@ -25,7 +25,7 @@ function PrecisionControls() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#F5F2EB] border-2 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+    <div className="flex flex-col  h-full bg-[#F5F2EB] border-2 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
       <h3 className="font-black text-black text-xl uppercase tracking-wider mb-4">Precision Controls</h3>
       
       {/* Checkerboard Preview Area */}
@@ -108,7 +108,6 @@ function PrecisionControls() {
 
       {/* Action Buttons */}
       <div className="flex gap-4 mt-6 pt-4 border-t-2 border-black border-dashed">
-        <button className="flex-1 border-2 border-black bg-white hover:bg-gray-100 text-black font-bold py-2 rounded-md uppercase text-sm transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">Reset</button>
       </div>
     </div>
   )
@@ -146,7 +145,7 @@ function CustomizerContent() {
   )
 
   return (
-    <div className="h-screen  w-full flex bg-[#F5F2EB]   p-10 gap-6 font-sans text-black overflow-hidden">
+    <div className="h-screen  mt-20 w-full flex bg-[#F5F2EB]   p-10 gap-6 font-sans text-black overflow-hidden">
       
       {/* LEFT SIDEBAR: Layers */}
       <aside className="w-[320px] flex flex-col shrink-0">

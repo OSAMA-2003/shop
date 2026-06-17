@@ -2,10 +2,10 @@ import mockupModel from "../models/mockupModel.js";
 import cloudinary from "../utils/cloudinary.js";
 
 const addMockup = async (req, res) => {
-    if (!req.file) {
+    if (!req.files || !req.files.imageFront || !req.files.imageBack) {
         return res.status(400).json({
             success: false,
-            message: "Image file is required."
+            message: "Both front and back image files are required."
         });
     }
 
@@ -24,7 +24,8 @@ const addMockup = async (req, res) => {
             description,
             price: Number(price),
             category,
-            image: req.file.path, // Cloudinary URL
+            imageFront: req.files.imageFront[0].path, // Cloudinary URL
+            imageBack: req.files.imageBack[0].path, // Cloudinary URL
             color,
         });
 
@@ -51,8 +52,13 @@ const removeMockup = async (req, res) => {
         const mockup = await mockupModel.findById(req.params.id);
         if (!mockup) return res.status(404).json({ success: false, message: "Mockup not found" });
 
-        if (mockup.image) {
-            const filename = mockup.image.split("/").pop(); 
+        if (mockup.imageFront) {
+            const filename = mockup.imageFront.split("/").pop(); 
+            const publicIdWithoutExt = filename.substring(0, filename.lastIndexOf('.')) || filename;
+            await cloudinary.uploader.destroy(`ecommerce/${publicIdWithoutExt}`);
+        }
+        if (mockup.imageBack) {
+            const filename = mockup.imageBack.split("/").pop(); 
             const publicIdWithoutExt = filename.substring(0, filename.lastIndexOf('.')) || filename;
             await cloudinary.uploader.destroy(`ecommerce/${publicIdWithoutExt}`);
         }

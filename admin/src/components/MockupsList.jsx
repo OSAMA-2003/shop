@@ -64,7 +64,7 @@ const MockupsList = () => {
                     </div>
 
                     <div className='flex flex-col gap-6'>
-                        <div className='hidden sm:grid grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center py-3 px-4 border-[3px] border-black bg-[#e5e5e5] font-black uppercase tracking-widest text-sm'>
+                        <div className='hidden sm:grid grid-cols-[1.5fr_3fr_1fr_1fr_1fr] items-center py-3 px-4 border-[3px] border-black bg-[#e5e5e5] font-black uppercase tracking-widest text-sm'>
                             <b>Image</b>
                             <b>Name</b>
                             <b>Category</b>
@@ -78,9 +78,16 @@ const MockupsList = () => {
                             </div>
                         ) : (
                             list.map((item, index) => (
-                                <div key={index} className='grid grid-cols-[1fr_3fr_1fr] sm:grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center gap-4 py-3 px-4 border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]'>
-                                    <div className='w-16 h-16 sm:w-20 sm:h-20 border-2 border-black bg-[#f9f9f6] flex items-center justify-center p-1'>
-                                        <img src={item.imageFront} alt={item.name} className='max-w-full max-h-full object-contain mix-blend-multiply' />
+                                <div key={index} className='grid grid-cols-[1fr_3fr_1fr] sm:grid-cols-[1.5fr_3fr_1fr_1fr_1fr] items-center gap-4 py-3 px-4 border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]'>
+                                    <div className='flex items-center gap-2'>
+                                        <div className='w-16 h-16 sm:w-20 sm:h-20 border-2 border-black bg-[#f9f9f6] flex items-center justify-center p-1'>
+                                            <img src={item.imageFront || item.image} alt={item.name} title="Front" className='max-w-full max-h-full object-contain mix-blend-multiply' />
+                                        </div>
+                                        {item.imageBack && (
+                                            <div className='hidden md:flex w-16 h-16 sm:w-20 sm:h-20 border-2 border-black bg-[#f9f9f6] items-center justify-center p-1'>
+                                                <img src={item.imageBack} alt={`${item.name} Back`} title="Back" className='max-w-full max-h-full object-contain mix-blend-multiply' />
+                                            </div>
+                                        )}
                                     </div>
                                     <p className='font-bold text-lg leading-tight uppercase tracking-tight'>{item.name}</p>
                                     <p className='font-bold text-sm uppercase tracking-widest hidden sm:block'>{item.category}</p>
