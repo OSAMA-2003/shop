@@ -82,7 +82,7 @@ const MenuItems = ({ setSideBarOpen, isMobile }) => {
                         navigate("/login");
                         if (setSideBarOpen) setSideBarOpen(false);
                     }}
-                    className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-linear-to-r from-indigo-500 to-purple-500 text-white font-semibold hover:opacity-90 shadow-md transition-all ${isMobile ? "w-full mt-4" : ""}`} 
+            className='bg-[#ff5500]  px-4 font-black text-lg  uppercase text-black hover:bg-black hover:text-[#ff5500] transition-colors rounded-xl'
                 >
                     Login
                 </button>

@@ -41,9 +41,9 @@ export default function UploadPanel() {
   }
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow">
-      <h3 className="font-semibold mb-3 flex items-center gap-2">
-        <Upload size={18} /> Upload Image
+    <div className="p-5 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+      <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider">
+        <Upload size={18} className="text-[#5A54F9]" /> Upload Image
       </h3>
       <input
         ref={fileRef}
@@ -54,11 +54,11 @@ export default function UploadPanel() {
       />
       <button
         onClick={() => fileRef.current?.click()}
-        className="w-full px-4 py-2 bg-[#5A54F9] text-white rounded hover:bg-opacity-90 transition-colors"
+        className="w-full px-4 py-3 bg-[#5A54F9] text-white font-bold rounded-lg hover:bg-[#4a45d9] transition-colors shadow-sm flex items-center justify-center gap-2"
       >
         Choose Image
       </button>
-      <p className="text-xs text-gray-500 mt-2 text-center">Supports JPG, PNG</p>
+      <p className="text-xs text-gray-400 mt-3 text-center font-medium">Supports JPG, PNG</p>
     </div>
   )
 }

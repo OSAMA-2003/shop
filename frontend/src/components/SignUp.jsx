@@ -1,15 +1,11 @@
-
 import { useNavigate } from "react-router-dom";
 import { useState, useContext } from "react";
-import axios from 'axios'
+import axios from 'axios';
 import { ShopContext } from "../context/ShopContenxt";
-
-
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const [state, setState] = useState("");
-  const { url , setToken} = useContext(ShopContext)
+  const { url, setToken } = useContext(ShopContext);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,115 +13,134 @@ const SignUp = () => {
     confirmPassword: "",
   });
 
-   const onChangeHandler = (e) => {
-  const name = e.target.name;
-  const value = e.target.value;
+  const onChangeHandler = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
 
-    setFormData((data)=>({
-      ...data, [name] : value
-    }))
-  }
-
+    setFormData((data) => ({
+      ...data,
+      [name]: value
+    }));
+  };
 
   const onSignUp = async (e) => {
-     e.preventDefault();
+    e.preventDefault();
 
-     if(formData.password !== formData.confirmPassword){
-      alert ("Password do not match")
-      return
-     }
- 
-     try {
-       const res = await axios.post(
-         url +"/api/user/signup",
-         formData
-       );
- 
-       if (res.data.success) {
-         localStorage.setItem("token", res.data.token);
-         setToken(res.data.token);
-         navigate("/");
-       } else {
-         alert(res.data.message);
-       }
-     } catch (err) {
-       console.log(err);
-       alert(err.message);
-     }
-   };
- 
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
 
+    try {
+      const res = await axios.post(
+        url + "/api/user/signup",
+        formData
+      );
 
+      if (res.data.success) {
+        localStorage.setItem("token", res.data.token);
+        setToken(res.data.token);
+        navigate("/");
+      } else {
+        alert(res.data.message);
+      }
+    } catch (err) {
+      console.log(err);
+      alert(err.message);
+    }
+  };
 
   return (
-    <section className='relative w-full min-h-screen bg-linear-to-r from-indigo-900
-    via-purple-900 to-pink-900 text-white py-24 px-6 sm:px-10 flex
-    items-center justify-center'>
-      <div className='absolute inset-0 bg-black/30 backdrop-blur-sm p-10 pointer-events-none'>
-      </div>
-      <div className='relative z-10 w-full max-w-md bg-white/10 backdrop-blur-md p-10 rounded-3xl
-shadow-2xl'>
+    <section className='relative w-full min-h-screen bg-[#f9f9f6] text-black py-30 px-6 sm:px-10 flex items-center justify-center font-sans'>
+      
+      <div className='w-full max-w-sm flex flex-col items-start'>
 
-        <h2 className='text-3xl sm:text-4xl font-extrabold mb-6 text-center'>Create a new account </h2>
-        <form onSubmit={onSignUp} className='flex flex-col gap-6'>
-          <input type='text'
-            name='name'
-            placeholder='Full name'
-            value={formData.name}
-            onChange={onChangeHandler}
-            required
-            className='w-full bg-white/15 text-white placeholder-gray-300 px-4 py-3 rounded-xl 
-  outline-none focus:ring-2 focus:ring-cyan-400 '/>
+        {/* HEADING */}
+        <h1 className='text-6xl sm:text-7xl font-black uppercase tracking-tighter mb-8 text-black leading-none'>
+          Sign Up
+        </h1>
 
-          <input type='email'
-            name='email'
-            placeholder='Email'
-            value={formData.email}
-            onChange={onChangeHandler}
-            required
-            className='w-full bg-white/15 text-white placeholder-gray-300 px-4 py-3 rounded-xl 
-  outline-none focus:ring-2 focus:ring-cyan-400 '/>
+        {/* FORM */}
+        <form onSubmit={onSignUp} className='w-full flex flex-col gap-5'>
+          
+          {/* NAME INPUT */}
+          <div className='flex flex-col'>
+            <label className='text-sm font-bold text-black mb-1'>Full Name</label>
+            <input 
+              type='text'
+              name='name'
+              value={formData.name}
+              onChange={onChangeHandler}
+              required
+              className='w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black transition-colors'
+            />
+          </div>
 
-          <input type='password'
-            name='password'
-            placeholder='Password'
-            autoComplete="new-password"
-            value={formData.password}
-            onChange={onChangeHandler}
-            required
+          {/* EMAIL INPUT */}
+          <div className='flex flex-col'>
+            <label className='text-sm font-bold text-black mb-1'>Email</label>
+            <input 
+              type='email'
+              name='email'
+              value={formData.email}
+              onChange={onChangeHandler}
+              required
+              className='w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black transition-colors'
+            />
+          </div>
 
-            className='w-full bg-white/15 text-white placeholder-gray-300 px-4 py-3 rounded-xl 
-  outline-none focus:ring-2 focus:ring-cyan-400 '/>
+          {/* PASSWORD INPUT */}
+          <div className='flex flex-col'>
+            <label className='text-sm font-bold text-black mb-1'>Password</label>
+            <input 
+              type='password'
+              name='password'
+              autoComplete="new-password"
+              value={formData.password}
+              onChange={onChangeHandler}
+              required
+              className='w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black transition-colors'
+            />
+          </div>
 
-          <input
-            type='password'
-            name='confirmPassword'
-            placeholder='Confirm Password'
-            value={formData.confirmPassword}
-            onChange={onChangeHandler}
-            required
-            className='w-full bg-white/15 text-white placeholder-gray-300 px-4 py-3 rounded-xl 
-  outline-none focus:ring-2 focus:ring-cyan-400 '
+          {/* CONFIRM PASSWORD INPUT */}
+          <div className='flex flex-col'>
+            <label className='text-sm font-bold text-black mb-1'>Confirm Password</label>
+            <input
+              type='password'
+              name='confirmPassword'
+              value={formData.confirmPassword}
+              onChange={onChangeHandler}
+              required
+              className='w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black transition-colors'
+            />
+          </div>
 
-          />
-
-
-          <button type='submit' className='bg-linear-to-r from-cyan-400 to-blue-500 px-6
-     py-3 rounded-2xl font-semibold text-white hover:opacity-90 transition-all shadow-lg'>
-            Create an account
+          {/* SUBMIT BUTTON */}
+          <button 
+            type='submit' 
+            className='w-full bg-[#ff5500] py-4 mt-2 font-black text-2xl sm:text-3xl tracking-widest uppercase text-black hover:bg-black hover:text-[#ff5500] transition-colors rounded-none'
+          >
+            Create
           </button>
         </form>
-        <p className='mt-6 text-center text-gray-300'>
-          Do you have an account? {""}
-          <span
-            onClick={() => navigate("/login")}
-            className='text-cyan-400 font-semibold cursor-pointer hover:underline'>
-            Log in
+
+        {/* FOOTER LINKS */}
+        <div className='flex flex-col mt-6 gap-3'>
+          <span className='text-sm font-bold text-black'>
+            Already have an account? {" "}
+            <span
+              onClick={() => navigate("/login")}
+              className='underline decoration-2 cursor-pointer hover:text-[#ff5500] transition-colors'
+            >
+              Log in
+            </span>
           </span>
-        </p>
+        </div>
+
       </div>
     </section>
-  )
-}
+  );
+};
 
 export default SignUp;

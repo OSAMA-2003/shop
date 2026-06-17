@@ -10,37 +10,66 @@ const Profile = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Default placeholders. 
-  // TODO: If you create a backend endpoint like /api/user/profile, fetch and set the data here!
+  // User data will be fetched from the backend.
   const [userData, setUserData] = useState({
-    name: 'My Profile',
-    email: 'user@example.com'
+    name: '',
+    email: ''
   });
-
-  const fetchOrders = async () => {
-    try {
-      const res = await axios.post(`${url}/api/order/userorders`, {}, { headers: { token } });
-      const data = res.data.data;
-      const ordersData = Array.isArray(data) ? data : [data];
-      
-      // Sort orders by newest first
-      ordersData.sort((a, b) => new Date(b.date) - new Date(a.date));
-      
-      setOrders(ordersData);
-    } catch (err) {
-      console.error(err);
-      setOrders([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     if (!token) {
       navigate('/login');
       return;
     }
-    fetchOrders();
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // 1. Fetch Orders
+        try {
+          const ordersResponse = await axios.post(`${url}/api/order/userorders`, {}, { headers: { token } });
+          if (ordersResponse.data && ordersResponse.data.success) {
+            const data = ordersResponse.data.data;
+            const ordersData = Array.isArray(data) ? data : [data];
+            ordersData.sort((a, b) => new Date(b.date) - new Date(a.date));
+            setOrders(ordersData);
+          } else {
+            setOrders([]);
+          }
+        } catch (err) {
+          console.error("Failed to fetch orders:", err);
+          setOrders([]);
+        }
+
+        // 2. Fetch User Profile
+        try {
+          const profileResponse = await axios.get(`${url}/api/user/profile`, { headers: { token } });
+          if (profileResponse.data && profileResponse.data.success) {
+            setUserData({
+              name: profileResponse.data.data.name || 'Unknown',
+              email: profileResponse.data.data.email || 'No Email'
+            });
+          } else {
+            console.error("Profile endpoint error or invalid response:", profileResponse.data);
+          }
+        } catch (err) {
+          // Check if the backend explicitly told us the user no longer exists in the DB
+          if (err.response && err.response.status === 404 && err.response.data?.message === "User not found") {
+            console.warn("User not found in the database. Logging out...");
+            localStorage.removeItem("token");
+            setToken(false);
+            navigate("/login");
+          } else {
+            // Log out the explicit error payload if it was something else (like forgot to restart server)
+            console.error("Failed to fetch profile data. Ensure backend is restarted and route exists:", err.response?.data || err.message);
+          }
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [token, navigate, url]);
 
   if (loading) {

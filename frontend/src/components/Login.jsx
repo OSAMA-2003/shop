@@ -1,39 +1,30 @@
-import React from 'react'
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react'; // useContext is not used in this component, so it can be removed if not needed elsewhere
 import axios from 'axios';
-import { useContext } from 'react';
 import { ShopContext } from '../context/ShopContenxt';
 
 const Login = () => {
-
-
   const navigate = useNavigate();
-  const [state, setState] = useState("login");
-  const { url, setToken } = useContext(ShopContext)
+  const { url, setToken } = useContext(ShopContext);
+  
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
     password: "",
   });
 
   const onChangeHandler = (event) => {
-  const name = event.target.name;
-  const value = event.target.value;
-
-    setFormData((data)=>({
-      ...data, [name] : value
-    }))
-  }
+    const { name, value } = event.target;
+    setFormData((data) => ({
+      ...data,
+      [name]: value
+    }));
+  };
   
   const onLogin = async (event) => {
     event.preventDefault();
 
     try {
-      const res = await axios.post(
-        url + "/api/user/login",
-        formData
-      );
+      const res = await axios.post(`${url}/api/user/login`, formData);
 
       if (res.data.success) {
         localStorage.setItem("token", res.data.token);
@@ -48,49 +39,75 @@ const Login = () => {
     }
   };
 
-
   return (
-    <section className='relative w-full min-h-screen bg-surface text-text-main py-32 px-6 sm:px-10 flex items-center justify-center'>
+    <section className='relative w-full min-h-screen bg-[#f9f9f6] text-black py-20 px-6 sm:px-10 flex items-center justify-center font-sans'>
+      
+      <div className='w-full max-w-sm flex flex-col items-start'>
+        
+        {/* HEADING */}
+        <h1 className='text-6xl sm:text-7xl font-black uppercase tracking-tighter mb-8 text-black leading-none'>
+          Log In
+        </h1>
 
-      <div className='relative z-10 w-full max-w-md bg-background border border-border-light p-10 
-   rounded-3xl shadow-soft'>
+        {/* FORM */}
+        <form onSubmit={onLogin} className='w-full flex flex-col gap-5'>
+          
+          {/* EMAIL INPUT */}
+          <div className='flex flex-col'>
+            <label className='text-sm font-bold text-black mb-1'>Email</label>
+            <input 
+              type='email' 
+              name='email'
+              value={formData.email}
+              onChange={onChangeHandler}
+              required
+              className='w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black transition-colors'
+            />
+          </div>
 
-        <h2 className='text-3xl sm:text-4xl font-extrabold mb-8 text-center text-text-main'>Login</h2>
+          {/* PASSWORD INPUT */}
+          <div className='flex flex-col'>
+            <label className='text-sm font-bold text-black mb-1'>Password</label>
+            <input 
+              type='password'
+              name='password'
+              autoComplete="current-password"
+              value={formData.password}
+              onChange={onChangeHandler}
+              required
+              className='w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black transition-colors'
+            />
+          </div>
 
-        <form onSubmit={onLogin} className='flex flex-col gap-6'>
-          <input type='email' name='email'
-            placeholder='Email'
-            value={formData.email}
-            onChange={onChangeHandler}
-            required
-            className='bg-surface p-4 rounded-xl text-text-main placeholder-text-muted border border-border-light font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all'/>
-
-          <input type='password'
-            name='password'
-            placeholder='Password'
-            autoComplete="current-password"
-            value={formData.password}
-            onChange={onChangeHandler}
-            required
-            className='bg-surface p-4 rounded-xl text-text-main placeholder-text-muted border border-border-light font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all'/>
-
-          <button type='submit' className='bg-primary px-6 py-4 rounded-xl font-bold text-white hover:bg-[#d94f15] transition-all shadow-soft mt-2'>
-            Log in
-
+          {/* SUBMIT BUTTON */}
+          <button 
+            type='submit' 
+            className='w-full bg-[#ff5500] py-4 mt-2 font-black text-2xl sm:text-3xl tracking-widest uppercase text-black hover:bg-black hover:text-[#ff5500] transition-colors rounded-none'
+          >
+            Enter
           </button>
 
         </form>
-        <p className='mt-8 text-center text-text-muted'>
-          Do you have an account? {""}
-          <span
-            onClick={() => navigate("/signup")}
-            className='text-primary font-bold cursor-pointer hover:underline'>
-            Create an account
+
+        {/* FOOTER LINKS */}
+        <div className='flex flex-col mt-6 gap-3'>
+          <span className='text-sm font-bold text-black underline decoration-2 cursor-pointer hover:text-[#ff5500] transition-colors'>
+            Forgot Password?
           </span>
-        </p>
+          <span className='text-sm font-bold text-black'>
+            Don't have an account? {" "}
+            <span
+              onClick={() => navigate("/signup")}
+              className='underline decoration-2 cursor-pointer hover:text-[#ff5500] transition-colors'
+            >
+              Sign up
+            </span>
+          </span>
+        </div>
+
       </div>
     </section>
-  )
-}
+  );
+};
 
 export default Login;

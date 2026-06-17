@@ -1,180 +1,168 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { MockupProvider, useMockup } from '../context/MockupContext'
 import MockupCanvas from '../components/MockupCanvas'
-import UploadPanel from '../components/UploadPanel'
 import LayerPanel from '../components/LayerPanel'
-import TextEditor from '../components/TextEditor'
-import Toolbar from '../components/Toolbar'
-import ExportButton from '../components/ExportButton'
-import { ChevronLeft } from 'lucide-react'
 
 import mockup1 from '../assets/mockups/front-black-mockup.png'
 import mockup2 from '../assets/mockups/back-black-mockup.png'
 import mockup3 from '../assets/mockups/white-front-mockup.png'
 
-function TransformControls() {
+// Replaces your TransformControls to match the "PRECISION CONTROLS" panel
+// Replaces your current PrecisionControls in MockupCustomizer.jsx
+function PrecisionControls() {
   const { layers, selectedId, updateLayer } = useMockup()
   const selectedLayer = layers?.find((l) => l.id === selectedId)
 
-  // Only show this panel when a layer is actually selected
-  if (!selectedLayer) return null;
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (updateLayer) updateLayer(selectedId, { [name]: parseFloat(value) || 0 });
+    if (updateLayer && selectedId) updateLayer(selectedId, { [name]: parseFloat(value) || 0 });
   };
 
+  // Custom handler for scale so we update both X and Y simultaneously to keep aspect ratio
   const handleScaleChange = (e) => {
     const val = parseFloat(e.target.value) || 0.1;
-    // Update both scaleX and scaleY together to maintain the image's aspect ratio
-    if (updateLayer) updateLayer(selectedId, { scaleX: val, scaleY: val });
+    if (updateLayer && selectedId) {
+      updateLayer(selectedId, { scaleX: val, scaleY: val });
+    }
   };
 
   return (
-    <div className="bg-white p-4 py-30 rounded-lg shadow space-y-3">
-      <h3 className="font-semibold text-gray-700 border-b pb-2">Precise Controls</h3>
-      <div className="grid grid-cols-2 gap-4">
+    <div className="flex flex-col h-full bg-[#F5F2EB] border-2 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+      <h3 className="font-black text-black text-xl uppercase tracking-wider mb-4">Precision Controls</h3>
+      
+      {/* Checkerboard Preview Area */}
+      <div 
+        className="w-full h-32 border-2 border-black border-dashed mb-6 rounded-md relative flex items-center justify-center overflow-hidden"
+        style={{
+          backgroundImage: 'repeating-conic-gradient(#E5E5E5 0% 25%, transparent 0% 50%)',
+          backgroundSize: '16px 16px'
+        }}
+      >
+        {selectedLayer?.src && (
+          <img src={selectedLayer.src} alt="preview" className="max-h-full max-w-full object-contain" />
+        )}
+      </div>
+
+      <div className="space-y-6 flex-1 overflow-y-auto pr-2">
+        {/* Position */}
         <div>
-          <label className="block text-xs text-gray-500 mb-1">X Position</label>
-          <input type="number" name="x" value={Math.round(selectedLayer.x || 0)} onChange={handleChange} className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" />
+          <label className="block text-sm font-bold text-black mb-2 uppercase tracking-wide">Position</label>
+          <div className="flex gap-4">
+            <div className="flex items-center border-2 border-black rounded-md bg-white overflow-hidden flex-1">
+              <span className="px-3 border-r-2 border-black font-bold text-sm bg-[#F5F2EB]">X:</span>
+              <input type="number" name="x" value={Math.round(selectedLayer?.x || 0)} onChange={handleChange} disabled={!selectedLayer} className="w-full px-2 py-1 text-sm outline-none bg-transparent font-mono" />
+            </div>
+            <div className="flex items-center border-2 border-black rounded-md bg-white overflow-hidden flex-1">
+              <span className="px-3 border-r-2 border-black font-bold text-sm bg-[#F5F2EB]">Y:</span>
+              <input type="number" name="y" value={Math.round(selectedLayer?.y || 0)} onChange={handleChange} disabled={!selectedLayer} className="w-full px-2 py-1 text-sm outline-none bg-transparent font-mono" />
+            </div>
+          </div>
         </div>
+
+        {/* Scale / Size Slider */}
         <div>
-          <label className="block text-xs text-gray-500 mb-1">Y Position</label>
-          <input type="number" name="y" value={Math.round(selectedLayer.y || 0)} onChange={handleChange} className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" />
+          <label className="block text-sm font-bold text-black mb-2 uppercase tracking-wide">Scale</label>
+          <div className="flex items-center gap-4">
+            <input 
+              type="range" min="0.1" max="3" step="0.05" 
+              value={selectedLayer?.scaleX ?? 1} 
+              onChange={handleScaleChange} 
+              disabled={!selectedLayer}
+              className="flex-1 accent-[#FF5722] cursor-pointer" 
+            />
+            <div className="border-2 border-black rounded-md bg-white px-2 py-1 font-mono text-sm w-16 text-center">
+              {Math.round((selectedLayer?.scaleX ?? 1) * 100)}%
+            </div>
+          </div>
         </div>
+
+        {/* Rotation */}
         <div>
-          <label className="block text-xs text-gray-500 mb-1">Scale / Size</label>
-          <input type="number" name="scale" step="0.1" value={Number(selectedLayer.scaleX || 1).toFixed(2)} onChange={handleScaleChange} className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" />
+          <label className="block text-sm font-bold text-black mb-2 uppercase tracking-wide">Rotation</label>
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full border-2 border-black relative flex items-center justify-center bg-white">
+              <div className="w-1 h-4 bg-black absolute top-1 rounded-full" style={{ transform: `rotate(${selectedLayer?.rotation || 0}deg)`, transformOrigin: 'bottom center' }}></div>
+            </div>
+            <div className="flex items-center border-2 border-black rounded-md bg-white overflow-hidden w-24">
+              <input type="number" name="rotation" value={Math.round(selectedLayer?.rotation || 0)} onChange={handleChange} disabled={!selectedLayer} className="w-full px-2 py-1 text-sm outline-none bg-transparent font-mono text-center" />
+              <span className="pr-2 font-bold text-sm bg-white">°</span>
+            </div>
+          </div>
         </div>
+
+        {/* Opacity */}
         <div>
-          <label className="block text-xs text-gray-500 mb-1">Rotation (°)</label>
-          <input type="number" name="rotation" value={Math.round(selectedLayer.rotation || 0)} onChange={handleChange} className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" />
+          <label className="block text-sm font-bold text-black mb-2 uppercase tracking-wide">Opacity</label>
+          <div className="flex items-center gap-4">
+            <input 
+              type="range" min="0" max="1" step="0.1" name="opacity" 
+              value={selectedLayer?.opacity ?? 1} 
+              onChange={handleChange} 
+              disabled={!selectedLayer}
+              className="flex-1 accent-[#FF5722] cursor-pointer" 
+            />
+            <div className="border-2 border-black rounded-md bg-white px-2 py-1 font-mono text-sm w-16 text-center">
+              {Math.round((selectedLayer?.opacity ?? 1) * 100)}%
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-4 mt-6 pt-4 border-t-2 border-black border-dashed">
+        <button className="flex-1 border-2 border-black bg-white hover:bg-gray-100 text-black font-bold py-2 rounded-md uppercase text-sm transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">Reset</button>
       </div>
     </div>
   )
 }
 
 const mockupRegistry = {
-  'tshirt-front': {
-    id: 'tshirt-front',
-    name: 'T-Shirt Front',
-    preview: mockup1,
-    printable: { x: 120, y: 160, width: 520, height: 640 },
-    colors: [
-      { name: 'white', hex: '#FFFFFF' },
-      { name: 'black', hex: '#000000' },
-      { name: 'red', hex: '#FF0000' },
-    ],
-  },
-  'tshirt-back': {
-    id: 'tshirt-back',
-    name: 'T-Shirt Back',
-    preview: mockup2,
-    printable: { x: 120, y: 160, width: 520, height: 640 },
-    colors: [
-      { name: 'white', hex: '#FFFFFF' },
-      { name: 'black', hex: '#000000' },
-    ],
-  },
-  mug: {
-    id: 'mug',
-    name: 'Coffee Mug',
-    preview: mockup3,
-    printable: { x: 50, y: 50, width: 560, height: 450 },
-    colors: [
-      { name: 'white', hex: '#FFFFFF' },
-      { name: 'black', hex: '#000000' },
-    ],
-  },
-  hoodie: {
+  'hoodie': {
     id: 'hoodie',
-    name: 'Hoodie Front',
+    name: 'Garment (Hoodie)',
     preview: mockup1,
-    printable: { x: 100, y: 100, width: 560, height: 680 },
-    colors: [
-      { name: 'navy', hex: '#001F3F' },
-      { name: 'gray', hex: '#808080' },
-    ],
+    printable: { x: 100, y: 150, width: 300, height: 350 }, // Adjusted sizes for the visual box
+    colors: [{ name: 'black', hex: '#000000' }],
   },
+  // ... other mockups
 }
 
 function CustomizerContent() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const mockup = mockupRegistry[id || 'tshirt-front']
-  const [color, setColor] = useState(mockup?.colors[0]?.name || 'white')
+  const mockup = mockupRegistry[id || 'hoodie'] // Default to hoodie for this styling
+  const [color, setColor] = useState(mockup?.colors[0]?.name || 'black')
 
-  if (!mockup) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Mockup not found</h1>
-          <button
-            onClick={() => navigate('/mockups')}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Back to Mockups
-          </button>
-        </div>
-      </div>
-    )
-  }
+  if (!mockup) return <div>Mockup not found</div>
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => navigate('/mockups')}
-            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-200 rounded"
-          >
-            <ChevronLeft size={20} />
-            Back
-          </button>
-          <h1 className="text-2xl font-bold">{mockup.name}</h1>
-          <div className="w-32" />
-        </div>
+    <div className="h-screen w-full flex bg-[#F5F2EB]  p-10 mt-20 gap-6 font-sans text-black overflow-hidden">
+      
+      {/* LEFT SIDEBAR: Layers */}
+      <aside className="w-[320px] flex flex-col shrink-0">
+        <LayerPanel />
+        
+      
+      </aside>
 
-        {/* Color Selector */}
-        <div className="mb-6 flex items-center gap-4">
-          <span className="font-semibold">Product Color:</span>
-          <div className="flex gap-3">
-            {mockup.colors.map((c) => (
-              <button
-                key={c.name}
-                onClick={() => setColor(c.name)}
-                className={`w-10 h-10 rounded-full border-2 ${
-                  color === c.name ? 'border-gray-900 ring-2 ring-offset-2 ring-blue-500' : 'border-gray-300'
-                }`}
-                style={{ backgroundColor: c.hex }}
-                title={c.name}
-              />
-            ))}
-          </div>
+      {/* CENTER: Canvas Workspace */}
+      <main className="flex-1 relative border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white flex flex-col">
+        {/* We moved the background grid directly inside MockupCanvas for precision */}
+        <div className="flex-1 w-full h-full relative">
+          <MockupCanvas mockup={mockup} color={color} />
         </div>
+      </main>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow">
-              <MockupCanvas mockup={mockup} color={color} />
-            </div>
-          </div>
+      {/* RIGHT SIDEBAR: Controls & Preview */}
+      <aside className="w-[340px] flex flex-col shrink-0 gap-6">
+        <PrecisionControls />
+        
+        <button className="w-full bg-[#FF5722] hover:bg-[#E64A19] text-black border-2 border-black rounded-xl py-6 font-black text-xl uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all">
+          Preview On Model
+        </button>
+      </aside>
 
-          {/* Sidebar */}
-          <div className="space-y-4">
-            <UploadPanel />
-            <TextEditor />
-            <LayerPanel />
-            <TransformControls />
-            <Toolbar />
-            <ExportButton mockup={mockup} />
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

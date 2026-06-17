@@ -1,22 +1,20 @@
-import React, { useEffect, useRef } from 'react'
-import { Stage, Layer, Image as KImage, Transformer, Rect } from 'react-konva'
+import React, { useEffect, useRef, useState } from 'react'
+import { Stage, Layer, Image as KImage, Transformer, Rect, Text, Group, Path } from 'react-konva'
 import useImage from 'use-image'
 import { useMockup } from '../context/MockupContext'
 
-// Matches the exact style of your screenshot
-const TRANSFORMER_COLOR = '#5A54F9'
+const TRANSFORMER_COLOR = '#FF5722' 
 const transformerProps = {
   anchorSize: 12,
-  anchorCornerRadius: 6, // Circular handles
-  anchorStroke: TRANSFORMER_COLOR,
+  anchorStroke: '#000',
   anchorFill: TRANSFORMER_COLOR,
   borderStroke: TRANSFORMER_COLOR,
   borderStrokeWidth: 2,
   keepRatio: true,
-  enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'], // Only corner handles for clean UI
+  rotateEnabled: true,
+  enabledAnchors: ['top-left', 'top-right', 'bottom-right', 'bottom-left'],
 }
 
-// Blocks resizing outside the printable box
 const createBoundBoxFunc = (printable) => {
   return (oldBox, newBox) => {
     if (
@@ -25,13 +23,12 @@ const createBoundBoxFunc = (printable) => {
       newBox.x + newBox.width > printable.x + printable.width ||
       newBox.y + newBox.height > printable.y + printable.height
     ) {
-      return oldBox // Reject the resize
+      return oldBox 
     }
-    return newBox // Accept the resize
+    return newBox 
   }
 }
 
-// The interactive image component
 function ImageLayerNode({ node, isSelected, onSelect, onChange, printable }) {
   const [image] = useImage(node.src)
   const shapeRef = useRef(null)
@@ -45,7 +42,7 @@ function ImageLayerNode({ node, isSelected, onSelect, onChange, printable }) {
   }, [isSelected])
 
   return (
-    <>
+    <React.Fragment>
       <KImage
         image={image}
         x={node.x}
@@ -55,20 +52,17 @@ function ImageLayerNode({ node, isSelected, onSelect, onChange, printable }) {
         rotation={node.rotation}
         scaleX={node.scaleX}
         scaleY={node.scaleY}
+        opacity={node.opacity ?? 1}
         draggable
-        onClick={onSelect}
-        onTap={onSelect}
-        onDragMove={(e) => {
-          // Block dragging outside the box
-          const target = e.target;
-          const width = target.width() * target.scaleX();
-          const height = target.height() * target.scaleY();
-          
-          const x = Math.max(printable.x, Math.min(printable.x + printable.width - width, target.x()));
-          const y = Math.max(printable.y, Math.min(printable.y + printable.height - height, target.y()));
-          
-          target.x(x);
-          target.y(y);
+        onMouseDown={onSelect}
+        onTouchStart={onSelect}
+        dragBoundFunc={(pos) => {
+          const width = (node.width || 200) * (node.scaleX || 1);
+          const height = (node.height || 200) * (node.scaleY || 1);
+          return {
+            x: Math.max(printable.x, Math.min(pos.x, printable.x + printable.width - width)),
+            y: Math.max(printable.y, Math.min(pos.y, printable.y + printable.height - height)),
+          };
         }}
         onDragEnd={(e) => {
           onChange({
@@ -78,23 +72,14 @@ function ImageLayerNode({ node, isSelected, onSelect, onChange, printable }) {
           })
         }}
         onTransformEnd={(e) => {
-          const node = shapeRef.current;
-          const scaleX = node.scaleX();
-          const scaleY = node.scaleY();
-
-          // Reset scale and apply it purely to width/height to prevent distortion bugs over time
-          node.scaleX(1);
-          node.scaleY(1);
-
+          const shape = shapeRef.current;
           onChange({
             ...node,
-            x: node.x(),
-            y: node.y(),
-            rotation: node.rotation(),
-            width: Math.max(5, node.width() * scaleX),
-            height: Math.max(5, node.height() * scaleY),
-            scaleX: 1,
-            scaleY: 1,
+            x: shape.x(),
+            y: shape.y(),
+            rotation: shape.rotation(),
+            scaleX: shape.scaleX(),
+            scaleY: shape.scaleY(),
           })
         }}
         ref={shapeRef}
@@ -106,77 +91,195 @@ function ImageLayerNode({ node, isSelected, onSelect, onChange, printable }) {
           boundBoxFunc={createBoundBoxFunc(printable)}
         />
       )}
-    </>
+    </React.Fragment>
   )
 }
 
 export default function MockupCanvas({ mockup }) {
+  const containerRef = useRef(null)
   const stageRef = useRef(null)
+  
+  // NEW: Ref for the hidden file input
+  const fileInputRef = useRef(null)
+
   const [backgroundImage] = useImage(mockup.preview)
-  const { layers, selectedId, selectLayer, updateLayer, scale } = useMockup()
+  
+  // NEW: Brought in addLayer from context
+  const { layers, selectedId, selectLayer, updateLayer, deleteLayer, scale, addLayer } = useMockup()
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
 
   const stageWidth = mockup.printable.width + mockup.printable.x * 2
   const stageHeight = mockup.printable.height + mockup.printable.y * 2
 
+  useEffect(() => {
+    function updateSize() {
+      if (containerRef.current) {
+        setContainerSize({
+          width: containerRef.current.clientWidth,
+          height: containerRef.current.clientHeight
+        })
+      }
+    }
+    updateSize()
+    window.addEventListener('resize', updateSize)
+    return () => window.removeEventListener('resize', updateSize)
+  }, [])
+
   const checkDeselect = (e) => {
-    // Clicked empty stage or background image
     if (e.target === e.target.getStage() || e.target.name() === 'background') {
       selectLayer(null)
     }
   }
 
-  return (
-    <div className="w-full flex justify-center items-center py-8">
-      <Stage 
-        width={stageWidth} 
-        height={stageHeight} 
-        scaleX={scale} 
-        scaleY={scale} 
-        ref={stageRef}
-        onMouseDown={checkDeselect}
-        onTouchStart={checkDeselect}
-      >
-        <Layer>
-          <KImage
-            image={backgroundImage}
-            x={0}
-            y={0}
-            width={stageWidth}
-            height={stageHeight}
-            name="background"
-          />
-          {/* Subtle outline showing the user where they are allowed to put the design */}
-          <Rect
-            x={mockup.printable.x}
-            y={mockup.printable.y}
-            width={mockup.printable.width}
-            height={mockup.printable.height}
-            stroke="#5A54F9"
-            strokeWidth={1}
-            dash={[5, 5]}
-            opacity={0.3}
-            listening={false} 
-          />
-        </Layer>
+  // NEW: Handle uploading an image directly from the canvas click
+  const handleCanvasUpload = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
 
-        <Layer>
-          {layers.map((layer) => {
-            if (layer.type === 'image') {
-              return (
-                <ImageLayerNode
-                  key={layer.id}
-                  node={layer}
-                  isSelected={selectedId === layer.id}
-                  onSelect={() => selectLayer(layer.id)}
-                  onChange={(updated) => updateLayer(layer.id, updated)}
-                  printable={mockup.printable}
-                />
-              )
-            }
-            return null
-          })}
-        </Layer>
-      </Stage>
+    const reader = new FileReader()
+    reader.onload = () => {
+      // Calculate aspect ratio so the image doesn't get stretched
+      const img = new window.Image()
+      img.src = reader.result
+      img.onload = () => {
+        const aspectRatio = img.width / img.height
+        const targetHeight = 250 // Base height
+        const targetWidth = targetHeight * aspectRatio // Responsive width
+
+        const newLayerId = Date.now().toString()
+        addLayer({
+          id: newLayerId,
+          type: 'image',
+          src: reader.result,
+          // Center it inside the printable area
+          x: mockup.printable.x + (mockup.printable.width / 2) - (targetWidth / 2),
+          y: mockup.printable.y + (mockup.printable.height / 2) - (targetHeight / 2),
+          width: targetWidth,
+          height: targetHeight,
+          rotation: 0,
+          scaleX: 1,
+          scaleY: 1,
+        })
+        selectLayer(newLayerId)
+      }
+    }
+    reader.readAsDataURL(file)
+    if (fileInputRef.current) fileInputRef.current.value = '' // Reset input
+  }
+
+  const padding = 40;
+  const availableWidth = Math.max(1, containerSize.width - padding * 2);
+  const availableHeight = Math.max(1, containerSize.height - padding * 2);
+  const fitScale = containerSize.width === 0 ? 1 : Math.min(availableWidth / stageWidth, availableHeight / stageHeight);
+  const finalScale = fitScale * scale;
+
+  return (
+    <div 
+      ref={containerRef} 
+      className="absolute inset-0 w-full h-full flex justify-center items-center"
+      style={{
+        backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.1) 1px, transparent 1px)`,
+        backgroundSize: '24px 24px',
+        backgroundColor: '#F5F2EB'
+      }}
+    >
+      {/* Hidden file input for canvas clicking */}
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        onChange={handleCanvasUpload} 
+        accept="image/*" 
+        className="hidden" 
+      />
+
+      {containerSize.width > 0 && (
+        <Stage 
+          width={stageWidth * finalScale} 
+          height={stageHeight * finalScale} 
+          scaleX={finalScale} 
+          scaleY={finalScale} 
+          ref={stageRef}
+          onMouseDown={checkDeselect}
+          onTouchStart={checkDeselect}
+        >
+          <Layer>
+            <KImage
+              image={backgroundImage}
+              x={0}
+              y={0}
+              width={stageWidth}
+              height={stageHeight}
+              name="background"
+            />
+            
+            <Rect
+              x={mockup.printable.x}
+              y={mockup.printable.y}
+              width={mockup.printable.width}
+              height={mockup.printable.height}
+              stroke="#FF5722"
+              strokeWidth={2}
+              dash={[8, 8]}
+              listening={false} 
+            />
+
+            {/* Clickable Area: We add an invisible rectangle to catch clicks easily */}
+            {layers.length === 0 && (
+               <Group 
+                 x={mockup.printable.x} 
+                 y={mockup.printable.y}
+                 // Add pointer cursor so the user knows they can click it
+                 onMouseEnter={(e) => { e.target.getStage().container().style.cursor = 'pointer' }}
+                 onMouseLeave={(e) => { e.target.getStage().container().style.cursor = 'default' }}
+                 onClick={() => fileInputRef.current?.click()}
+                 onTap={() => fileInputRef.current?.click()}
+               >
+                 {/* Invisible background to catch the click anywhere in the box */}
+                 <Rect 
+                   x={0} y={0} 
+                   width={mockup.printable.width} 
+                   height={mockup.printable.height} 
+                   fill="transparent" 
+                 />
+
+                 {/* The visual graphic */}
+                 <Group y={mockup.printable.height / 2 - 40} listening={false}>
+                    <Path
+                        x={mockup.printable.width / 2 - 12} y={-30}
+                        data="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" fill="#FF5722" scale={{x: 1.5, y: 1.5}}
+                    />
+                    <Text
+                        y={0} width={mockup.printable.width}
+                        text="CLICK OR DRAG & DROP\nYOUR GRAPHIC HERE" align="center" fill="#FF5722" fontSize={16} fontFamily="monospace" fontStyle="bold" lineHeight={1.5}
+                    />
+                    <Path
+                        x={mockup.printable.width / 2 - 12} y={45}
+                        data="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" fill="#FF5722" scale={{x: 1.5, y: -1.5}} 
+                    />
+                 </Group>
+               </Group>
+            )}
+          </Layer>
+
+          <Layer>
+            {layers.map((layer) => {
+              if (layer.type === 'image') {
+                return (
+                  <ImageLayerNode
+                    key={layer.id}
+                    node={layer}
+                    isSelected={selectedId === layer.id}
+                    onSelect={() => selectLayer(layer.id)}
+                    onChange={(updated) => updateLayer(layer.id, updated)}
+                    printable={mockup.printable}
+                  />
+                )
+              }
+              return null
+            })}
+          </Layer>
+        </Stage>
+      )}
     </div>
   )
 }

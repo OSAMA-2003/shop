@@ -1,49 +1,64 @@
-import React from 'react'
-import axios from 'axios'
-import { useState } from 'react'
-
+import React, { useState } from 'react';
+import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
 
 const Add = () => {
-
-
-    const url = 'https://shop-2-ms77.onrender.com'
-    const [image, setImage] = useState(null)
+    const url = 'https://shop-2-ms77.onrender.com';
+    const [image, setImage] = useState(null);
+    const [loading, setLoading] = useState(false); // Track loading state
     const [data, setData] = useState({
         name: '',
         description: '',
         price: '',
         category: 'Men',
         color: 'Black',
-    })
+    });
+
+    // Custom styles for brutalist toast notifications
+    const toastStyle = {
+        style: {
+            border: '3px solid black',
+            padding: '16px',
+            color: 'black',
+            fontWeight: '900',
+            textTransform: 'uppercase',
+            borderRadius: '0',
+            backgroundColor: '#f9f9f6'
+        },
+    };
 
     const onChangeHandler = (e) => {
-        const { name, value } = e.target
-        setData((prev) => ({ ...prev, [name]: value }))
-    }
+        const { name, value } = e.target;
+        setData((prev) => ({ ...prev, [name]: value }));
+    };
 
     const onImageChange = (e) => {
-        if (e.target.files[0] && e.target.files) {
-            setImage(e.target.files[0])
+        if (e.target.files[0]) {
+            setImage(e.target.files[0]);
         }
-    }
-
-
+    };
 
     const onSubmitHandler = async (e) => {
-        e.preventDefault()
-        const formData = new FormData()
-        formData.append('name', data.name)
-        formData.append('description', data.description)
-        formData.append('price', Number(data.price))
-        formData.append('category', data.category)
-        formData.append('color', data.color)
-        if (image) formData.append('image', image)
+        e.preventDefault();
+        
+        // Prevent submission if already loading
+        if (loading) return; 
+        
+        setLoading(true); // Start loading
+
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('price', Number(data.price));
+        formData.append('category', data.category);
+        formData.append('color', data.color);
+        if (image) formData.append('image', image);
 
         try {
-            const token = localStorage.getItem('adminToken')
+            const token = localStorage.getItem('adminToken');
             const res = await axios.post(`${url}/api/product/add`, formData, {
                 headers: { token }
-            })
+            });
             if (res.data.success) {
                 setData({
                     name: '',
@@ -51,123 +66,161 @@ const Add = () => {
                     price: '',
                     category: 'Men',
                     color: 'Black',
-                })
-                setImage(null)
-                document.getElementById('imageInput').value = ''
-                alert("Product Added Successfully")
+                });
+                setImage(null);
+                document.getElementById('imageInput').value = '';
+                toast.success("Product Added Successfully", toastStyle);
             } else {
-                alert(res.data.message)
+                toast.error(res.data.message, toastStyle);
             }
         } catch (err) {
-            console.log(err)
-            // Extract and show the actual error message from the backend
-            const errorMessage = err.response?.data?.message || err.message || "Something went wrong"
-            alert(`Error: ${errorMessage}`)
+            console.log(err);
+            const errorMessage = err.response?.data?.message || err.message || "Something went wrong";
+            toast.error(`Error: ${errorMessage}`, toastStyle);
+        } finally {
+            setLoading(false); // Stop loading regardless of success or failure
         }
-
-
-    }
-
+    };
 
     return (
-        <section className='relative w-full min-h-screen bg-linear-to-r from-indigo-900 
-    via-purple-900 to-pink-900 text-white py-24 px-6 sm:px-10'>
+        <section className='relative max-w-screen mx-auto p-4 w-fullbg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans '>
+            
+            <Toaster position="top-center" />
 
-            <form onSubmit={onSubmitHandler}>
-                <div className='relative z-10 max-w-3xl mx-auto bg-white/10 backdrop-blur-md p-10 
-  rounded-3xl shadow-xl'>
-                    <h2 className='text-3xl font-bold mb-6 text-center'>Add New Product
-                    </h2>
-
-                    <div className='space-y-4'>
-                        <input type='text'
-                            name='name'
-                            placeholder='Product Name'
-                            value={data.name}
-                            onChange={onChangeHandler}
-                            required
-                            className="w-full px-4 py-3 rounded-xl bg-white/15 text-white
-         placeholder-gray-300 focus:ring-2 focus:ring-cyan-400 outline-none"
-                        />
-
-                        <input type='text'
-                            name='description'
-                            placeholder='Product Description'
-                            value={data.description}
-                            onChange={onChangeHandler}
-                            required
-                            className="w-full px-4 py-3 rounded-xl bg-white/15 text-white
-         placeholder-gray-300 focus:ring-2 focus:ring-cyan-400 outline-none "
-                        />
-
-                        <input type='number'
-                            name='price'
-                            placeholder='Price'
-                            value={data.price}
-                            onChange={onChangeHandler}
-                            required
-                            min="0"
-                            className="w-full px-4 py-3 rounded-xl bg-white/15 text-white
-         placeholder-gray-300 focus:ring-2 focus:ring-cyan-400 outline-none "
-                        />
-
-                        <select name='category'
-                            value={data.category}
-                            onChange={onChangeHandler}
-                            className="w-full px-4 py-3 rounded-xl bg-white/15 text-white
-         placeholder-gray-300 focus:ring-2 focus:ring-cyan-400 outline-none ">
-
-
-                            <option>Men</option>
-                            <option>Women</option>
-                            <option>Kids</option>
-                            <option>Electronics</option>
-                            <option>Cosmetics</option>
-                        </select>
-
-                        <select name='color'
-                            value={data.color}
-                            onChange={onChangeHandler}
-                            className="w-full px-4 py-3 rounded-xl bg-white/15 text-white
-         placeholder-gray-300 focus:ring-2 focus:ring-cyan-400 outline-none ">
-
-                            <option>Black</option>
-                            <option>White</option>
-                            <option>Red</option>
-                            <option>Blue</option>
-                        </select>
-
-                        <input type='file'
-                            accept='image/*'
-                            id='imageInput'
-                            onChange={onImageChange}
-                            required
-                            className='w-full text-white'
-                        /> Add image
-                        {image && (
-                            <img
-                            src={URL.createObjectURL(image)}
-                            alt="Preview"
-                            className='w-full h-64 object-cover rounded-2xl mt-2'
-                            />                        )}
-
-                        <button type='submit'
-                            className='w-full bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500
-px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition-all 
-text-white shadow-lg mt-4 '>
+            <form onSubmit={onSubmitHandler} className='max-w-3xl mx-auto'>
+                
+                {/* FORM CONTAINER */}
+                <div className='bg-white border-[4px] border-black p-8 sm:p-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'>
+                    
+                    {/* HEADING */}
+                    <div className='border-b-[4px] border-black pb-6 mb-8'>
+                        <h2 className='text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none'>
                             Add Product
+                        </h2>
+                    </div>
 
+                    <div className='flex flex-col gap-6'>
+                        
+                        {/* NAME & PRICE ROW */}
+                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+                            <div className='flex flex-col'>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Product Name *</label>
+                                <input 
+                                    type='text'
+                                    name='name'
+                                    placeholder='HEAVYWEIGHT TEE'
+                                    value={data.name}
+                                    onChange={onChangeHandler}
+                                    required
+                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors"
+                                />
+                            </div>
+
+                            <div className='flex flex-col'>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Price ($) *</label>
+                                <input 
+                                    type='number'
+                                    name='price'
+                                    placeholder='0.00'
+                                    value={data.price}
+                                    onChange={onChangeHandler}
+                                    required
+                                    min="0"
+                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors"
+                                />
+                            </div>
+                        </div>
+
+                        {/* DESCRIPTION */}
+                        <div className='flex flex-col'>
+                            <label className='text-sm font-black uppercase tracking-widest mb-2'>Description *</label>
+                            <textarea 
+                                name='description'
+                                placeholder='Enter product details, materials, and fit...'
+                                value={data.description}
+                                onChange={onChangeHandler}
+                                required
+                                rows="3"
+                                className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors resize-none"
+                            />
+                        </div>
+
+                        {/* CATEGORY & COLOR ROW */}
+                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+                            <div className='flex flex-col'>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Category *</label>
+                                <select 
+                                    name='category'
+                                    value={data.category}
+                                    onChange={onChangeHandler}
+                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-white text-black transition-colors cursor-pointer appearance-none"
+                                >
+                                    <option value="Men">Men</option>
+                                    <option value="Women">Women</option>
+                                    <option value="Kids">Kids</option>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Cosmetics">Cosmetics</option>
+                                </select>
+                            </div>
+
+                            <div className='flex flex-col'>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Color *</label>
+                                <select 
+                                    name='color'
+                                    value={data.color}
+                                    onChange={onChangeHandler}
+                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-white text-black transition-colors cursor-pointer appearance-none"
+                                >
+                                    <option value="Black">Black</option>
+                                    <option value="White">White</option>
+                                    <option value="Red">Red</option>
+                                    <option value="Blue">Blue</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* IMAGE UPLOAD */}
+                        <div className='flex flex-col'>
+                            <label className='text-sm font-black uppercase tracking-widest mb-2'>Product Image *</label>
+                            <input 
+                                type='file'
+                                accept='image/*'
+                                id='imageInput'
+                                onChange={onImageChange}
+                                required
+                                className='w-full border-[3px] border-black p-2 font-bold cursor-pointer file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-black file:uppercase file:bg-black file:text-white hover:file:bg-[#ff5500] hover:file:text-black transition-all'
+                            />
+                            
+                            {/* IMAGE PREVIEW */}
+                            {image && (
+                                <div className="mt-4 border-[3px] border-black p-2 bg-[#e5e5e5] w-fit">
+                                    <img 
+                                        src={URL.createObjectURL(image)} 
+                                        alt="Preview" 
+                                        className='w-48 h-48 object-cover mix-blend-multiply' 
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        {/* SUBMIT BUTTON */}
+                        <button 
+                            type='submit'
+                            disabled={loading}
+                            className={`w-full mt-6 border-[3px] border-black py-4 font-black text-xl uppercase tracking-widest transition-all ${
+                                loading 
+                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none translate-y-[2px] translate-x-[2px]' 
+                                : 'bg-[#ff5500] text-black hover:bg-black hover:text-[#ff5500] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]'
+                            }`}
+                        >
+                            {loading ? "Publishing..." : "Publish Product"}
                         </button>
 
-
-
                     </div>
-                </div >
-
+                </div>
             </form>
-
         </section>
-    )
+    );
 }
 
-export default Add
+export default Add;
