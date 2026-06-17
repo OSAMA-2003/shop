@@ -43,8 +43,8 @@ const Hero = () => {
 
             <button
               onClick={() => navigate("/products")}
-              className='w-full  sm:w-auto bg-transparent border border-white text-white font-bold uppercase tracking-widest px-8 py-4 text-xs sm:text-sm hover:bg-white hover:text-black transition-colors duration-300'
-            >
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 hover:bg-[#ff5500] border-[3px] border-[#ff5500] hover:text-black text-sm font-black uppercase tracking-widest bg-black text-[#ff5500] transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"            >
+            
               View Lookbook
             </button>
           </div>
