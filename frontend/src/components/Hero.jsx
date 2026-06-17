@@ -36,15 +36,14 @@ const Hero = () => {
           {/* Action Buttons (Sharp Edges, Brutalist Style) */}
           <div className='flex flex-col sm:flex-row items-center gap-4 pt-6'>
             <button 
-              onClick={() => navigate("/shop")}
-              className='w-full rounded-xl sm:w-auto bg-[#ff5500] text-black font-bold uppercase tracking-widest px-8 py-4 text-xs sm:text-sm hover:bg-[#e04a00] transition-colors duration-300'
-            >
-              Explore Collection
+              onClick={() => navigate("/mockups")}
+className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#ff5500] border-[3px] border-black text-black text-sm font-black uppercase tracking-widest hover:bg-black hover:text-[#ff5500] transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"            >
+              Explore Mockups
             </button>
 
             <button 
-              onClick={() => navigate("/lookbook")}
-              className='w-full rounded-xl sm:w-auto bg-transparent border border-white text-white font-bold uppercase tracking-widest px-8 py-4 text-xs sm:text-sm hover:bg-white hover:text-black transition-colors duration-300'
+              onClick={() => navigate("/products")}
+              className='w-full  sm:w-auto bg-transparent border border-white text-white font-bold uppercase tracking-widest px-8 py-4 text-xs sm:text-sm hover:bg-white hover:text-black transition-colors duration-300'
             >
               View Lookbook
             </button>

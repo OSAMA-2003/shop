@@ -10,6 +10,7 @@ export const ShopContext = createContext()
 const ShopContextProvider = ({ children }) => {
     
     const [products, setProducts] = useState([])
+    const [all_mockups, setAllMockups] = useState([]);
     const [cartItems, setCartItems] = useState({}) 
     const [token,setToken] = useState()
     const [loading, setLoading] = useState(true); 
@@ -118,6 +119,19 @@ const fetchProductsList = async ()=>{
     }
 }
 
+const fetchMockups = async () => {
+    try {
+        const res = await axios.get(`${url}/api/mockup/list`);
+        if (res.data.success) {
+            setAllMockups(res.data.data);
+        } else {
+            console.error("Failed to fetch mockups");
+        }
+    } catch (err) {
+        console.error("Error fetching mockups:", err);
+    }
+};
+
 
 const loadCartData = async(token)=> {
 
@@ -130,7 +144,10 @@ useEffect(()=>{
 
     async function loadData() {
         setLoading(true);
-        await fetchProductsList()
+        await Promise.all([
+            fetchProductsList(),
+            fetchMockups()
+        ]);
         if(localStorage.getItem('token')){
             setToken(localStorage.getItem('token'))
             await loadCartData(localStorage.getItem('token'))
@@ -144,6 +161,7 @@ useEffect(()=>{
 const value ={
     cartItems,
     all_products:products, 
+    all_mockups,
     addToCart,
     removeFromCart,
     getTotalCartAmount,

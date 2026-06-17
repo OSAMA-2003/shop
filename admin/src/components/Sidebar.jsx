@@ -9,7 +9,8 @@ const Sidebar = () => {
     const menuItems = [
         { to: '/admin/add', label: 'Add Product', Icon: PlusCircle },
         { to: '/admin/mockups', label: 'Add Mockup', Icon: PlusCircle },
-        { to: '/admin/list', label: 'Products List', Icon: List },
+        { to: '/admin/products-list', label: 'Products List', Icon: List },
+        { to: '/admin/mockups-list', label: 'Mockups List', Icon: List },
         { to: '/admin/orders', label: 'Customer Orders', Icon: ClipboardCheck },
         { to: '/admin/user', label: 'Users', Icon: Users },
         { to: '/admin/notifications', label: "Notifications", Icon: Bell }

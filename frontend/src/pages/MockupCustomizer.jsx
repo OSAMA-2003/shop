@@ -122,17 +122,22 @@ function CustomizerContent() {
   
   const backendMockup = (all_mockups || []).find(m => m._id === id)
   
+  const [activeSide, setActiveSide] = useState('front')
+
   const mockup = backendMockup ? {
     id: backendMockup._id,
     name: backendMockup.name,
-    preview: backendMockup.image,
+    previewFront: backendMockup.imageFront,
+    previewBack: backendMockup.imageBack,
+    preview: activeSide === 'front' ? (backendMockup.imageFront || backendMockup.image) : backendMockup.imageBack,
     printable: { x: 150, y: 150, width: 300, height: 400 }, // Default relative box mapping
     colors: [
       { name: backendMockup.color || 'Black', hex: backendMockup.color === 'White' ? '#FFFFFF' : backendMockup.color === 'Red' ? '#FF0000' : backendMockup.color === 'Blue' ? '#0000FF' : backendMockup.color === 'Gray' ? '#808080' : '#000000' }
     ],
   } : null;
 
-  const [color, setColor] = useState(mockup?.colors[0]?.name || 'black')
+  // Default to black or the first available color
+  const [color, setColor] = useState(mockup?.colors?.[0]?.name || 'black')
 
   if (!mockup) return (
     <div className="h-screen w-full flex items-center justify-center bg-[#F5F2EB] font-sans text-black">
@@ -141,7 +146,7 @@ function CustomizerContent() {
   )
 
   return (
-    <div className="h-screen w-full flex bg-[#F5F2EB]  p-10 mt-20 gap-6 font-sans text-black overflow-hidden">
+    <div className="h-screen  w-full flex bg-[#F5F2EB]   p-10 gap-6 font-sans text-black overflow-hidden">
       
       {/* LEFT SIDEBAR: Layers */}
       <aside className="w-[320px] flex flex-col shrink-0">
@@ -152,7 +157,24 @@ function CustomizerContent() {
 
       {/* CENTER: Canvas Workspace */}
       <main className="flex-1 relative border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white flex flex-col">
-        {/* We moved the background grid directly inside MockupCanvas for precision */}
+        
+        {/* VIEW TOGGLE TABS */}
+        <div className="flex border-b-2 border-black shrink-0">
+          <button 
+              onClick={() => setActiveSide('front')}
+              className={`flex-1 py-3 font-black uppercase tracking-widest text-sm transition-colors ${activeSide === 'front' ? 'bg-[#FF5722] text-black' : 'bg-[#E5E5E5] text-black/50 hover:bg-[#E5E5E5]/80 hover:text-black'}`}
+          >
+              Front View
+          </button>
+          <div className="w-[2px] bg-black"></div>
+          <button 
+              onClick={() => setActiveSide('back')}
+              className={`flex-1 py-3 font-black uppercase tracking-widest text-sm transition-colors ${activeSide === 'back' ? 'bg-[#FF5722] text-black' : 'bg-[#E5E5E5] text-black/50 hover:bg-[#E5E5E5]/80 hover:text-black'}`}
+          >
+              Back View
+          </button>
+        </div>
+
         <div className="flex-1 w-full h-full relative">
           <MockupCanvas mockup={mockup} color={color} />
         </div>
@@ -174,7 +196,8 @@ function CustomizerContent() {
 export default function MockupCustomizer() {
   return (
     <MockupProvider>
-      <CustomizerContent />
+         <CustomizerContent />
+     
     </MockupProvider>
   )
 }

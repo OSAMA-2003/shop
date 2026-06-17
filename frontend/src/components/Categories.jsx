@@ -17,12 +17,13 @@ const Categories = () => {
 
   return (
     <section className='relative w-full min-h-screen bg-[#f4f6f8] py-24 px-6 sm:px-10'>
-      <div className='max-w-6xl mx-auto'>
+      <div className='max-w-7xl mx-auto'>
         
-        {/* Heading matching the image */}
-        <h2 className='text-4xl md:text-5xl font-black text-center uppercase tracking-tight text-[#0a192f] mb-12'>
-          New Arrivals
-        </h2>
+        
+
+        <h2 className='text-6xl sm:text-7xl font-black uppercase  text-center tracking-tighter mb-4 leading-none'>
+            New  <span className="text-[#ff5500]">Arrivals</span>
+          </h2>
 
         {/* Clean, Minimal Filter Buttons */}
         <div className="flex flex-wrap justify-center gap-6 mb-16">

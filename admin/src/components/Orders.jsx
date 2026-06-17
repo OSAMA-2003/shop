@@ -99,7 +99,7 @@ const Orders = () => {
         <>
             <Toaster position="top-center" />
 
-            <section className='relative max-w-screen mx-auto bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans'>
+            <section className='relative max-w-5xl mx-auto  text-black py-16 px-6 sm:px-10 font-sans'>
                 
                 {/* HEADING */}
                 <div className='max-w-screen mx-auto border-b-[4px] border-black pb-6 mb-10'>

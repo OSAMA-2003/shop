@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx'
 import { Toaster } from 'react-hot-toast'
 import Users from './components/Users.jsx'
 import AddMockup from './components/AddMockup.jsx'
+import MockupsList from './components/MockupsList.jsx'
 import Notifications from './components/Notifications.jsx'
 
 function App() {
@@ -22,7 +23,7 @@ function App() {
       <Routes>
         <Route path='/admin/login' element={<AdminLogin />} />
        
-        <Route path='/admin/list' element={
+        <Route path='/admin/products-list' element={
           <ProtectedRoute>
             <List />
           </ProtectedRoute>
@@ -36,6 +37,12 @@ function App() {
         <Route path='/admin/mockups' element={
           <ProtectedRoute>
             <AddMockup />
+          </ProtectedRoute>
+        } />
+
+        <Route path='/admin/mockups-list' element={
+          <ProtectedRoute>
+            <MockupsList />
           </ProtectedRoute>
         } />
 

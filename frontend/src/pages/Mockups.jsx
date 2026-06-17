@@ -9,7 +9,7 @@ export default function Mockups() {
   const formattedMockups = (all_mockups || []).map(m => ({
     id: m._id,
     name: m.name,
-    preview: m.image,
+    preview: m.imageFront || m.image,
     printable: { x: 150, y: 150, width: 300, height: 400 }, // Default mapping to canvas layout
     colors: [
       { name: m.color || 'Black', hex: m.color === 'White' ? '#FFFFFF' : m.color === 'Red' ? '#FF0000' : m.color === 'Blue' ? '#0000FF' : m.color === 'Gray' ? '#808080' : '#000000' }

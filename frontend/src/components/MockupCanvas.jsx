@@ -131,17 +131,14 @@ export default function MockupCanvas({ mockup }) {
     }
   }
 
-  // NEW: Handle uploading an image directly from the canvas click
-  const handleCanvasUpload = (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
+  // Shared logic for both clicking and dragging files
+  const processFile = (file) => {
     const reader = new FileReader()
     reader.onload = () => {
-      // Calculate aspect ratio so the image doesn't get stretched
       const img = new window.Image()
       img.src = reader.result
       img.onload = () => {
+        // Calculate aspect ratio so the image doesn't get stretched
         const aspectRatio = img.width / img.height
         const targetHeight = 250 // Base height
         const targetWidth = targetHeight * aspectRatio // Responsive width
@@ -164,8 +161,31 @@ export default function MockupCanvas({ mockup }) {
       }
     }
     reader.readAsDataURL(file)
+  }
+
+  // NEW: Handle uploading an image directly from the canvas click
+  const handleCanvasUpload = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    
+    processFile(file)
     if (fileInputRef.current) fileInputRef.current.value = '' // Reset input
   }
+
+  // NEW: Handle Drag and Drop natively on the container
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const file = e.dataTransfer?.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      processFile(file);
+    }
+  };
 
   const padding = 40;
   const availableWidth = Math.max(1, containerSize.width - padding * 2);
@@ -177,6 +197,8 @@ export default function MockupCanvas({ mockup }) {
     <div 
       ref={containerRef} 
       className="absolute inset-0 w-full h-full flex justify-center items-center"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
       style={{
         backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.1) 1px, transparent 1px)`,
         backgroundSize: '24px 24px',
@@ -239,21 +261,22 @@ export default function MockupCanvas({ mockup }) {
                    x={0} y={0} 
                    width={mockup.printable.width} 
                    height={mockup.printable.height} 
-                   fill="transparent" 
+                  fill="rgba(0,0,0,0)" 
                  />
 
                  {/* The visual graphic */}
-                 <Group y={mockup.printable.height / 2 - 40} listening={false}>
+                 <Group y={mockup.printable.height / 2 - 30} listening={false}  onClick={() => fileRef.current?.click()} >
                     <Path
-                        x={mockup.printable.width / 2 - 12} y={-30}
+                        x={mockup.printable.width / 2 - 15} y={-45}
                         data="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" fill="#FF5722" scale={{x: 1.5, y: 1.5}}
                     />
                     <Text
+                    
                         y={0} width={mockup.printable.width}
-                        text="CLICK OR DRAG & DROP\nYOUR GRAPHIC HERE" align="center" fill="#FF5722" fontSize={16} fontFamily="monospace" fontStyle="bold" lineHeight={1.5}
+                        text="CLICK OR DRAG IMAGE HERE" align="center" fill="#FF5722" fontSize={16} fontFamily="monospace" fontStyle="bold" lineHeight={1.5}
                     />
                     <Path
-                        x={mockup.printable.width / 2 - 12} y={45}
+                        x={mockup.printable.width / 2 - 15} y={65}
                         data="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" fill="#FF5722" scale={{x: 1.5, y: -1.5}} 
                     />
                  </Group>

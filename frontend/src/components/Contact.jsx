@@ -19,7 +19,7 @@ const Contact = () => {
   };
 
   return (
-    <section className='w-full min-h-screen bg-[#f9f9f6] text-black py-24 px-6 sm:px-10 font-sans border-b-[4px] border-black'>
+    <section id='contact' className='w-full min-h-screen bg-[#f9f9f6] text-black py-24 px-6 sm:px-10 font-sans border-b-[4px] border-black'>
       <div className='max-w-7xl mx-auto'>
         
         {/* HEADING */}

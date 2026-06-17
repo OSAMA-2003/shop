@@ -4,7 +4,8 @@ import toast, { Toaster } from 'react-hot-toast';
 
 const AddMockup = () => {
     const url = 'https://shop-2-ms77.onrender.com';
-    const [image, setImage] = useState(null);
+    const [imageFront, setImageFront] = useState(null);
+    const [imageBack, setImageBack] = useState(null);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState({
         name: '',
@@ -31,9 +32,15 @@ const AddMockup = () => {
         setData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const onImageChange = (e) => {
+    const onImageFrontChange = (e) => {
         if (e.target.files[0]) {
-            setImage(e.target.files[0]);
+            setImageFront(e.target.files[0]);
+        }
+    };
+
+    const onImageBackChange = (e) => {
+        if (e.target.files[0]) {
+            setImageBack(e.target.files[0]);
         }
     };
 
@@ -50,7 +57,8 @@ const AddMockup = () => {
         formData.append('price', Number(data.price));
         formData.append('category', data.category);
         formData.append('color', data.color);
-        if (image) formData.append('image', image);
+        if (imageFront) formData.append('imageFront', imageFront);
+        if (imageBack) formData.append('imageBack', imageBack);
 
         try {
             const token = localStorage.getItem('adminToken');
@@ -65,8 +73,10 @@ const AddMockup = () => {
                     category: 'T-Shirt',
                     color: 'Black',
                 });
-                setImage(null);
-                document.getElementById('imageInput').value = '';
+                setImageFront(null);
+                setImageBack(null);
+                document.getElementById('imageFrontInput').value = '';
+                document.getElementById('imageBackInput').value = '';
                 toast.success("Mockup Added Successfully", toastStyle);
             } else {
                 toast.error(res.data.message, toastStyle);
@@ -172,26 +182,50 @@ const AddMockup = () => {
                             </div>
                         </div>
 
-                        <div className='flex flex-col'>
-                            <label className='text-sm font-black uppercase tracking-widest mb-2'>Mockup Image *</label>
-                            <input 
-                                type='file'
-                                accept='image/*'
-                                id='imageInput'
-                                onChange={onImageChange}
-                                required
-                                className='w-full border-[3px] border-black p-2 font-bold cursor-pointer file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-black file:uppercase file:bg-black file:text-white hover:file:bg-[#ff5500] hover:file:text-black transition-all'
-                            />
-                            
-                            {image && (
-                                <div className="mt-4 border-[3px] border-black p-2 bg-[#e5e5e5] w-fit">
-                                    <img 
-                                        src={URL.createObjectURL(image)} 
-                                        alt="Preview" 
-                                        className='w-48 h-48 object-cover mix-blend-multiply' 
-                                    />
-                                </div>
-                            )}
+                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+                            <div className='flex flex-col'>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Front Mockup Image *</label>
+                                <input 
+                                    type='file'
+                                    accept='image/*'
+                                    id='imageFrontInput'
+                                    onChange={onImageFrontChange}
+                                    required
+                                    className='w-full border-[3px] border-black p-2 font-bold cursor-pointer file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-black file:uppercase file:bg-black file:text-white hover:file:bg-[#ff5500] hover:file:text-black transition-all'
+                                />
+                                
+                                {imageFront && (
+                                    <div className="mt-4 border-[3px] border-black p-2 bg-[#e5e5e5] w-fit">
+                                        <img 
+                                            src={URL.createObjectURL(imageFront)} 
+                                            alt="Front Preview" 
+                                            className='w-48 h-48 object-cover mix-blend-multiply' 
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className='flex flex-col'>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Back Mockup Image *</label>
+                                <input 
+                                    type='file'
+                                    accept='image/*'
+                                    id='imageBackInput'
+                                    onChange={onImageBackChange}
+                                    required
+                                    className='w-full border-[3px] border-black p-2 font-bold cursor-pointer file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-black file:uppercase file:bg-black file:text-white hover:file:bg-[#ff5500] hover:file:text-black transition-all'
+                                />
+                                
+                                {imageBack && (
+                                    <div className="mt-4 border-[3px] border-black p-2 bg-[#e5e5e5] w-fit">
+                                        <img 
+                                            src={URL.createObjectURL(imageBack)} 
+                                            alt="Back Preview" 
+                                            className='w-48 h-48 object-cover mix-blend-multiply' 
+                                        />
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <button 
