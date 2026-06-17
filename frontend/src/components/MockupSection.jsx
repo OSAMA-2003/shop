@@ -1,51 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MockupGrid from './MockupGrid';
-import mockup1 from '../assets/mockups/front-black-mockup.png';
-import mockup2 from '../assets/mockups/back-black-mockup.png';
-import mockup3 from '../assets/mockups/white-front-mockup.png';
-
-const mockups = [
-  {
-    id: 'tshirt-front',
-    name: 'T-Shirt Front',
-    preview: mockup1,
-    colors: [
-      { name: 'white', hex: '#FFFFFF' },
-      { name: 'black', hex: '#000000' },
-    ],
-  },
-  {
-    id: 'tshirt-back',
-    name: 'T-Shirt Back',
-    preview: mockup2,
-    colors: [
-      { name: 'white', hex: '#FFFFFF' },
-      { name: 'black', hex: '#000000' },
-    ],
-  },
-  {
-    id: 'mug',
-    name: 'White shirt',
-    preview: mockup3,
-    colors: [
-      { name: 'white', hex: '#FFFFFF' },
-      { name: 'black', hex: '#000000' },
-    ],
-  },
-  {
-    id: 'hoodie',
-    name: 'Hoodie Front',
-    preview: mockup1,
-    colors: [
-      { name: 'navy', hex: '#001F3F' },
-      { name: 'gray', hex: '#808080' },
-    ],
-  },
-];
+import { ShopContext } from '../context/ShopContenxt';
 
 const MockupSection = () => {
   const navigate = useNavigate();
+  const { all_mockups } = useContext(ShopContext);
+
+  const formattedMockups = (all_mockups || []).slice(0, 4).map(m => ({
+    id: m._id,
+    name: m.name,
+    preview: m.image,
+    printable: { x: 150, y: 150, width: 300, height: 400 }, // Default relative box mapping
+    colors: [
+      { name: m.color || 'Black', hex: m.color === 'White' ? '#FFFFFF' : m.color === 'Red' ? '#FF0000' : m.color === 'Blue' ? '#0000FF' : m.color === 'Gray' ? '#808080' : '#000000' }
+    ],
+  }));
 
   return (
     <section className='relative w-full min-h-screen bg-background text-text-main py-32 px-6 sm:px-10 flex flex-col justify-center'>
@@ -57,7 +27,11 @@ const MockupSection = () => {
         </p>
 
         <div className='mb-12 text-left'>
-          <MockupGrid mockups={mockups} />
+          {formattedMockups.length > 0 ? (
+            <MockupGrid mockups={formattedMockups} />
+          ) : (
+            <p className="text-center font-bold text-gray-500 uppercase tracking-widest">Loading mockups...</p>
+          )}
         </div>
 
         <button onClick={() => navigate('/mockups')} className='rounded-xl sm:w-auto bg-[#ff5500] text-white font-bold uppercase tracking-widest px-8 py-4 text-xs sm:text-sm hover:bg-[#e04a00] transition-colors duration-300'>

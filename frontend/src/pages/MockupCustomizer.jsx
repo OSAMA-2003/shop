@@ -1,12 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { MockupProvider, useMockup } from '../context/MockupContext'
+import { ShopContext } from '../context/ShopContenxt'
 import MockupCanvas from '../components/MockupCanvas'
 import LayerPanel from '../components/LayerPanel'
-
-import mockup1 from '../assets/mockups/front-black-mockup.png'
-import mockup2 from '../assets/mockups/back-black-mockup.png'
-import mockup3 from '../assets/mockups/white-front-mockup.png'
 
 // Replaces your TransformControls to match the "PRECISION CONTROLS" panel
 // Replaces your current PrecisionControls in MockupCustomizer.jsx
@@ -117,24 +114,31 @@ function PrecisionControls() {
   )
 }
 
-const mockupRegistry = {
-  'hoodie': {
-    id: 'hoodie',
-    name: 'Garment (Hoodie)',
-    preview: mockup1,
-    printable: { x: 100, y: 150, width: 300, height: 350 }, // Adjusted sizes for the visual box
-    colors: [{ name: 'black', hex: '#000000' }],
-  },
-  // ... other mockups
-}
 
 function CustomizerContent() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const mockup = mockupRegistry[id || 'hoodie'] // Default to hoodie for this styling
+  const { all_mockups } = useContext(ShopContext)
+  
+  const backendMockup = (all_mockups || []).find(m => m._id === id)
+  
+  const mockup = backendMockup ? {
+    id: backendMockup._id,
+    name: backendMockup.name,
+    preview: backendMockup.image,
+    printable: { x: 150, y: 150, width: 300, height: 400 }, // Default relative box mapping
+    colors: [
+      { name: backendMockup.color || 'Black', hex: backendMockup.color === 'White' ? '#FFFFFF' : backendMockup.color === 'Red' ? '#FF0000' : backendMockup.color === 'Blue' ? '#0000FF' : backendMockup.color === 'Gray' ? '#808080' : '#000000' }
+    ],
+  } : null;
+
   const [color, setColor] = useState(mockup?.colors[0]?.name || 'black')
 
-  if (!mockup) return <div>Mockup not found</div>
+  if (!mockup) return (
+    <div className="h-screen w-full flex items-center justify-center bg-[#F5F2EB] font-sans text-black">
+      <p className="text-2xl font-black uppercase tracking-widest animate-pulse">Loading Mockup...</p>
+    </div>
+  )
 
   return (
     <div className="h-screen w-full flex bg-[#F5F2EB]  p-10 mt-20 gap-6 font-sans text-black overflow-hidden">

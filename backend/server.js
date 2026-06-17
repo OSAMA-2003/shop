@@ -8,6 +8,7 @@ import productRouter from './routes/productRoutes.js'
 import cartRouter from './routes/cartRoutes.js'
 import adminRouter from './routes/adminRoutes.js'
 import notificationsRouter from './routes/notificationsRoutes.js'
+import mockupRouter from './routes/mockupRoutes.js'
 
 const app = express()
 const PORT = process.env.PORT || 4000
@@ -20,6 +21,7 @@ app.use('/api/product',productRouter)
 app.use('/api/cart', cartRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/notifications', notificationsRouter)
+app.use('/api/mockup', mockupRouter)
 
 
 app.get('/',(req,res)=>{

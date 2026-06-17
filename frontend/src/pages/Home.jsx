@@ -5,6 +5,7 @@ import Categories from "../components/Categories.jsx";
 import Offer from "../components/Offer.jsx" ;
 import Footer from "../components/Footer.jsx" ;
 import MockupSection from "../components/MockupSection.jsx";
+import Contact from '../components/Contact.jsx';
 
 const Home = () => {
   return (
@@ -29,6 +30,10 @@ const Home = () => {
           {/* <section id="shop">
             <Offer/>
                </section> */}
+
+       <section>
+        <Contact/>
+        </section>        
 
       <section id="contact">
             <Footer/>

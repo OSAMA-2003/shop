@@ -12,47 +12,56 @@ interface Mockup {
 
 export default function MockupCard({ mockup }: { mockup: Mockup }) {
   return (
-    <div className="group relative bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] border border-gray-100 hover:-translate-y-1 transition-all duration-500 ease-out overflow-hidden flex flex-col">
+    <div className="group relative bg-white border-[4px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all duration-300 flex flex-col">
       
-      {/* Image Area - Apple's signature #f5f5f7 surface background */}
-      <div className="aspect-square bg-[#f5f5f7] p-8 overflow-hidden">
+      {/* Image Area - Brutalist grey with heavy bottom border */}
+      <div className="aspect-square bg-[#e5e5e5] border-b-[4px] border-black p-8 overflow-hidden relative flex items-center justify-center">
+        {/* Subtle "Hover to View" brutalist badge */}
+        <div className='absolute top-3 left-3 bg-black text-white text-[10px] font-black uppercase px-2 py-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity'>
+          Preview
+        </div>
+        
         <img 
           src={mockup.preview} 
           alt={mockup.name} 
-          className="w-full h-full object-contain transition-transform duration-700 ease-out group-hover:scale-105" 
+          className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 ease-out group-hover:scale-110" 
         />
       </div>
       
       <div className="p-6 flex flex-col flex-grow">
-        {/* Clean, tight tracking typography */}
-        <h3 className="font-semibold text-xl mb-6 text-[#1d1d1f] tracking-tight">
+        {/* Heavy, tight tracking typography */}
+        <h3 className="font-black text-2xl mb-6 text-black uppercase tracking-tighter leading-none">
           {mockup.name}
         </h3>
         
-        <div className="flex items-center justify-between mt-auto">
+        <div className="flex items-end justify-between mt-auto gap-4">
           
-          {/* Apple-style color swatches (circular with subtle inner shadow/ring) */}
-          <div className="flex items-center gap-1.5">
-            {mockup.colors.slice(0, 3).map((c: any) => (
-              <div 
-                key={c.name} 
-                className="w-5 h-5 rounded-full ring-1 ring-inset ring-black/10 shadow-sm" 
-                style={{ backgroundColor: c.hex }} 
-              />
-            ))}
-            {mockup.colors.length > 3 && (
-              <span className="text-xs font-medium text-gray-500 ml-1">
-                +{mockup.colors.length - 3}
-              </span>
-            )}
+          {/* Square, heavy-bordered color swatches */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-black uppercase tracking-widest text-black/50">Colors</span>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {mockup.colors.slice(0, 3).map((c: any) => (
+                <div 
+                  key={c.name} 
+                  className="w-6 h-6 border-[3px] border-black" 
+                  style={{ backgroundColor: c.hex }} 
+                  title={c.name}
+                />
+              ))}
+              {mockup.colors.length > 3 && (
+                <span className="text-xs font-black text-black ml-1">
+                  +{mockup.colors.length - 3}
+                </span>
+              )}
+            </div>
           </div>
           
-          {/* Apple-style pill button */}
+          {/* Brutalist call-to-action button */}
           <Link
             to={`/mockups/${mockup.id}`}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0071e3] text-white text-sm font-medium rounded-full hover:bg-[#0077ED] hover:shadow-md transition-all duration-300 active:scale-95"
+            className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#ff5500] border-[3px] border-black text-black text-sm font-black uppercase tracking-widest hover:bg-black hover:text-[#ff5500] transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
           >
-            Customize <ArrowRight size={16} />
+            Design <ArrowRight size={18} strokeWidth={3} />
           </Link>
 
         </div>

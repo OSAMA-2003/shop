@@ -2,19 +2,18 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 
-const Add = () => {
+const AddMockup = () => {
     const url = 'https://shop-2-ms77.onrender.com';
     const [image, setImage] = useState(null);
-    const [loading, setLoading] = useState(false); // Track loading state
+    const [loading, setLoading] = useState(false);
     const [data, setData] = useState({
         name: '',
         description: '',
         price: '',
-        category: 'Men',
+        category: 'T-Shirt',
         color: 'Black',
     });
 
-    // Custom styles for brutalist toast notifications
     const toastStyle = {
         style: {
             border: '3px solid black',
@@ -41,10 +40,9 @@ const Add = () => {
     const onSubmitHandler = async (e) => {
         e.preventDefault();
         
-        // Prevent submission if already loading
         if (loading) return; 
         
-        setLoading(true); // Start loading
+        setLoading(true);
 
         const formData = new FormData();
         formData.append('name', data.name);
@@ -56,7 +54,7 @@ const Add = () => {
 
         try {
             const token = localStorage.getItem('adminToken');
-            const res = await axios.post(`${url}/api/product/add`, formData, {
+            const res = await axios.post(`${url}/api/mockup/add`, formData, {
                 headers: { token }
             });
             if (res.data.success) {
@@ -64,12 +62,12 @@ const Add = () => {
                     name: '',
                     description: '',
                     price: '',
-                    category: 'Men',
+                    category: 'T-Shirt',
                     color: 'Black',
                 });
                 setImage(null);
                 document.getElementById('imageInput').value = '';
-                toast.success("Product Added Successfully", toastStyle);
+                toast.success("Mockup Added Successfully", toastStyle);
             } else {
                 toast.error(res.data.message, toastStyle);
             }
@@ -78,7 +76,7 @@ const Add = () => {
             const errorMessage = err.response?.data?.message || err.message || "Something went wrong";
             toast.error(`Error: ${errorMessage}`, toastStyle);
         } finally {
-            setLoading(false); // Stop loading regardless of success or failure
+            setLoading(false);
         }
     };
 
@@ -89,26 +87,23 @@ const Add = () => {
 
             <form onSubmit={onSubmitHandler} className='max-w-3xl mx-auto'>
                 
-                {/* FORM CONTAINER */}
                 <div className='bg-white border-[4px] border-black p-8 sm:p-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'>
                     
-                    {/* HEADING */}
                     <div className='border-b-[4px] border-black pb-6 mb-8'>
                         <h2 className='text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none'>
-                            Add Product
+                            Add Mockup
                         </h2>
                     </div>
 
                     <div className='flex flex-col gap-6'>
                         
-                        {/* NAME & PRICE ROW */}
                         <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
                             <div className='flex flex-col'>
-                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Product Name *</label>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Mockup Name *</label>
                                 <input 
                                     type='text'
                                     name='name'
-                                    placeholder='HEAVYWEIGHT TEE'
+                                    placeholder='e.g., T-Shirt Front'
                                     value={data.name}
                                     onChange={onChangeHandler}
                                     required
@@ -131,12 +126,11 @@ const Add = () => {
                             </div>
                         </div>
 
-                        {/* DESCRIPTION */}
                         <div className='flex flex-col'>
                             <label className='text-sm font-black uppercase tracking-widest mb-2'>Description *</label>
                             <textarea 
                                 name='description'
-                                placeholder='Enter product details, materials, and fit...'
+                                placeholder='Enter mockup details...'
                                 value={data.description}
                                 onChange={onChangeHandler}
                                 required
@@ -145,7 +139,6 @@ const Add = () => {
                             />
                         </div>
 
-                        {/* CATEGORY & COLOR ROW */}
                         <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
                             <div className='flex flex-col'>
                                 <label className='text-sm font-black uppercase tracking-widest mb-2'>Category *</label>
@@ -155,11 +148,10 @@ const Add = () => {
                                     onChange={onChangeHandler}
                                     className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-white text-black transition-colors cursor-pointer appearance-none"
                                 >
-                                    <option value="Men">Men</option>
-                                    <option value="Women">Women</option>
-                                    <option value="Kids">Kids</option>
-                                    <option value="Electronics">Electronics</option>
-                                    <option value="Cosmetics">Cosmetics</option>
+                                    <option value="T-Shirt">T-Shirt</option>
+                                    <option value="Hoodie">Hoodie</option>
+                                    <option value="Mug">Mug</option>
+                                    <option value="Cap">Cap</option>
                                 </select>
                             </div>
 
@@ -175,13 +167,13 @@ const Add = () => {
                                     <option value="White">White</option>
                                     <option value="Red">Red</option>
                                     <option value="Blue">Blue</option>
+                                    <option value="Gray">Gray</option>
                                 </select>
                             </div>
                         </div>
 
-                        {/* IMAGE UPLOAD */}
                         <div className='flex flex-col'>
-                            <label className='text-sm font-black uppercase tracking-widest mb-2'>Product Image *</label>
+                            <label className='text-sm font-black uppercase tracking-widest mb-2'>Mockup Image *</label>
                             <input 
                                 type='file'
                                 accept='image/*'
@@ -191,7 +183,6 @@ const Add = () => {
                                 className='w-full border-[3px] border-black p-2 font-bold cursor-pointer file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-black file:uppercase file:bg-black file:text-white hover:file:bg-[#ff5500] hover:file:text-black transition-all'
                             />
                             
-                            {/* IMAGE PREVIEW */}
                             {image && (
                                 <div className="mt-4 border-[3px] border-black p-2 bg-[#e5e5e5] w-fit">
                                     <img 
@@ -203,7 +194,6 @@ const Add = () => {
                             )}
                         </div>
 
-                        {/* SUBMIT BUTTON */}
                         <button 
                             type='submit'
                             disabled={loading}
@@ -213,7 +203,7 @@ const Add = () => {
                                 : 'bg-[#ff5500] text-black hover:bg-black hover:text-[#ff5500] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]'
                             }`}
                         >
-                            {loading ? "Publishing..." : "Publish Product"}
+                            {loading ? "Publishing..." : "Publish Mockup"}
                         </button>
 
                     </div>
@@ -223,4 +213,4 @@ const Add = () => {
     );
 }
 
-export default Add;
+export default AddMockup;

@@ -1,5 +1,5 @@
 import { React, useState } from 'react'
-import Add from './components/Add.jsx'
+import Add from './components/AddProduct.jsx'
 import List from './components/List.jsx'
 import Orders from './components/Orders.jsx'
 import Sidebar from './components/Sidebar.jsx'
@@ -9,6 +9,7 @@ import AdminLogin from './components/AdminLogin.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import { Toaster } from 'react-hot-toast'
 import Users from './components/Users.jsx'
+import AddMockup from './components/AddMockup.jsx'
 import Notifications from './components/Notifications.jsx'
 
 function App() {
@@ -31,6 +32,12 @@ function App() {
           <ProtectedRoute>
             <Add />
           </ProtectedRoute>} />
+
+        <Route path='/admin/mockups' element={
+          <ProtectedRoute>
+            <AddMockup />
+          </ProtectedRoute>
+        } />
 
         <Route path='/admin/orders' element={
           <ProtectedRoute>

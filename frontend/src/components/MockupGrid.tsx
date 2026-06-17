@@ -11,9 +11,7 @@ interface Mockup {
 
 export default function MockupGrid({ mockups }: { mockups: Mockup[] }) {
   return (
-    // 1. Flex layout with horizontal scrolling
-    // 2. Hide scrollbars for a clean look
-    // 3. Enable horizontal scroll snapping
+   
     <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4 md:px-0">
       
       {mockups.map((m) => (
