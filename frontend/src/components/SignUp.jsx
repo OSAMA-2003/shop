@@ -1,11 +1,15 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useContext } from "react";
 import axios from 'axios';
 import { ShopContext } from "../context/ShopContenxt";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { url, setToken } = useContext(ShopContext);
+  
+  const from = location.state?.from || "/";
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -40,7 +44,7 @@ const SignUp = () => {
       if (res.data.success) {
         localStorage.setItem("token", res.data.token);
         setToken(res.data.token);
-        navigate("/");
+        navigate(from);
       } else {
         alert(res.data.message);
       }
@@ -130,7 +134,7 @@ const SignUp = () => {
           <span className='text-sm font-bold text-black'>
             Already have an account? {" "}
             <span
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/login", { state: { from } })}
               className='underline decoration-2 cursor-pointer hover:text-[#ff5500] transition-colors'
             >
               Log in

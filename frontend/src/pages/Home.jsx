@@ -2,7 +2,6 @@ import React from 'react'
 import Hero from "../components/Hero.jsx" ;
 import Features from "../components/Features.jsx" ;
 import Categories from "../components/Categories.jsx";
-import Offer from "../components/Offer.jsx" ;
 import Footer from "../components/Footer.jsx" ;
 import MockupSection from "../components/MockupSection.jsx";
 import Contact from '../components/Contact.jsx';
@@ -27,9 +26,7 @@ const Home = () => {
             <MockupSection/>
       </section>
 
-          {/* <section id="shop">
-            <Offer/>
-               </section> */}
+        
 
        <section>
         <Contact/>

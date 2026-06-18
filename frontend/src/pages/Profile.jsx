@@ -3,6 +3,54 @@ import axios from 'axios';
 import { ShopContext } from '../context/ShopContenxt';
 import { User, Mail, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+
+// 1. Define Animation Variants
+const pageVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const headerVariants = {
+  hidden: { y: -20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const cardVariants = {
+  hidden: { y: 40, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const imageContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+  },
+};
+
+const imageItemVariants = {
+  hidden: { scale: 0.8, opacity: 0 },
+  visible: {
+    scale: 1,
+    opacity: 1,
+    transition: { duration: 0.4, ease: "easeOut" },
+  },
+};
 
 const Profile = () => {
   const { url, token, setToken } = useContext(ShopContext);
@@ -53,14 +101,12 @@ const Profile = () => {
             console.error("Profile endpoint error or invalid response:", profileResponse.data);
           }
         } catch (err) {
-          // Check if the backend explicitly told us the user no longer exists in the DB
           if (err.response && err.response.status === 404 && err.response.data?.message === "User not found") {
             console.warn("User not found in the database. Logging out...");
             localStorage.removeItem("token");
             setToken(false);
             navigate("/login");
           } else {
-            // Log out the explicit error payload if it was something else (like forgot to restart server)
             console.error("Failed to fetch profile data. Ensure backend is restarted and route exists:", err.response?.data || err.message);
           }
         }
@@ -74,21 +120,30 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <section className='min-h-screen flex items-center justify-center bg-[#f9f9f6] text-black px-6 font-sans'>
-        <h2 className='text-3xl font-black uppercase tracking-widest animate-pulse'>Loading Profile...</h2>
-      </section>
+      <motion.section 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        exit={{ opacity: 0 }}
+        className='min-h-screen flex items-center justify-center bg-[#f9f9f6] text-black px-6 font-sans'
+      >
+        <motion.h2 
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+          className='text-3xl md:text-5xl font-black uppercase tracking-widest'
+        >
+          Loading Profile...
+        </motion.h2>
+      </motion.section>
     );
   }
 
-  // Helper function to determine badge colors based on status
   const getStatusBadge = (status) => {
     const s = status?.toLowerCase() || '';
-    if (s === 'delivered') return 'bg-[#4ade80] text-white border-2 border-black'; // Green
-    if (s === 'canceled') return 'bg-red-600 text-white border-2 border-black'; // Red
-    return 'bg-[#ff5500] text-black border-2 border-black'; // Orange for pending/shipped
+    if (s === 'delivered') return 'bg-[#4ade80] text-white border-2 border-black';
+    if (s === 'canceled') return 'bg-red-600 text-white border-2 border-black';
+    return 'bg-[#ff5500] text-black border-2 border-black';
   };
 
-  // Format date to match the brutalist image style (e.g., OCT 26, 2024)
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
@@ -102,11 +157,16 @@ const Profile = () => {
   };
 
   return (
-    <section className='bg-[#f9f9f6] min-h-screen px-4 sm:px-3 py-30 font-sans text-black'>
-      <div className='max-w-7xl mx-auto space-y-16'>
+    <section className='bg-[#f9f9f6] min-h-screen px-4 sm:px-3 py-32 font-sans text-black overflow-hidden'>
+      <motion.div 
+        variants={pageVariants}
+        initial="hidden"
+        animate="visible"
+        className='max-w-7xl mx-auto space-y-16'
+      >
         
         {/* USER PROFILE CARD */}
-        <div className='bg-white border-[4px] border-black p-6 sm:p-10 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'>
+        <motion.div variants={cardVariants} className='bg-white border-[4px] border-black p-6 sm:p-10 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'>
           <div className='flex flex-col sm:flex-row items-center sm:items-start gap-6'>
             {/* Avatar Block */}
             <div className='w-24 h-24 bg-[#ff5500] border-[3px] border-black flex items-center justify-center shrink-0'>
@@ -133,19 +193,19 @@ const Profile = () => {
             <LogOut className='w-5 h-5' strokeWidth={2.5} />
             Log Out
           </button>
-        </div>
+        </motion.div>
 
         {/* ORDERS SECTION */}
         <div>
           {/* Heavy Section Header */}
-          <div className='border-b-[6px] border-black pb-4 mb-10'>
+          <motion.div variants={headerVariants} className='border-b-[6px] border-black pb-4 mb-10'>
             <h2 className='text-4xl sm:text-5xl font-black uppercase tracking-tighter'>
               My Orders
             </h2>
-          </div>
+          </motion.div>
 
           {orders.length === 0 ? (
-            <div className='bg-white border-[4px] border-black p-10 text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]'>
+            <motion.div variants={cardVariants} className='bg-white border-[4px] border-black p-10 text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]'>
               <p className='text-2xl font-black uppercase tracking-tight mb-8'>No orders found.</p>
               <button 
                 onClick={() => navigate("/")} 
@@ -153,7 +213,7 @@ const Profile = () => {
               >
                 Start Shopping
               </button>
-            </div>
+            </motion.div>
           ) : (
             <div className='flex flex-col gap-10'>
               {orders.map((order) => {
@@ -162,7 +222,8 @@ const Profile = () => {
                 ) || 0;
                 
                 return (
-                  <div 
+                  <motion.div 
+                    variants={cardVariants}
                     key={order._id} 
                     className='bg-white border-[4px] border-black p-6 flex flex-col justify-between shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]'
                   >
@@ -193,10 +254,17 @@ const Profile = () => {
                       </div>
                     </div>
 
-                    {/* ORDER IMAGES GRID */}
-                    <div className='flex flex-wrap gap-4'>
+                    {/* ORDER IMAGES GRID - Staggered sub-animation */}
+                    <motion.div 
+                      variants={imageContainerVariants}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
+                      className='flex flex-wrap gap-4'
+                    >
                       {order.items?.map((item, index) => (
-                        <div 
+                        <motion.div 
+                          variants={imageItemVariants}
                           key={`${item._id}-${index}`} 
                           className='w-24 h-28 sm:w-28 sm:h-32 bg-[#e5e5e5] border-2 border-black flex items-center justify-center p-2 relative group'
                         >
@@ -211,20 +279,20 @@ const Profile = () => {
                             <img 
                               src={item.image}
                               alt={item.name}
-                              className='w-full h-full object-contain mix-blend-multiply'
+                              className='w-full h-full object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-110'
                             />
                           )}
-                        </div>
+                        </motion.div>
                       ))}
-                    </div>
+                    </motion.div>
 
-                  </div>
+                  </motion.div>
                 )
               })}
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
