@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MockupGrid from './MockupGrid';
 import { ShopContext } from '../context/ShopContenxt';
+import CardSkeleton from './CardSkeleton';
 
 const MockupSection = () => {
   const navigate = useNavigate();
@@ -34,7 +35,11 @@ const MockupSection = () => {
           {formattedMockups.length > 0 ? (
             <MockupGrid mockups={formattedMockups} />
           ) : (
-            <p className="text-center font-bold text-gray-500 uppercase tracking-widest">Loading mockups...</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[...Array(4)].map((_, index) => (
+                <CardSkeleton key={index} />
+              ))}
+            </div>
           )}
         </div>
 

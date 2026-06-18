@@ -13,7 +13,7 @@ const Product = () => {
 
   if (!product) {
     return (
-      <section className="min-h-screen flex items-center justify-center text-white 
+      <section className="min-h-screen  flex items-center justify-center text-white 
       bg-linear-to-r from-indigo-900 via-purple-900 to-pink-900">
         <p className="text-lg font-bold">Product not found</p>
       </section>
@@ -28,7 +28,7 @@ const Product = () => {
   return (
     <section className="relative w-full min-h-screen 
     bg-linear-to-r from-indigo-900 via-purple-900 to-pink-900 
-    text-white py-16 px-4 sm:px-6">
+    text-white  px-4 sm:px-6">
 
       <div className="max-w-5xl mx-auto bg-white/10 backdrop-blur-md 
       rounded-2xl p-4 flex flex-col md:flex-row gap-6 shadow-xl">

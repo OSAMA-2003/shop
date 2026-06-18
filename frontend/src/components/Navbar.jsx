@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { Menu, X, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import MenuItems from './MenuItems';
@@ -7,6 +7,8 @@ import { ShopContext } from '../context/ShopContenxt';
 
 const Navbar = () => {
     const [sidebarOpen, setSideBarOpen] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
+    const lastScrollY = useRef(0);
     const navigate = useNavigate();
     
     // Bring context into the Navbar to show the cart count on the mobile header
@@ -24,10 +26,27 @@ const Navbar = () => {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
+    // Track scroll direction to hide/show navbar
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+            // Hide navbar if scrolling down and passed the 100px threshold
+            if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+                setIsVisible(false);
+            } else {
+                setIsVisible(true);
+            }
+            lastScrollY.current = currentScrollY;
+        };
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
     return (
         <>
             {/* DESKTOP HEADER (Floating & Rounded) */}
-            <header className='hidden md:flex items-center px-8 py-2.5 fixed top-6 left-1/2 -translate-x-1/2 w-[96%] max-w-7xl bg-white/70 backdrop-blur-lg border border-white/40 shadow-xl rounded-full z-50 transition-all'>
+            <header className={`hidden md:flex items-center px-8 py-2.5 fixed top-6 left-1/2 -translate-x-1/2 w-[96%] max-w-7xl bg-white/70 backdrop-blur-lg border border-white/40 shadow-xl rounded-full z-50 transition-all duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-32'}`}>
                 <div className='items-center gap-4 flex shrink-0'>
                     <img 
                         src={logo} 
@@ -42,7 +61,7 @@ const Navbar = () => {
             </header>
 
             {/* MOBILE HEADER (Floating & Rounded with Cart) */}
-            <header className='md:hidden flex justify-between items-center px-6 py-3 fixed top-4 left-4 right-4 bg-white/70 backdrop-blur-lg border border-white/40 shadow-xl rounded-full z-50 transition-all'>
+            <header className={`md:hidden flex justify-between items-center px-6 py-3 fixed top-4 left-4 right-4 bg-white/70 backdrop-blur-lg border border-white/40 shadow-xl rounded-full z-50 transition-all duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-32'}`}>
                 <div className='flex items-center'>
                     <img 
                         src={logo} 

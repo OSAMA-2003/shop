@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react'
 import { categories } from "../assets/data";
 import { ShopContext } from '../context/ShopContenxt';
 import { useNavigate } from 'react-router-dom';
+import CardSkeleton from './CardSkeleton';
 
 const Categories = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -54,51 +55,64 @@ const Categories = () => {
         </div>
 
         {/* Editorial Grid Layout */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-12 auto-rows-[350px] md:auto-rows-[350px] lg:auto-rows-[400px]'>
-          {filteredProducts.slice(0, displayCount).map((product, index) => {
-            
-            // This logic creates the specific layout: Every 1st item out of 3 is large.
-            const isLarge = index % 3 === 0;
-
-            return (
-              <div 
-                key={product._id}
-                onClick={() => navigate(`/product/${product._id}`)}
-                className={`group relative overflow-hidden bg-gray-200 cursor-pointer ${
-                  isLarge ? "md:row-span-2" : ""
-                }`}
-              >
-                {/* Full coverage image */}
-                <img 
-                  src={product.image}
-                  alt={product.name}
-                  className='w-full h-full object-cover transition-transform duration-700 group-hover:scale-105'
-                />
-                
-                {/* Dark Gradient Overlay for text readability */}
-                <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100'></div>
-                
-                {/* Overlay Text Content */}
-                <div className='absolute bottom-0 left-0 p-6 md:p-8 w-full text-white'>
-                  <p className='text-xs font-bold uppercase tracking-widest text-gray-300 mb-1'>
-                    {product.category}
-                  </p>
-                  
-                  {/* Title scales based on whether it is the large card or small card */}
-                  <h3 className={`font-black uppercase tracking-tight mb-2 leading-none ${
-                    isLarge ? 'text-3xl md:text-4xl lg:text-5xl' : 'text-xl md:text-2xl lg:text-3xl'
-                  }`}>
-                    {product.name}
-                  </h3>
-                  
-                  <p className='text-sm md:text-base font-medium text-gray-200'>
-                    ${product.price.toFixed(2)}
-                  </p>
+        {filteredProducts.length === 0 ? (
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-12 auto-rows-[350px] md:auto-rows-[350px] lg:auto-rows-[400px]'>
+            {[...Array(displayCount)].map((_, index) => {
+              const isLarge = index % 3 === 0;
+              return (
+                <div key={index} className={`h-full ${isLarge ? "md:row-span-2" : ""}`}>
+                  <CardSkeleton />
                 </div>
-              </div>
-            )
-          })}
-        </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-12 auto-rows-[350px] md:auto-rows-[350px] lg:auto-rows-[400px]'>
+            {filteredProducts.slice(0, displayCount).map((product, index) => {
+              
+              // This logic creates the specific layout: Every 1st item out of 3 is large.
+              const isLarge = index % 3 === 0;
+
+              return (
+                <div 
+                  key={product._id}
+                  onClick={() => navigate(`/product/${product._id}`)}
+                  className={`group relative overflow-hidden bg-gray-200 cursor-pointer ${
+                    isLarge ? "md:row-span-2" : ""
+                  }`}
+                >
+                  {/* Full coverage image */}
+                  <img 
+                    src={product.image}
+                    alt={product.name}
+                    className='w-full h-full object-cover transition-transform duration-700 group-hover:scale-105'
+                  />
+                  
+                  {/* Dark Gradient Overlay for text readability */}
+                  <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100'></div>
+                  
+                  {/* Overlay Text Content */}
+                  <div className='absolute bottom-0 left-0 p-6 md:p-8 w-full text-white'>
+                    <p className='text-xs font-bold uppercase tracking-widest text-gray-300 mb-1'>
+                      {product.category}
+                    </p>
+                    
+                    {/* Title scales based on whether it is the large card or small card */}
+                    <h3 className={`font-black uppercase tracking-tight mb-2 leading-none ${
+                      isLarge ? 'text-3xl md:text-4xl lg:text-5xl' : 'text-xl md:text-2xl lg:text-3xl'
+                    }`}>
+                      {product.name}
+                    </h3>
+                    
+                    <p className='text-sm md:text-base font-medium text-gray-200'>
+                      ${product.price.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
 
         {/* Load More Logic (Updates by 6 to maintain grid balance) */}
         {displayCount < filteredProducts.length && (

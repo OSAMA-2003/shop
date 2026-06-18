@@ -4,6 +4,7 @@ import { all_products } from "../assets/data"
 import { ShoppingBag } from "lucide-react"
 import { ShopContext } from "../context/ShopContenxt"
 import { useNavigate } from 'react-router-dom';
+import CardSkeleton from './CardSkeleton';
 
 const Offer = () => {
   const { addToCart } = useContext(ShopContext)
@@ -60,48 +61,56 @@ const Offer = () => {
           ))}
         </div>
 
-        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mb-10'>
-          {all_products.slice(0, displayCount).map((product) => (
-            <div
-              key={product._id}
-              onClick={() => navigate(`/product/${product._id}`)} // Added onClick here
-              className='group bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden shadow-2xl hover:-translate-y-2 hover:shadow-glow transition-all duration-500 cursor-pointer'
-            >
-              <div className='relative w-full h-72 flex items-center justify-center bg-white/10 p-6 rounded-b-[2.5rem] transition-transform duration-500 group-hover:scale-105'>
-                <img
-                  src={product.image}
-                  className='object-contain w-56 h-56 transition-transform duration-500 drop-shadow-2xl'
-                />
-              </div>
+        {all_products.length === 0 ? (
+          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mb-10'>
+            {[...Array(displayCount)].map((_, index) => (
+              <CardSkeleton key={index} />
+            ))}
+          </div>
+        ) : (
+          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mb-10'>
+            {all_products.slice(0, displayCount).map((product) => (
+              <div
+                key={product._id}
+                onClick={() => navigate(`/product/${product._id}`)} // Added onClick here
+                className='group bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden shadow-2xl hover:-translate-y-2 hover:shadow-glow transition-all duration-500 cursor-pointer'
+              >
+                <div className='relative w-full h-72 flex items-center justify-center bg-white/10 p-6 rounded-b-[2.5rem] transition-transform duration-500 group-hover:scale-105'>
+                  <img
+                    src={product.image}
+                    className='object-contain w-56 h-56 transition-transform duration-500 drop-shadow-2xl'
+                  />
+                </div>
 
-              <div className='p-6 pt-8 text-left'>
-                <h3 className='text-lg font-bold mb-1 truncate text-white group-hover:text-primary transition-colors'>
-                  {product.name}
-                </h3>
+                <div className='p-6 pt-8 text-left'>
+                  <h3 className='text-lg font-bold mb-1 truncate text-white group-hover:text-primary transition-colors'>
+                    {product.name}
+                  </h3>
 
-                <p className='text-gray-400 text-sm mb-6 line-clamp-1'>
-                  {product.description}
-                </p>
+                  <p className='text-gray-400 text-sm mb-6 line-clamp-1'>
+                    {product.description}
+                  </p>
 
-                <div className='flex justify-between items-center'>
-                  <span className='text-2xl font-extrabold text-white'>
-                    ${product.price.toFixed(2)}
-                  </span>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-2xl font-extrabold text-white'>
+                      ${product.price.toFixed(2)}
+                    </span>
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent click from bubbling to parent div
-                      addToCart(product._id);
-                    }}
-                    className='flex items-center justify-center w-12 h-12 bg-primary hover:bg-[#d94f15] rounded-full text-white shadow-glow transition-all duration-300 hover:scale-110'
-                  >
-                    <ShoppingBag className='w-5 h-5' />
-                  </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent click from bubbling to parent div
+                        addToCart(product._id);
+                      }}
+                      className='flex items-center justify-center w-12 h-12 bg-primary hover:bg-[#d94f15] rounded-full text-white shadow-glow transition-all duration-300 hover:scale-110'
+                    >
+                      <ShoppingBag className='w-5 h-5' />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {displayCount < all_products.length && (
           <div className='text-center mt-10'>

@@ -25,9 +25,9 @@ const Product = () => {
   }
 
   return (
-    <section className="relative w-full min-h-screen bg-[#f9f9f6] text-black py-20 px-6 sm:px-10 font-sans">
+    <section className="relative w-full min-h-screen bg-[#f9f9f6] text-black py-30 px-6 sm:px-10 font-sans">
       
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-10 md:gap-16">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-10 md:gap-16">
         
         {/* LEFT: IMAGE SECTION */}
         <div className="md:w-1/2 relative bg-[#e5e5e5] border border-black/10 aspect-[4/5] overflow-hidden group cursor-crosshair">
