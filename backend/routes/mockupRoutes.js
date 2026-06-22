@@ -33,4 +33,6 @@ mockupRouter.get("/list", listMockups);
 // Customized Mockups APIs
 mockupRouter.post("/custom/save", authMiddleware, addCustomizedMockup);
 mockupRouter.get("/custom/list", authMiddleware, listCustomizedMockups);
+
+export default mockupRouter;
 
