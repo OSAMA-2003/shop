@@ -1,4 +1,5 @@
 import mockupModel from "../models/mockupModel.js";
+import customizedMockupModel from "../models/customizedMockupModel.js";
 import cloudinary from "../utils/cloudinary.js";
 
 const addMockup = async (req, res) => {
@@ -19,6 +20,19 @@ const addMockup = async (req, res) => {
     }
 
     try {
+        let sizesArray = ["S", "M", "L", "XL"];
+        if (req.body.sizes) {
+            try {
+                sizesArray = JSON.parse(req.body.sizes);
+            } catch (e) {
+                if (typeof req.body.sizes === 'string') {
+                    sizesArray = req.body.sizes.split(',').map(s => s.trim());
+                } else {
+                    sizesArray = req.body.sizes;
+                }
+            }
+        }
+
         const mockup = new mockupModel({
             name,
             description,
@@ -27,6 +41,7 @@ const addMockup = async (req, res) => {
             imageFront: req.files.imageFront[0].path, // Cloudinary URL
             imageBack: req.files.imageBack[0].path, // Cloudinary URL
             color,
+            sizes: sizesArray,
         });
 
         await mockup.save();
@@ -70,4 +85,45 @@ const removeMockup = async (req, res) => {
     }
 };
 
-export { addMockup, listMockups, removeMockup };
+const addCustomizedMockup = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { mockupId, name, price, color, size, imageFront, imageBack, layers, uploadedImages } = req.body;
+
+        if (!mockupId || !name || !price || !color || !size || !imageFront || !imageBack) {
+            return res.status(400).json({ success: false, message: "Missing required custom design fields" });
+        }
+
+        const customMockup = new customizedMockupModel({
+            userId,
+            mockupId,
+            name,
+            price: Number(price),
+            color,
+            size,
+            imageFront,
+            imageBack,
+            layers: layers || [],
+            uploadedImages: uploadedImages || []
+        });
+
+        await customMockup.save();
+        res.status(201).json({ success: true, message: "Custom design saved successfully", data: customMockup });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+const listCustomizedMockups = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const customMockups = await customizedMockupModel.find({ userId });
+        res.status(200).json({ success: true, data: customMockups });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+export { addMockup, listMockups, removeMockup, addCustomizedMockup, listCustomizedMockups };

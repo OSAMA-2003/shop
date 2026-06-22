@@ -9,7 +9,7 @@ function CardSkeleton() {
     <div className="h-4 bg-[#e5e5e5] border border-black w-full mb-2.5"></div>
     <div className="h-4 bg-[#e5e5e5] border border-black w-5/6 mb-6"></div>
     <div className="h-8 bg-[#e5e5e5] border-2 border-black w-1/3 mt-auto"></div>
-    <span class="sr-only">Loading...</span>
+    <span className="sr-only">Loading...</span>
 </div>
 
   )

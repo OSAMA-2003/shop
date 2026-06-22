@@ -11,82 +11,122 @@ const ShopContextProvider = ({ children }) => {
     
     const [products, setProducts] = useState([])
     const [all_mockups, setAllMockups] = useState([]);
+    const [customMockups, setCustomMockups] = useState([]);
     const [cartItems, setCartItems] = useState({}) 
     const [token,setToken] = useState()
     const [loading, setLoading] = useState(true); 
     const url = "https://shop-2-ms77.onrender.com" 
 
 
-useEffect(()=>{
-    const savedCart = localStorage.getItem("cartItems");
-    if(savedCart){
-        setCartItems(JSON.parse(savedCart))
-    }
-},[])
+    // Fetch user's cart from backend when token changes (login/logout)
+    useEffect(() => {
+        const syncCart = async () => {
+            if (token) {
+                setLoading(true);
+                await Promise.all([
+                    loadCartData(token),
+                    fetchCustomMockups(token)
+                ]);
+                setLoading(false);
+            } else {
+                // Clear cart state on client side only when logged out
+                setCartItems({});
+                setCustomMockups([]);
+            }
+        };
+        syncCart();
+    }, [token]);
 
-
-useEffect(()=>{
-    localStorage.setItem("cartItems", JSON.stringify(cartItems))
-},[cartItems])
-
-const addToCart = async (id, quantity = 1) => {
-    const productId = id.toString()
+const addToCart = async (id, quantity = 1, size = 'M') => {
+    const cartKey = id.includes('_') ? id : `${id}_${size}`;
+    const [productId, itemSize] = cartKey.split('_');
     setCartItems(prev => ({
         ...prev,
-        [id]: prev[id] ? prev[id] + quantity : quantity // Use the provided quantity
+        [cartKey]: (prev[cartKey] || 0) + quantity
     }))
     if(token){
-        await axios.post(`${url}/api/cart/add`, {id:id}, {headers:{token}})
+        await axios.post(`${url}/api/cart/add`, {id: productId, size: itemSize, quantity: quantity}, {headers:{token}})
     }
 }
 
+const removeFromCart = async (id, size = 'M', removeAll=false)=>{
+    // Find the matching key in cartItems, supporting both legacy and size-suffixed formats
+    let cartKey = id;
+    if (cartItems && !(cartKey in cartItems)) {
+        cartKey = id.includes('_') ? id : `${id}_${size}`;
+        if (!(cartKey in cartItems)) {
+            const [productId] = id.split('_');
+            if (productId in cartItems) {
+                cartKey = productId;
+            }
+        }
+    }
 
-const removeFromCart = async (id, removeAll=false)=>{
+    const [productId, itemSize] = cartKey.includes('_') ? cartKey.split('_') : [cartKey, size];
+
     setCartItems(prev=>{
         const updated = {...prev}
-        if (removeAll || updated[id] === 1) {
-            delete updated[id];
-        } else if (updated[id]) {
-            updated[id] -= 1;
+        if (removeAll || updated[cartKey] <= 1) {
+            delete updated[cartKey];
+        } else if (updated[cartKey]) {
+            updated[cartKey] -= 1;
         }
         return updated
     })
-   try{
-            await axios.post(`${url}/api/cart/remove`, {id:id, removeAll:removeAll} , {headers:{token}})
-
-   }catch(err){
-    console.log(err)
-   }
+    if(token){
+        try{
+            await axios.post(`${url}/api/cart/remove`, {id: productId, size: itemSize, removeAll: removeAll} , {headers:{token}})
+        }catch(err){
+            console.log(err)
+        }
+    }
 }
-
 
 const clearCart = async ()=>{
-    if(!token) console.log("ERROR")
-
-    try{
-        const res = await axios.post(`${url}/api/cart/clear`, {}, {headers:{token}})
-        setCartItems({})
-    }catch(err){
-        console.log(err)
+    setCartItems({})
+    if(token){
+        try{
+            await axios.post(`${url}/api/cart/clear`, {}, {headers:{token}})
+        }catch(err){
+            console.log(err)
+        }
     }
-
 }
 
-
 const getTotalCartAmount = () => {
-    return Object.entries(cartItems).reduce((total, [id, qty]) => {
-        const product = products.find((p) => p._id === String(id));
+    return Object.entries(cartItems).reduce((total, [cartKey, qty]) => {
+        const [productId] = cartKey.split('_');
+        const product = products.find((p) => p._id === String(productId)) 
+                      || all_mockups.find((m) => m._id === String(productId))
+                      || customMockups.find((cm) => cm._id === String(productId));
         return total + (product ? product.price * qty : 0);
     }, 0);
 }
 
 const placeOrder = async (orderData) => {
     const orderItems = [];
-    products.forEach((product) => {
-        if (cartItems[product._id] > 0) {
-            // Creating a new object to avoid mutating the original product object from state
-            let itemInfo = {...product, quantity: cartItems[product._id]};
-            orderItems.push(itemInfo);
+    Object.entries(cartItems).forEach(([cartKey, qty]) => {
+        if (qty > 0) {
+            const [productId, size] = cartKey.split('_');
+            const isCustomMockup = customMockups.some((cm) => cm._id === String(productId));
+            const product = products.find((p) => p._id === String(productId)) 
+                          || all_mockups.find((m) => m._id === String(productId))
+                          || customMockups.find((cm) => cm._id === String(productId));
+            if (product) {
+                let itemInfo = { 
+                    ...product, 
+                    image: product.image || product.imageFront, 
+                    size: size || 'M', 
+                    quantity: qty 
+                };
+                if (isCustomMockup) {
+                    itemInfo.isCustomMockup = true;
+                    itemInfo.imageFront = product.imageFront;
+                    itemInfo.imageBack = product.imageBack;
+                    itemInfo.uploadedImages = product.uploadedImages || [];
+                }
+                orderItems.push(itemInfo);
+            }
         }
     });
 
@@ -132,6 +172,19 @@ const fetchMockups = async () => {
     }
 };
 
+const fetchCustomMockups = async (tokenValue) => {
+    const activeToken = tokenValue || token;
+    if (!activeToken) return;
+    try {
+        const res = await axios.get(`${url}/api/mockup/custom/list`, { headers: { token: activeToken } });
+        if (res.data.success) {
+            setCustomMockups(res.data.data || []);
+        }
+    } catch (err) {
+        console.error("Error fetching custom mockups:", err);
+    }
+};
+
 
 const loadCartData = async(token)=> {
 
@@ -150,9 +203,9 @@ useEffect(()=>{
         ]);
         if(localStorage.getItem('token')){
             setToken(localStorage.getItem('token'))
-            await loadCartData(localStorage.getItem('token'))
+        } else {
+            setLoading(false);
         }
-        setLoading(false);
     }
     loadData()
 }, [])
@@ -162,6 +215,8 @@ const value ={
     cartItems,
     all_products:products, 
     all_mockups,
+    customMockups,
+    fetchCustomMockups,
     addToCart,
     removeFromCart,
     getTotalCartAmount,

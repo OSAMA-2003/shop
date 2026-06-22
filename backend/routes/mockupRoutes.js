@@ -6,7 +6,10 @@ import {
   addMockup,
   removeMockup,
   listMockups,
+  addCustomizedMockup,
+  listCustomizedMockups,
 } from "../controllers/mockupController.js";
+import authMiddleware from "../middleware/auth.js";
 
 const mockupRouter = express.Router();
 
@@ -23,8 +26,11 @@ const upload = multer({ storage });
 mockupRouter.post("/add", upload.fields([
   { name: "imageFront", maxCount: 1 },
   { name: "imageBack", maxCount: 1 }
-]), addMockup);
+  ]), addMockup);
 mockupRouter.delete("/remove/:id", removeMockup);
 mockupRouter.get("/list", listMockups);
 
-export default mockupRouter;
+// Customized Mockups APIs
+mockupRouter.post("/custom/save", authMiddleware, addCustomizedMockup);
+mockupRouter.get("/custom/list", authMiddleware, listCustomizedMockups);
+

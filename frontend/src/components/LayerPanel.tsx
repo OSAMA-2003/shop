@@ -2,39 +2,41 @@ import React, { useRef } from 'react'
 import { useMockup } from '../context/MockupContext'
 import { Eye, Lock } from 'lucide-react'
 
-export default function LayerPanel() {
+export default function LayerPanel({ activeSide = 'front' }: { activeSide?: 'front' | 'back' }) {
   const { layers, selectedId, selectLayer, addLayer, deleteLayer } = useMockup()
   const fileRef = useRef<HTMLInputElement>(null)
 
-  // Merged Upload logic directly into the layer panel actions
+  const sideLayers = layers.filter((layer) => layer.side === activeSide)
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
     const reader = new FileReader()
     reader.onload = () => {
-      const newLayerId = Date.now().toString()
-      addLayer({
-        id: newLayerId, type: 'image', src: reader.result as string,
-        x: 150, y: 200, width: 200, height: 200, rotation: 0, scaleX: 1, scaleY: 1,
+      const generatedId = addLayer({
+        type: 'image',
+        side: activeSide,
+        src: reader.result as string,
+        x: 150,
+        y: 200,
+        width: 200,
+        height: 200,
+        rotation: 0,
+        scaleX: 1,
+        scaleY: 1,
       })
-      selectLayer(newLayerId)
+      selectLayer(generatedId)
     }
     reader.readAsDataURL(files[0])
     if (fileRef.current) fileRef.current.value = ''
   }
 
   return (
-    <div className="flex flex-col  h-full bg-[#F5F2EB] border-2 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+    <div className="flex flex-col h-full bg-[#F5F2EB] border-2 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
       <h2 className="font-black text-black text-xl uppercase tracking-wider mb-6">Layers</h2>
       
       <div className="flex-1 space-y-3 overflow-y-auto pr-2">
-        {/* Mock static layers for aesthetic matching */}
-        
-
-        
-
-        {/* Dynamic User Layers */}
-        {layers.length === 0 ? (
+        {sideLayers.length === 0 ? (
           <div className={`flex items-center justify-between border-2 border-black rounded-lg p-3 cursor-pointer ${!selectedId ? 'bg-[#FF5722] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white'}`}>
             <div>
               <div className="font-bold uppercase text-sm">Graphics</div>
@@ -45,7 +47,7 @@ export default function LayerPanel() {
             </div>
           </div>
         ) : (
-          layers.map((layer, idx) => {
+          sideLayers.map((layer, idx) => {
             const isSelected = selectedId === layer.id
             return (
               <div
@@ -73,14 +75,14 @@ export default function LayerPanel() {
         <input ref={fileRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
         <button 
           onClick={() => fileRef.current?.click()}
-className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#ff5500] border-[3px] border-black text-black text-sm font-black uppercase tracking-widest hover:bg-black hover:text-[#ff5500] transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"            >
-        
+          className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#ff5500] border-[3px] border-black text-black text-sm font-black uppercase tracking-widest hover:bg-black hover:text-[#ff5500] transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
+        >
           Add New Image
         </button>
         <button 
           onClick={() => selectedId && deleteLayer(selectedId)}
-className="inline-flex items-center justify-center gap-2 px-10 py-4  bg-black border-[3px] border-black hover:text-black text-sm font-black uppercase tracking-widest hover:bg-[#ff5500] text-[#ff5500] transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"            >
-        
+          className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-black border-[3px] border-black hover:text-black text-sm font-black uppercase tracking-widest hover:bg-[#ff5500] text-[#ff5500] transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
+        >
           Delete Image
         </button>
       </div>

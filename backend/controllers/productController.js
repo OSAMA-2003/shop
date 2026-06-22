@@ -19,6 +19,18 @@ const addProduct = async (req, res) => {
     }
 
     try {
+        let sizesArray = ["S", "M", "L", "XL"];
+        if (req.body.sizes) {
+            try {
+                sizesArray = JSON.parse(req.body.sizes);
+            } catch (e) {
+                if (typeof req.body.sizes === 'string') {
+                    sizesArray = req.body.sizes.split(',').map(s => s.trim());
+                } else {
+                    sizesArray = req.body.sizes;
+                }
+            }
+        }
 
         const product = new productModel({
             name,
@@ -27,6 +39,7 @@ const addProduct = async (req, res) => {
             category,
             image: req.file.path, // Cloudinary URL
             color,
+            sizes: sizesArray,
         });
 
         await product.save();

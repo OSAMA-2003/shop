@@ -1,4 +1,5 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useRef, useEffect } from 'react'
+import axios from 'axios'
 import { useParams, useNavigate } from 'react-router-dom'
 import { MockupProvider, useMockup } from '../context/MockupContext'
 import { ShopContext } from '../context/ShopContenxt'
@@ -117,12 +118,17 @@ function PrecisionControls() {
 function CustomizerContent() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { all_mockups } = useContext(ShopContext)
+  const { all_mockups, addToCart, token, url, fetchCustomMockups } = useContext(ShopContext)
+  const { layers } = useMockup()
   
+  const frontCanvasRef = useRef(null)
+  const backCanvasRef = useRef(null)
+
+  const [activeSide, setActiveSide] = useState('front')
+  const [selectedSize, setSelectedSize] = useState('M')
+
   const backendMockup = (all_mockups || []).find(m => m._id === id)
   
-  const [activeSide, setActiveSide] = useState('front')
-
   const mockup = backendMockup ? {
     id: backendMockup._id,
     name: backendMockup.name,
@@ -135,8 +141,105 @@ function CustomizerContent() {
     ],
   } : null;
 
-  // Default to black or the first available color
-  const [color, setColor] = useState(mockup?.colors?.[0]?.name || 'black')
+  const [color, setColor] = useState('black')
+
+  useEffect(() => {
+    if (mockup?.colors?.[0]?.name) {
+      setColor(mockup.colors[0].name)
+    }
+  }, [mockup])
+
+  const availableSizes = backendMockup?.sizes && backendMockup.sizes.length > 0 ? backendMockup.sizes : ["S", "M", "L", "XL"];
+
+  const handleExportPNG = () => {
+    if (!mockup) return
+    const frontImg = frontCanvasRef.current?.exportImage()
+    const backImg = backCanvasRef.current?.exportImage()
+    
+    if (frontImg) {
+      const link = document.createElement('a')
+      link.href = frontImg
+      link.download = `${mockup.name || 'mockup'}-front.png`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+    if (backImg) {
+      const link = document.createElement('a')
+      link.href = backImg
+      link.download = `${mockup.name || 'mockup'}-back.png`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+  }
+
+  const handleSaveDesign = async (quiet = false) => {
+    if (!mockup || !backendMockup) return null
+    if (!token) {
+      navigate('/login', { state: { from: `/mockups/${mockup.id}` } })
+      return null
+    }
+
+    try {
+      const frontImg = frontCanvasRef.current?.exportImage()
+      const backImg = backCanvasRef.current?.exportImage()
+
+      if (!frontImg || !backImg) {
+        alert('Failed to capture front or back view.')
+        return null
+      }
+
+      const uploadedImages = (layers || [])
+        .filter((l) => l.type === 'image' && l.src && l.src.startsWith('data:'))
+        .map((l) => l.src)
+
+      const payload = {
+        mockupId: mockup.id,
+        name: mockup.name,
+        price: backendMockup.price,
+        color: color,
+        size: selectedSize,
+        imageFront: frontImg,
+        imageBack: backImg,
+        layers: layers || [],
+        uploadedImages: uploadedImages
+      }
+
+      const res = await axios.post(`${url}/api/mockup/custom/save`, payload, {
+        headers: { token }
+      })
+
+      if (res.data.success) {
+        if (!quiet) {
+          alert('Design saved successfully!')
+        }
+        await fetchCustomMockups(token)
+        return res.data.data
+      } else {
+        alert('Failed to save design: ' + res.data.message)
+        return null
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Error saving design: ' + err.message)
+      return null
+    }
+  }
+
+  const handleAddToCart = async () => {
+    if (!mockup) return
+    if (!token) {
+      navigate('/login', { state: { from: `/mockups/${mockup.id}` } })
+      return
+    }
+
+    const savedDesign = await handleSaveDesign(true)
+    if (!savedDesign) return
+    
+    await addToCart(savedDesign._id, 1, selectedSize)
+    navigate('/cart')
+  }
 
   if (!mockup) return (
     <div className="h-screen w-full flex items-center justify-center bg-[#F5F2EB] font-sans text-black">
@@ -145,13 +248,16 @@ function CustomizerContent() {
   )
 
   return (
-    <div className="h-screen  mt-20 w-full flex bg-[#F5F2EB]   p-10 gap-6 font-sans text-black overflow-hidden">
+    <div className="h-screen mt-20 w-full flex bg-[#F5F2EB] p-10 gap-6 font-sans text-black overflow-hidden">
       
-      {/* LEFT SIDEBAR: Layers */}
-      <aside className="w-[320px] flex flex-col shrink-0">
-        <LayerPanel />
-        
-      
+      {/* LEFT SIDEBAR: Layers & Precision Controls */}
+      <aside className="w-[330px] flex flex-col shrink-0 gap-6 overflow-y-auto pr-2 h-full">
+        <div className="flex-1 min-h-[320px]">
+          <LayerPanel activeSide={activeSide} />
+        </div>
+        <div className="flex-1 min-h-[380px]">
+          <PrecisionControls />
+        </div>
       </aside>
 
       {/* CENTER: Canvas Workspace */}
@@ -175,17 +281,58 @@ function CustomizerContent() {
         </div>
 
         <div className="flex-1 w-full h-full relative">
-          <MockupCanvas mockup={mockup} color={color} />
+          <div className={`w-full h-full absolute inset-0 transition-opacity duration-300 ${activeSide === 'front' ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}>
+            <MockupCanvas ref={frontCanvasRef} mockup={mockup} color={color} activeSide="front" />
+          </div>
+          <div className={`w-full h-full absolute inset-0 transition-opacity duration-300 ${activeSide === 'back' ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}>
+            <MockupCanvas ref={backCanvasRef} mockup={mockup} color={color} activeSide="back" />
+          </div>
         </div>
       </main>
 
-      {/* RIGHT SIDEBAR: Controls & Preview */}
-      <aside className="w-[340px] flex flex-col shrink-0 gap-6">
-        <PrecisionControls />
-        
-        <button className="w-full bg-[#FF5722] hover:bg-[#E64A19] text-black border-2 border-black rounded-xl py-6 font-black text-xl uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all">
-          Preview On Model
-        </button>
+      {/* RIGHT SIDEBAR: Select Size & Actions */}
+      <aside className="w-[340px] flex flex-col shrink-0 gap-6 overflow-y-auto pr-2 h-full">
+        {/* SELECT SIZE */}
+        <div className="bg-[#F5F2EB] border-2 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <h3 className="font-black text-black text-lg uppercase tracking-wider mb-3">Select Size</h3>
+          <div className="flex gap-2">
+            {availableSizes.map((size) => (
+              <button
+                key={size}
+                onClick={() => setSelectedSize(size)}
+                className={`w-10 h-10 flex items-center justify-center border-2 border-black font-black text-sm transition-colors ${
+                  selectedSize === size ? 'bg-[#FF5722] text-black' : 'bg-white text-black hover:bg-black/5'
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ACTIONS */}
+        <div className="flex flex-col gap-3">
+          <button 
+            onClick={handleAddToCart}
+            className="w-full bg-[#FF5722] hover:bg-[#E64A19] text-black border-2 border-black rounded-xl py-4 font-black text-lg uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all"
+          >
+            Add Design to Cart
+          </button>
+          
+          <button 
+            onClick={() => handleSaveDesign(false)}
+            className="w-full bg-black text-[#F5F2EB] border-2 border-black rounded-xl py-4 font-black text-lg uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all"
+          >
+            Save Design
+          </button>
+
+          <button 
+            onClick={handleExportPNG}
+            className="w-full bg-white text-black border-2 border-black rounded-xl py-4 font-black text-lg uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all hover:bg-black/5"
+          >
+            Export PNG
+          </button>
+        </div>
       </aside>
 
     </div>

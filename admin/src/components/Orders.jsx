@@ -147,7 +147,7 @@ const Orders = () => {
                                             <div className='mb-6 space-y-2'>
                                                 <p className='text-sm uppercase'>
                                                     <span className='font-black tracking-widest mr-2'>Customer:</span> 
-                                                    <span className='font-bold'>{order.user?.name || 'Unknown'}</span>
+                                                    <span className='font-bold'>{order.userId?.name || 'Unknown'}</span>
                                                 </p>
                                                 <p className='text-sm uppercase leading-relaxed'>
                                                     <span className='font-black tracking-widest mr-2'>Address:</span> 
@@ -186,6 +186,38 @@ const Orders = () => {
                                                                         <p className='text-xs font-bold uppercase'>Size: {item.size || 'M'}</p>
                                                                         <p className='text-xs font-bold uppercase text-[#ff5500]'>Qty: {item.quantity || 1}</p>
                                                                     </div>
+                                                                    {item.imageFront && item.imageBack && (
+                                                                        <div className='mt-3 space-y-2'>
+                                                                            <p className='text-[10px] font-black uppercase tracking-wider text-black/50'>Custom Print Preview (Front / Back):</p>
+                                                                            <div className='flex gap-3'>
+                                                                                <div className='w-20 h-20 bg-[#e5e5e5] border-2 border-black relative group cursor-zoom-in overflow-hidden'>
+                                                                                    <img src={item.imageFront} className='w-full h-full object-contain' alt="Custom Front" onClick={() => window.open(item.imageFront, '_blank')} />
+                                                                                    <div className='absolute bottom-0 left-0 right-0 bg-black/85 text-white text-[8px] font-black uppercase text-center py-0.5'>Front</div>
+                                                                                </div>
+                                                                                <div className='w-20 h-20 bg-[#e5e5e5] border-2 border-black relative group cursor-zoom-in overflow-hidden'>
+                                                                                    <img src={item.imageBack} className='w-full h-full object-contain' alt="Custom Back" onClick={() => window.open(item.imageBack, '_blank')} />
+                                                                                    <div className='absolute bottom-0 left-0 right-0 bg-black/85 text-white text-[8px] font-black uppercase text-center py-0.5'>Back</div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                    {item.uploadedImages && item.uploadedImages.length > 0 && (
+                                                                        <div className='mt-3 space-y-2'>
+                                                                            <p className='text-[10px] font-black uppercase tracking-wider text-black/50'>Uploaded Assets ({item.uploadedImages.length}):</p>
+                                                                            <div className='flex flex-wrap gap-2'>
+                                                                                {item.uploadedImages.map((imgSrc, imgIdx) => (
+                                                                                    <div key={imgIdx} className='w-12 h-12 bg-white border-2 border-black relative cursor-zoom-in overflow-hidden'>
+                                                                                        <img 
+                                                                                            src={imgSrc} 
+                                                                                            className='w-full h-full object-cover' 
+                                                                                            alt={`Asset ${imgIdx + 1}`} 
+                                                                                            onClick={() => window.open(imgSrc, '_blank')}
+                                                                                        />
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                             </div>
                                                             <p className='font-black text-lg'>

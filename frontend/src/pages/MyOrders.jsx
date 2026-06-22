@@ -125,6 +125,17 @@ const MyOrders = () => {
                             className='w-full h-full object-contain mix-blend-multiply'
                           />
                         )}
+
+                        {/* Size Badge */}
+                        <div className='absolute bottom-1 left-1 bg-black text-[#f9f9f6] text-[10px] font-black uppercase px-1.5 py-0.5 border border-black shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] z-10'>
+                          {item.size || 'M'}
+                        </div>
+
+                        {item.isCustomMockup && (
+                          <div className='absolute top-1 left-1 bg-[#ff5500] text-black text-[8px] font-black uppercase px-1 py-0.5 border border-black z-10'>
+                            Custom
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

@@ -5,7 +5,7 @@ import { ShopContext } from '../context/ShopContenxt'
 import CardSkeleton from '../components/CardSkeleton'
 
 export default function Mockups() {
-  const { all_mockups } = useContext(ShopContext);
+  const { all_mockups, loading } = useContext(ShopContext);
 
   const formattedMockups = (all_mockups || []).map(m => ({
     id: m._id,
@@ -26,14 +26,23 @@ export default function Mockups() {
           </h1>
           <p className="text-gray-600">Choose a product and customize it with your design</p>
         </div>
-        {formattedMockups.length === 0 ? (
+        {loading ? (
            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {[...Array(8)].map((_, index) => (
                 <CardSkeleton key={index} />
               ))}
             </div>
-        ) : (
+        ) : formattedMockups.length > 0 ? (
           <MockupGrid mockups={formattedMockups} />
+        ) : (
+          <div className="w-full py-24 flex flex-col items-center justify-center text-center border-[4px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-black">
+              Mockups <span className="text-[#ff5500]">Coming Soon</span>
+            </h3>
+            <p className="mt-4 text-sm font-bold uppercase tracking-widest text-gray-500">
+              The lab is currently cooking up new canvases. Stay tuned.
+            </p>
+          </div>
         )}
       </div>
     </div>

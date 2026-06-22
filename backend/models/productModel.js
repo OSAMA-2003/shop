@@ -28,8 +28,10 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-
-
+    sizes: {
+        type: Array,
+        default: ["S", "M", "L", "XL"]
+    }
 })
 
 

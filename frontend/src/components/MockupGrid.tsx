@@ -11,19 +11,12 @@ interface Mockup {
 
 export default function MockupGrid({ mockups }: { mockups: Mockup[] }) {
   return (
-   
-    <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4 md:px-0">
-      
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
       {mockups.map((m) => (
-        // 4. Wrap the card to enforce dimensions and snap behavior
-        <div 
-          key={m.id} 
-          className="snap-center shrink-0 w-[80vw] sm:w-[320px] lg:w-[400px]"
-        >
+        <div key={m.id} className="w-full">
           <MockupCard mockup={m} />
         </div>
       ))}
-
     </div>
   )
 }

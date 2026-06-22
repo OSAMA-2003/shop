@@ -21,7 +21,7 @@ const MenuItems = ({ setSideBarOpen, isMobile }) => {
 
     return (
         <div className={`flex md:justify-center lg:justify-end ${isMobile ? "flex-col space-y-4 items-start pt-4" : "flex-row w-full items-center gap-2 lg:gap-4"}`}>
-            
+
             {/* NAVIGATION LINKS */}
             {menuItemsData.map(({ to, label, Icon }) =>
                 location.pathname === "/" ? (
@@ -59,12 +59,12 @@ const MenuItems = ({ setSideBarOpen, isMobile }) => {
 
             {/* DESKTOP CART ICON (Hidden on Mobile Sidebar) */}
             {!isMobile && (
-                <button 
+                <button
                     onClick={() => {
                         navigate("/cart");
                         if (setSideBarOpen) setSideBarOpen(false);
                     }}
-                    className="relative flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-gray-600 hover:bg-white/50 hover:text-[#ff5500]" 
+                    className="relative flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-gray-600 hover:bg-white/50 hover:text-[#ff5500]"
                 >
                     <ShoppingCart className='w-5 h-5' />
                     {totalItems > 0 && (
@@ -82,14 +82,14 @@ const MenuItems = ({ setSideBarOpen, isMobile }) => {
                         navigate("/login");
                         if (setSideBarOpen) setSideBarOpen(false);
                     }}
-            className='bg-[#ff5500]  px-4 font-black text-lg  uppercase text-black hover:bg-black hover:text-[#ff5500] transition-colors rounded-xl'
+                    className='bg-[#ff5500]  px-4 font-bold text-lg  uppercase text-white hover:bg-black hover:text-[#ff5500] transition-colors rounded-xl'
                 >
                     Login
                 </button>
             ) : (
                 <div className={`flex ${isMobile ? 'flex-col w-full gap-2' : 'items-center gap-2'}`}>
-                    <button 
-                        onClick={() => { navigate("/profile"); if (setSideBarOpen) setSideBarOpen(false); }} 
+                    <button
+                        onClick={() => { navigate("/profile"); if (setSideBarOpen) setSideBarOpen(false); }}
                         className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:bg-white/50 hover:text-[#ff5500] transition-colors ${isMobile ? "w-full" : ""}`}
                     >
                         <User className='w-5 h-5' />

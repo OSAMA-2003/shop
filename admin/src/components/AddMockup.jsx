@@ -14,6 +14,7 @@ const AddMockup = () => {
         category: 'T-Shirt',
         color: 'Black',
     });
+    const [selectedSizes, setSelectedSizes] = useState(["S", "M", "L", "XL"]);
 
     const toastStyle = {
         style: {
@@ -57,6 +58,7 @@ const AddMockup = () => {
         formData.append('price', Number(data.price));
         formData.append('category', data.category);
         formData.append('color', data.color);
+        formData.append('sizes', JSON.stringify(selectedSizes));
         if (imageFront) formData.append('imageFront', imageFront);
         if (imageBack) formData.append('imageBack', imageBack);
 
@@ -73,6 +75,7 @@ const AddMockup = () => {
                     category: 'T-Shirt',
                     color: 'Black',
                 });
+                setSelectedSizes(["S", "M", "L", "XL"]);
                 setImageFront(null);
                 setImageBack(null);
                 document.getElementById('imageFrontInput').value = '';
@@ -179,6 +182,30 @@ const AddMockup = () => {
                                     <option value="Blue">Blue</option>
                                     <option value="Gray">Gray</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        {/* SIZES SELECTION */}
+                        <div className='flex flex-col'>
+                            <label className='text-sm font-black uppercase tracking-widest mb-2'>Available Sizes *</label>
+                            <div className='flex gap-4 flex-wrap'>
+                                {["S", "M", "L", "XL", "XXL"].map((size) => (
+                                    <label key={size} className="flex items-center gap-2 cursor-pointer font-bold text-sm uppercase">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={selectedSizes.includes(size)}
+                                            onChange={(e) => {
+                                                if (e.target.checked) {
+                                                    setSelectedSizes(prev => [...prev, size]);
+                                                } else {
+                                                    setSelectedSizes(prev => prev.filter(s => s !== size));
+                                                }
+                                            }}
+                                            className="w-5 h-5 border-2 border-black accent-black rounded-none cursor-pointer"
+                                        />
+                                        {size}
+                                    </label>
+                                ))}
                             </div>
                         </div>
 

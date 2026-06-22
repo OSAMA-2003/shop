@@ -76,7 +76,7 @@ const Product = () => {
       return;
     }
     // Context handles adding to cart
-    addToCart(product._id, quantity);
+    addToCart(product._id, quantity, selectedSize);
     alert(`Added ${quantity} of ${product.name} (Size: ${selectedSize}) to the cart!`);
   }
 
@@ -125,7 +125,7 @@ const Product = () => {
 
           {/* SIZES */}
           <motion.div variants={itemVariants} className="flex gap-2 mb-6">
-            {["S", "M", "L", "XL"].map((size) => (
+            {(product.sizes && product.sizes.length > 0 ? product.sizes : ["S", "M", "L", "XL"]).map((size) => (
               <button
                 key={size}
                 onClick={() => setSelectedSize(size)}

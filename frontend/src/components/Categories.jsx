@@ -3,6 +3,7 @@ import { categories } from "../assets/data";
 import { ShopContext } from '../context/ShopContenxt';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import CardSkeleton from './CardSkeleton';
 
 // 1. Define Animation Variants
 const headerVariants = {
@@ -47,7 +48,7 @@ const cardVariants = {
 const Categories = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [displayCount, setDisplayCount] = useState(6); 
-  const { all_products } = useContext(ShopContext);
+  const { all_products, loading } = useContext(ShopContext);
   const navigate = useNavigate();
 
   // Safely fallback to empty array if all_products is undefined
@@ -111,7 +112,25 @@ const Categories = () => {
 
         {/* Editorial Grid Layout or Coming Soon State */}
         <AnimatePresence mode="wait">
-          {filteredProducts.length === 0 ? (
+          {loading ? (
+            /* Skeleton Loading State */
+            <motion.div 
+              key="skeleton-grid"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-12 auto-rows-[350px] md:auto-rows-[350px] lg:auto-rows-[400px]'
+            >
+              {[...Array(6)].map((_, index) => {
+                const isLarge = index % 3 === 0;
+                return (
+                  <div key={index} className={`w-full h-full ${isLarge ? "md:row-span-2" : ""}`}>
+                    <CardSkeleton />
+                  </div>
+                );
+              })}
+            </motion.div>
+          ) : filteredProducts.length === 0 ? (
             /* Coming Soon State */
             <motion.div 
               key="coming-soon"

@@ -34,6 +34,7 @@ const placeOrder = async(req,res)=>{
             items : req.body.items,
             amount : req.body.amount,
             address : addressData,
+            date: new Date().toISOString()
         })
 
         await newOrder.save()

@@ -99,7 +99,7 @@ const Hero = () => {
               onClick={() => {
                 document.getElementById('mockups')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="inline-flex items-center w-full justify-center rounded-3xl gap-2 px-8 py-4 bg-[#ff5500] border-[1px] border-black hover:border-white text-white text-sm font-black uppercase tracking-widest hover:bg-black transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"            
+              className="inline-flex items-center w-full justify-center  gap-2 px-8 py-4 bg-[#ff5500] border-[1px] border-black hover:border-white text-white text-sm font-black uppercase tracking-widest hover:bg-black transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"            
             >
               Explore Mockups
             </motion.button>
@@ -111,7 +111,7 @@ const Hero = () => {
               onClick={() => {
                 document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="inline-flex items-center w-full justify-center gap-2 rounded-3xl px-8 py-4 hover:bg-[#ff5500] border-[1px] border-white text-sm font-black uppercase tracking-widest bg-black text-white transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"            
+              className="inline-flex items-center w-full justify-center gap-2 px-8 py-4 hover:bg-[#ff5500] border-[1px] border-white text-sm font-black uppercase tracking-widest bg-black text-white transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"            
             >
               View Lookbook
             </motion.button>

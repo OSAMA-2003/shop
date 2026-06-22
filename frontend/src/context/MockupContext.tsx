@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 export interface Layer {
   id: string
   type: 'image' | 'text'
+  side?: 'front' | 'back'
   src?: string // for images
   text?: string // for text
   x: number
@@ -58,7 +59,7 @@ export function MockupProvider({ children }: { children: React.ReactNode }) {
 
   const addLayer = useCallback((layer: Omit<Layer, 'id'>) => {
     const id = uuidv4()
-    setLayers((prev) => [...prev, { ...layer, id }])
+    setLayers((prev) => [...prev, { side: 'front', ...layer, id }])
     return id
   }, [])
 

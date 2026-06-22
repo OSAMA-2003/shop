@@ -3,7 +3,7 @@ import { ShopContext } from '../context/ShopContenxt';
 import { useNavigate } from 'react-router-dom';
 
 const Order = () => {
-  const { getTotalCartAmount, placeOrder, loading, cartItems, all_products } = useContext(ShopContext);
+  const { getTotalCartAmount, placeOrder, loading, cartItems, all_products, all_mockups, customMockups } = useContext(ShopContext);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -27,10 +27,22 @@ const Order = () => {
   }, [loading, getTotalCartAmount, navigate]);
 
   // Map cart items for the summary box
-  const cartProducts = Object.keys(cartItems || {})
-    .map((id) => all_products.find((p) => p._id === id))
-    .filter(Boolean)
-    .map((product) => ({ ...product, quantity: cartItems[product._id] }));
+  const cartProducts = Object.entries(cartItems || {})
+    .map(([cartKey, qty]) => {
+      const [id, size] = cartKey.split('_');
+      const product = all_products.find((p) => p._id === id) 
+                    || all_mockups.find((m) => m._id === id)
+                    || (customMockups || []).find((cm) => cm._id === id);
+      if (!product) return null;
+      return { 
+        ...product, 
+        image: product.image || product.imageFront, 
+        size: size || 'M', 
+        quantity: qty, 
+        cartKey 
+      };
+    })
+    .filter(Boolean);
 
   // Calculate totals to match the reference image's structure
   const subtotal = getTotalCartAmount();

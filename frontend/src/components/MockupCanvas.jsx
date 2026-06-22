@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react'
 import { Stage, Layer, Image as KImage, Transformer, Rect, Text, Group, Path } from 'react-konva'
 import useImage from 'use-image'
 import { useMockup } from '../context/MockupContext'
@@ -15,14 +15,10 @@ const transformerProps = {
   enabledAnchors: ['top-left', 'top-right', 'bottom-right', 'bottom-left'],
 }
 
-const createBoundBoxFunc = (printable) => {
+const createBoundBoxFunc = () => {
   return (oldBox, newBox) => {
-    if (
-      newBox.x < printable.x ||
-      newBox.y < printable.y ||
-      newBox.x + newBox.width > printable.x + printable.width ||
-      newBox.y + newBox.height > printable.y + printable.height
-    ) {
+    // Avoid scaling below 10px to prevent disappearing/flipping issues
+    if (newBox.width < 10 || newBox.height < 10) {
       return oldBox 
     }
     return newBox 
@@ -30,16 +26,22 @@ const createBoundBoxFunc = (printable) => {
 }
 
 function ImageLayerNode({ node, isSelected, onSelect, onChange, printable }) {
-  const [image] = useImage(node.src)
+  const [image] = useImage(node.src, 'anonymous')
   const shapeRef = useRef(null)
   const trRef = useRef(null)
+
+  // Force render to populate shapeRef for Transformer on mount/load
+  const [, forceUpdate] = useState({});
+  useEffect(() => {
+    forceUpdate({});
+  }, [image]);
 
   useEffect(() => {
     if (isSelected && trRef.current && shapeRef.current) {
       trRef.current.nodes([shapeRef.current])
       trRef.current.getLayer()?.batchDraw()
     }
-  }, [isSelected])
+  }, [isSelected, image])
 
   return (
     <React.Fragment>
@@ -54,15 +56,42 @@ function ImageLayerNode({ node, isSelected, onSelect, onChange, printable }) {
         scaleY={node.scaleY}
         opacity={node.opacity ?? 1}
         draggable
-        onMouseDown={onSelect}
-        onTouchStart={onSelect}
+        onMouseDown={(e) => {
+          e.cancelBubble = true;
+          onSelect();
+        }}
+        onTouchStart={(e) => {
+          e.cancelBubble = true;
+          onSelect();
+        }}
+        onClick={(e) => {
+          e.cancelBubble = true;
+          onSelect();
+        }}
+        onTap={(e) => {
+          e.cancelBubble = true;
+          onSelect();
+        }}
         dragBoundFunc={(pos) => {
+          const stage = shapeRef.current?.getStage();
+          if (!stage) return pos;
+          
+          // Convert absolute screen coordinates to local stage coordinates
+          const transform = stage.getAbsoluteTransform().copy().invert();
+          const localPos = transform.point(pos);
+          
           const width = (node.width || 200) * (node.scaleX || 1);
           const height = (node.height || 200) * (node.scaleY || 1);
-          return {
-            x: Math.max(printable.x, Math.min(pos.x, printable.x + printable.width - width)),
-            y: Math.max(printable.y, Math.min(pos.y, printable.y + printable.height - height)),
-          };
+          
+          // Allow dragging anywhere within the stage canvas limits
+          const sWidth = stage.width() / stage.scaleX();
+          const sHeight = stage.height() / stage.scaleY();
+          
+          const clampedLocalX = Math.max(0, Math.min(localPos.x, sWidth - width));
+          const clampedLocalY = Math.max(0, Math.min(localPos.y, sHeight - height));
+          
+          // Convert local coordinates back to absolute coordinates for Konva
+          return stage.getAbsoluteTransform().point({ x: clampedLocalX, y: clampedLocalY });
         }}
         onDragEnd={(e) => {
           onChange({
@@ -84,32 +113,68 @@ function ImageLayerNode({ node, isSelected, onSelect, onChange, printable }) {
         }}
         ref={shapeRef}
       />
-      {isSelected && (
+      {isSelected && shapeRef.current && (
         <Transformer 
           ref={trRef} 
+          nodes={[shapeRef.current]}
           {...transformerProps} 
-          boundBoxFunc={createBoundBoxFunc(printable)}
+          boundBoxFunc={createBoundBoxFunc()}
         />
       )}
     </React.Fragment>
   )
 }
 
-export default function MockupCanvas({ mockup }) {
+const MockupCanvas = forwardRef(({ mockup, activeSide = 'front' }, ref) => {
   const containerRef = useRef(null)
   const stageRef = useRef(null)
-  
-  // NEW: Ref for the hidden file input
   const fileInputRef = useRef(null)
 
-  const [backgroundImage] = useImage(mockup.preview)
+  const previewImageSrc = activeSide === 'front' ? (mockup.previewFront || mockup.preview) : (mockup.previewBack || mockup.preview)
+  const [backgroundImage] = useImage(previewImageSrc, 'anonymous')
   
-  // NEW: Brought in addLayer from context
   const { layers, selectedId, selectLayer, updateLayer, deleteLayer, scale, addLayer } = useMockup()
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
 
   const stageWidth = mockup.printable.width + mockup.printable.x * 2
   const stageHeight = mockup.printable.height + mockup.printable.y * 2
+
+  // Filter layers for the current active side
+  const sideLayers = layers.filter(layer => layer.side === activeSide)
+
+  useImperativeHandle(ref, () => ({
+    exportImage: () => {
+      if (!stageRef.current) return null;
+      
+      // Find and hide transformers
+      const transformers = stageRef.current.find('Transformer');
+      transformers.forEach(tr => tr.hide());
+      
+      // Find and hide boundary
+      const boundary = stageRef.current.findOne('.printableBoundary');
+      if (boundary) boundary.hide();
+      
+      // Find and hide upload placeholder Group
+      const uploadGroup = stageRef.current.findOne('.uploadGroup');
+      if (uploadGroup) uploadGroup.hide();
+      
+      // Redraw stage to reflect hidden elements
+      stageRef.current.draw();
+      
+      // Get the data URL (Base64 PNG)
+      const dataUrl = stageRef.current.toDataURL({ pixelRatio: 2 });
+      
+      // Restore the elements' visibility
+      transformers.forEach(tr => tr.show());
+      if (boundary) boundary.show();
+      if (uploadGroup) uploadGroup.show();
+      
+      // Redraw stage to restore UI state
+      stageRef.current.draw();
+      
+      return dataUrl;
+    }
+  }));
 
   useEffect(() => {
     function updateSize() {
@@ -131,24 +196,21 @@ export default function MockupCanvas({ mockup }) {
     }
   }
 
-  // Shared logic for both clicking and dragging files
   const processFile = (file) => {
     const reader = new FileReader()
     reader.onload = () => {
       const img = new window.Image()
       img.src = reader.result
       img.onload = () => {
-        // Calculate aspect ratio so the image doesn't get stretched
         const aspectRatio = img.width / img.height
-        const targetHeight = 250 // Base height
+        const targetHeight = 200 // Base height
         const targetWidth = targetHeight * aspectRatio // Responsive width
 
-        const newLayerId = Date.now().toString()
-        addLayer({
-          id: newLayerId,
+        const newLayerId = addLayer({
           type: 'image',
+          side: activeSide,
           src: reader.result,
-          // Center it inside the printable area
+          // Center inside printable area
           x: mockup.printable.x + (mockup.printable.width / 2) - (targetWidth / 2),
           y: mockup.printable.y + (mockup.printable.height / 2) - (targetHeight / 2),
           width: targetWidth,
@@ -163,16 +225,14 @@ export default function MockupCanvas({ mockup }) {
     reader.readAsDataURL(file)
   }
 
-  // NEW: Handle uploading an image directly from the canvas click
   const handleCanvasUpload = (e) => {
     const file = e.target.files?.[0]
     if (!file) return
     
     processFile(file)
-    if (fileInputRef.current) fileInputRef.current.value = '' // Reset input
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
-  // NEW: Handle Drag and Drop natively on the container
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -205,7 +265,6 @@ export default function MockupCanvas({ mockup }) {
         backgroundColor: '#F5F2EB'
       }}
     >
-      {/* Hidden file input for canvas clicking */}
       <input 
         type="file" 
         ref={fileInputRef} 
@@ -243,35 +302,32 @@ export default function MockupCanvas({ mockup }) {
               strokeWidth={2}
               dash={[8, 8]}
               listening={false} 
+              name="printableBoundary"
             />
 
-            {/* Clickable Area: We add an invisible rectangle to catch clicks easily */}
-            {layers.length === 0 && (
+            {sideLayers.length === 0 && (
                <Group 
                  x={mockup.printable.x} 
                  y={mockup.printable.y}
-                 // Add pointer cursor so the user knows they can click it
                  onMouseEnter={(e) => { e.target.getStage().container().style.cursor = 'pointer' }}
                  onMouseLeave={(e) => { e.target.getStage().container().style.cursor = 'default' }}
                  onClick={() => fileInputRef.current?.click()}
                  onTap={() => fileInputRef.current?.click()}
+                 name="uploadGroup"
                >
-                 {/* Invisible background to catch the click anywhere in the box */}
                  <Rect 
                    x={0} y={0} 
                    width={mockup.printable.width} 
                    height={mockup.printable.height} 
-                  fill="rgba(0,0,0,0)" 
+                   fill="rgba(0,0,0,0)" 
                  />
 
-                 {/* The visual graphic */}
-                 <Group y={mockup.printable.height / 2 - 30} listening={false}  onClick={() => fileRef.current?.click()} >
+                 <Group y={mockup.printable.height / 2 - 30} listening={false}>
                     <Path
                         x={mockup.printable.width / 2 - 15} y={-45}
                         data="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" fill="#FF5722" scale={{x: 1.5, y: 1.5}}
                     />
                     <Text
-                    
                         y={0} width={mockup.printable.width}
                         text="CLICK OR DRAG IMAGE HERE" align="center" fill="#FF5722" fontSize={16} fontFamily="monospace" fontStyle="bold" lineHeight={1.5}
                     />
@@ -285,7 +341,7 @@ export default function MockupCanvas({ mockup }) {
           </Layer>
 
           <Layer>
-            {layers.map((layer) => {
+            {sideLayers.map((layer) => {
               if (layer.type === 'image') {
                 return (
                   <ImageLayerNode
@@ -305,4 +361,6 @@ export default function MockupCanvas({ mockup }) {
       )}
     </div>
   )
-}
+})
+
+export default MockupCanvas

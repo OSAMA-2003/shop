@@ -49,15 +49,27 @@ const cartItemVariants = {
 };
 
 const Cart = () => {
-  const { cartItems, all_products, addToCart, removeFromCart, getTotalCartAmount } = useContext(ShopContext)
+  const { cartItems, all_products, all_mockups, customMockups, addToCart, removeFromCart, getTotalCartAmount } = useContext(ShopContext)
   const navigate = useNavigate()
   
   const total = getTotalCartAmount()
 
-  const cartProducts = Object.keys(cartItems)
-    .map((id) => all_products.find((p) => p._id === id)) 
-    .filter(Boolean) 
-    .map((product) => ({ ...product, quantity: cartItems[product._id] })); 
+  const cartProducts = Object.entries(cartItems || {})
+    .map(([cartKey, qty]) => {
+      const [id, size] = cartKey.split('_');
+      const product = all_products.find((p) => p._id === id) 
+                    || all_mockups.find((m) => m._id === id)
+                    || (customMockups || []).find((cm) => cm._id === id);
+      if (!product) return null;
+      return { 
+        ...product, 
+        image: product.image || product.imageFront, 
+        size: size || 'M', 
+        quantity: qty, 
+        cartKey 
+      };
+    })
+    .filter(Boolean);
 
   // Calculate total number of items for the header
   const totalItemsCount = cartProducts.reduce((acc, item) => acc + item.quantity, 0);
@@ -100,7 +112,7 @@ const Cart = () => {
                     initial="hidden"
                     animate="visible"
                     exit="exit"
-                    key={item._id} 
+                    key={item.cartKey} 
                     className='flex items-start justify-between'
                   >
                     <div className='flex gap-4 sm:gap-6 w-full'>
@@ -126,7 +138,7 @@ const Cart = () => {
                       {/* Controls */}
                       <div className='flex items-start gap-2 sm:gap-3 pt-1'>
                         <button 
-                          onClick={() => removeFromCart(item._id)} 
+                          onClick={() => removeFromCart(item.cartKey)} 
                           className='w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center border-2 border-black hover:bg-[#ff5500] hover:text-white transition-colors font-mono text-xl sm:text-2xl leading-none active:scale-90'
                         >
                           -
@@ -137,7 +149,7 @@ const Cart = () => {
                         </span>
 
                         <button 
-                          onClick={() => addToCart(item._id)} 
+                          onClick={() => addToCart(item._id, 1, item.size)} 
                           className='w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center border-2 border-black hover:bg-[#ff5500] hover:text-white transition-colors font-mono text-xl sm:text-2xl leading-none active:scale-90'
                         >
                           +
