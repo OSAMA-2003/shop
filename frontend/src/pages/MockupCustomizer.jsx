@@ -5,6 +5,7 @@ import { MockupProvider, useMockup } from '../context/MockupContext'
 import { ShopContext } from '../context/ShopContenxt'
 import MockupCanvas from '../components/MockupCanvas'
 import LayerPanel from '../components/LayerPanel'
+import { Loader2 } from 'lucide-react'
 
 // Replaces your TransformControls to match the "PRECISION CONTROLS" panel
 // Replaces your current PrecisionControls in MockupCustomizer.jsx
@@ -28,9 +29,9 @@ function PrecisionControls() {
   return (
     <div className="flex flex-col  h-full bg-[#F5F2EB] border-2 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
       <h3 className="font-black text-black text-xl uppercase tracking-wider mb-4">Precision Controls</h3>
-      
+
       {/* Checkerboard Preview Area */}
-      <div 
+      <div
         className="w-full h-32 border-2 border-black border-dashed mb-6 rounded-md relative flex items-center justify-center overflow-hidden"
         style={{
           backgroundImage: 'repeating-conic-gradient(#E5E5E5 0% 25%, transparent 0% 50%)',
@@ -62,12 +63,12 @@ function PrecisionControls() {
         <div>
           <label className="block text-sm font-bold text-black mb-2 uppercase tracking-wide">Scale</label>
           <div className="flex items-center gap-4">
-            <input 
-              type="range" min="0.1" max="3" step="0.05" 
-              value={selectedLayer?.scaleX ?? 1} 
-              onChange={handleScaleChange} 
+            <input
+              type="range" min="0.1" max="3" step="0.05"
+              value={selectedLayer?.scaleX ?? 1}
+              onChange={handleScaleChange}
               disabled={!selectedLayer}
-              className="flex-1 accent-[#FF5722] cursor-pointer" 
+              className="flex-1 accent-[#FF5722] cursor-pointer"
             />
             <div className="border-2 border-black rounded-md bg-white px-2 py-1 font-mono text-sm w-16 text-center">
               {Math.round((selectedLayer?.scaleX ?? 1) * 100)}%
@@ -93,12 +94,12 @@ function PrecisionControls() {
         <div>
           <label className="block text-sm font-bold text-black mb-2 uppercase tracking-wide">Opacity</label>
           <div className="flex items-center gap-4">
-            <input 
-              type="range" min="0" max="1" step="0.1" name="opacity" 
-              value={selectedLayer?.opacity ?? 1} 
-              onChange={handleChange} 
+            <input
+              type="range" min="0" max="1" step="0.1" name="opacity"
+              value={selectedLayer?.opacity ?? 1}
+              onChange={handleChange}
               disabled={!selectedLayer}
-              className="flex-1 accent-[#FF5722] cursor-pointer" 
+              className="flex-1 accent-[#FF5722] cursor-pointer"
             />
             <div className="border-2 border-black rounded-md bg-white px-2 py-1 font-mono text-sm w-16 text-center">
               {Math.round((selectedLayer?.opacity ?? 1) * 100)}%
@@ -120,15 +121,16 @@ function CustomizerContent() {
   const navigate = useNavigate()
   const { all_mockups, addToCart, token, url, fetchCustomMockups } = useContext(ShopContext)
   const { layers } = useMockup()
-  
+
   const frontCanvasRef = useRef(null)
   const backCanvasRef = useRef(null)
 
   const [activeSide, setActiveSide] = useState('front')
   const [selectedSize, setSelectedSize] = useState('M')
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const backendMockup = (all_mockups || []).find(m => m._id === id)
-  
+
   const mockup = backendMockup ? {
     id: backendMockup._id,
     name: backendMockup.name,
@@ -155,7 +157,7 @@ function CustomizerContent() {
     if (!mockup) return
     const frontImg = frontCanvasRef.current?.exportImage()
     const backImg = backCanvasRef.current?.exportImage()
-    
+
     if (frontImg) {
       const link = document.createElement('a')
       link.href = frontImg
@@ -227,6 +229,17 @@ function CustomizerContent() {
     }
   }
 
+  const handleSaveClick = async () => {
+    setIsProcessing(true)
+    try {
+      await handleSaveDesign(false)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
   const handleAddToCart = async () => {
     if (!mockup) return
     if (!token) {
@@ -234,11 +247,21 @@ function CustomizerContent() {
       return
     }
 
-    const savedDesign = await handleSaveDesign(true)
-    if (!savedDesign) return
-    
-    await addToCart(savedDesign._id, 1, selectedSize)
-    navigate('/cart')
+    setIsProcessing(true)
+    try {
+      const savedDesign = await handleSaveDesign(true)
+      if (!savedDesign) {
+        setIsProcessing(false)
+        return
+      }
+
+      await addToCart(savedDesign._id, 1, selectedSize)
+      navigate('/cart')
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
   if (!mockup) return (
@@ -249,7 +272,7 @@ function CustomizerContent() {
 
   return (
     <div className="h-screen mt-20 w-full flex bg-[#F5F2EB] p-10 gap-6 font-sans text-black overflow-hidden">
-      
+
       {/* LEFT SIDEBAR: Layers & Precision Controls */}
       <aside className="w-[330px] flex flex-col shrink-0 gap-6 overflow-y-auto pr-2 h-full">
         <div className="flex-1 min-h-[320px]">
@@ -262,21 +285,21 @@ function CustomizerContent() {
 
       {/* CENTER: Canvas Workspace */}
       <main className="flex-1 relative border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white flex flex-col">
-        
+
         {/* VIEW TOGGLE TABS */}
         <div className="flex border-b-2 border-black shrink-0">
-          <button 
-              onClick={() => setActiveSide('front')}
-              className={`flex-1 py-3 font-black uppercase tracking-widest text-sm transition-colors ${activeSide === 'front' ? 'bg-[#FF5722] text-black' : 'bg-[#E5E5E5] text-black/50 hover:bg-[#E5E5E5]/80 hover:text-black'}`}
+          <button
+            onClick={() => setActiveSide('front')}
+            className={`flex-1 py-3 font-black uppercase tracking-widest text-sm transition-colors ${activeSide === 'front' ? 'bg-[#FF5722] text-black' : 'bg-[#E5E5E5] text-black/50 hover:bg-[#E5E5E5]/80 hover:text-black'}`}
           >
-              Front View
+            Front View
           </button>
           <div className="w-[2px] bg-black"></div>
-          <button 
-              onClick={() => setActiveSide('back')}
-              className={`flex-1 py-3 font-black uppercase tracking-widest text-sm transition-colors ${activeSide === 'back' ? 'bg-[#FF5722] text-black' : 'bg-[#E5E5E5] text-black/50 hover:bg-[#E5E5E5]/80 hover:text-black'}`}
+          <button
+            onClick={() => setActiveSide('back')}
+            className={`flex-1 py-3 font-black uppercase tracking-widest text-sm transition-colors ${activeSide === 'back' ? 'bg-[#FF5722] text-black' : 'bg-[#E5E5E5] text-black/50 hover:bg-[#E5E5E5]/80 hover:text-black'}`}
           >
-              Back View
+            Back View
           </button>
         </div>
 
@@ -300,9 +323,8 @@ function CustomizerContent() {
               <button
                 key={size}
                 onClick={() => setSelectedSize(size)}
-                className={`w-10 h-10 flex items-center justify-center border-2 border-black font-black text-sm transition-colors ${
-                  selectedSize === size ? 'bg-[#FF5722] text-black' : 'bg-white text-black hover:bg-black/5'
-                }`}
+                className={`w-10 h-10 flex items-center justify-center border-2 border-black font-black text-sm transition-colors ${selectedSize === size ? 'bg-[#FF5722] text-black' : 'bg-white text-black hover:bg-black/5'
+                  }`}
               >
                 {size}
               </button>
@@ -312,23 +334,40 @@ function CustomizerContent() {
 
         {/* ACTIONS */}
         <div className="flex flex-col gap-3">
-          <button 
+          <button
             onClick={handleAddToCart}
-            className="w-full bg-[#FF5722] hover:bg-[#E64A19] text-black border-2 border-black rounded-xl py-4 font-black text-lg uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all"
+            disabled={isProcessing}
+            className="w-full bg-[#FF5722] hover:bg-[#E64A19] disabled:bg-gray-400 disabled:cursor-not-allowed text-black border-2 border-black rounded-xl py-4 font-black text-lg uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all flex items-center justify-center gap-2"
           >
-            Add Design to Cart
-          </button>
-          
-          <button 
-            onClick={() => handleSaveDesign(false)}
-            className="w-full bg-black text-[#F5F2EB] border-2 border-black rounded-xl py-4 font-black text-lg uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all"
-          >
-            Save Design
+            {isProcessing ? (
+              <>
+                <Loader2 className="animate-spin w-5 h-5" />
+                Processing...
+              </>
+            ) : (
+              'Add Design to Cart'
+            )}
           </button>
 
-          <button 
+          <button
+            onClick={handleSaveClick}
+            disabled={isProcessing}
+            className="w-full bg-black hover:bg-black/90 disabled:bg-gray-700 disabled:cursor-not-allowed text-[#F5F2EB] border-2 border-black rounded-xl py-4 font-black text-lg uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all flex items-center justify-center gap-2"
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="animate-spin w-5 h-5" />
+                Saving...
+              </>
+            ) : (
+              'Save Design'
+            )}
+          </button>
+
+          <button
             onClick={handleExportPNG}
-            className="w-full bg-white text-black border-2 border-black rounded-xl py-4 font-black text-lg uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all hover:bg-black/5"
+            disabled={isProcessing}
+            className="w-full bg-white text-black disabled:bg-gray-200 disabled:cursor-not-allowed border-2 border-black rounded-xl py-4 font-black text-lg uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all hover:bg-black/5 flex items-center justify-center gap-2"
           >
             Export PNG
           </button>
@@ -342,8 +381,8 @@ function CustomizerContent() {
 export default function MockupCustomizer() {
   return (
     <MockupProvider>
-         <CustomizerContent />
-     
+      <CustomizerContent />
+
     </MockupProvider>
   )
 }

@@ -23,15 +23,21 @@ const ShopContextProvider = ({ children }) => {
         const syncCart = async () => {
             if (token) {
                 setLoading(true);
-                await Promise.all([
-                    loadCartData(token),
-                    fetchCustomMockups(token)
-                ]);
-                setLoading(false);
+                try {
+                    await Promise.all([
+                        loadCartData(token),
+                        fetchCustomMockups(token)
+                    ]);
+                } catch (err) {
+                    console.error("Error syncing cart data:", err);
+                } finally {
+                    setLoading(false);
+                }
             } else {
                 // Clear cart state on client side only when logged out
                 setCartItems({});
                 setCustomMockups([]);
+                setLoading(false);
             }
         };
         syncCart();
