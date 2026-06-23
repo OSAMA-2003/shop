@@ -5,11 +5,13 @@ import { Eye, Lock, ChevronRight, ChevronDown } from 'lucide-react'
 export default function LayerPanel({
   activeSide = 'front',
   isOpen = true,
-  onToggle
+  onToggle,
+  printable = { x: 150, y: 150, width: 300, height: 400 }
 }: {
   activeSide?: 'front' | 'back';
   isOpen?: boolean;
   onToggle?: () => void;
+  printable?: { x: number; y: number; width: number; height: number };
 }) {
   const { layers, selectedId, selectLayer, addLayer, deleteLayer } = useMockup()
   const fileRef = useRef<HTMLInputElement>(null)
@@ -21,19 +23,27 @@ export default function LayerPanel({
     if (!files || files.length === 0) return
     const reader = new FileReader()
     reader.onload = () => {
-      const generatedId = addLayer({
-        type: 'image',
-        side: activeSide,
-        src: reader.result as string,
-        x: 150,
-        y: 200,
-        width: 200,
-        height: 200,
-        rotation: 0,
-        scaleX: 1,
-        scaleY: 1,
-      })
-      selectLayer(generatedId)
+      const img = new window.Image()
+      img.src = reader.result as string
+      img.onload = () => {
+        const aspectRatio = img.width / img.height
+        const targetHeight = 200
+        const targetWidth = targetHeight * aspectRatio
+
+        const generatedId = addLayer({
+          type: 'image',
+          side: activeSide,
+          src: reader.result as string,
+          x: printable.x + (printable.width / 2) - (targetWidth / 2),
+          y: printable.y + (printable.height / 2) - (targetHeight / 2),
+          width: targetWidth,
+          height: targetHeight,
+          rotation: 0,
+          scaleX: 1,
+          scaleY: 1,
+        })
+        selectLayer(generatedId)
+      }
     }
     reader.readAsDataURL(files[0])
     if (fileRef.current) fileRef.current.value = ''
@@ -59,12 +69,12 @@ export default function LayerPanel({
         }}
       >
         <h2 className="font-black text-black text-xl uppercase tracking-wider">Layers</h2>
-        {onToggle && <span className="font-black text-xl">{isOpen ? <ChevronDown size={24} /> : <ChevronRight size={24} />}</span>}
+        <span className="font-black text-xl">{isOpen ? <ChevronDown size={24} /> : <ChevronRight size={24} />}</span>
       </div>
 
       {isOpen && (
         <>
-          <div className="flex-1 space-y-2 overflow-y-auto pr-2">
+          <div className="flex-1   space-y-2 overflow-y-auto pr-2">
             {sideLayers.length === 0 ? (
               <div className={`flex items-center justify-between border-2 border-black rounded-lg p-3 cursor-pointer ${!selectedId ? 'bg-[#FF5722] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white'}`}>
                 <div>

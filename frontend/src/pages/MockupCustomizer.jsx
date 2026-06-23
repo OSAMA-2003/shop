@@ -151,29 +151,60 @@ function CustomizerContent() {
   const navigate = useNavigate()
   const { all_mockups, addToCart, token, url, fetchCustomMockups } = useContext(ShopContext)
   const { layers, selectedId, selectLayer, addLayer, deleteLayer, updateLayer } = useMockup()
+
+  const [activeSide, setActiveSide] = useState('front')
+  const [selectedSize, setSelectedSize] = useState('M')
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [openAccordion, setOpenAccordion] = useState('layers')
+  const [activeMobileTab, setActiveMobileTab] = useState('upload')
+
+  const mobileFileRef = useRef(null)
+  const frontCanvasRef = useRef(null)
+  const backCanvasRef = useRef(null)
+
   const selectedLayer = layers?.find((l) => l.id === selectedId)
   const sideLayers = (layers || []).filter((layer) => layer.side === activeSide)
 
-  const mobileFileRef = useRef(null)
+  const backendMockup = (all_mockups || []).find(m => m._id === id)
+
+  const mockup = backendMockup ? {
+    id: backendMockup._id,
+    name: backendMockup.name,
+    previewFront: backendMockup.imageFront,
+    previewBack: backendMockup.imageBack,
+    preview: activeSide === 'front' ? (backendMockup.imageFront || backendMockup.image) : backendMockup.imageBack,
+    printable: { x: 150, y: 150, width: 300, height: 400 }, // Default relative box mapping
+    colors: [
+      { name: backendMockup.color || 'Black', hex: backendMockup.color === 'White' ? '#FFFFFF' : backendMockup.color === 'Red' ? '#FF0000' : backendMockup.color === 'Blue' ? '#0000FF' : backendMockup.color === 'Gray' ? '#808080' : '#000000' }
+    ],
+  } : null;
 
   const handleMobileUpload = (e) => {
     const files = e.target.files
     if (!files || files.length === 0) return
     const reader = new FileReader()
     reader.onload = () => {
-      const generatedId = addLayer({
-        type: 'image',
-        side: activeSide,
-        src: reader.result,
-        x: 150,
-        y: 200,
-        width: 200,
-        height: 200,
-        rotation: 0,
-        scaleX: 1,
-        scaleY: 1,
-      })
-      selectLayer(generatedId)
+      const img = new window.Image()
+      img.src = reader.result
+      img.onload = () => {
+        const aspectRatio = img.width / img.height
+        const targetHeight = 200
+        const targetWidth = targetHeight * aspectRatio
+
+        const generatedId = addLayer({
+          type: 'image',
+          side: activeSide,
+          src: reader.result,
+          x: mockup.printable.x + (mockup.printable.width / 2) - (targetWidth / 2),
+          y: mockup.printable.y + (mockup.printable.height / 2) - (targetHeight / 2),
+          width: targetWidth,
+          height: targetHeight,
+          rotation: 0,
+          scaleX: 1,
+          scaleY: 1,
+        })
+        selectLayer(generatedId)
+      }
     }
     reader.readAsDataURL(files[0])
     if (mobileFileRef.current) mobileFileRef.current.value = ''
@@ -191,28 +222,7 @@ function CustomizerContent() {
     }
   };
 
-  const frontCanvasRef = useRef(null)
-  const backCanvasRef = useRef(null)
 
-  const [activeSide, setActiveSide] = useState('front')
-  const [selectedSize, setSelectedSize] = useState('M')
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [openAccordion, setOpenAccordion] = useState('layers')
-  const [activeMobileTab, setActiveMobileTab] = useState('upload')
-
-  const backendMockup = (all_mockups || []).find(m => m._id === id)
-
-  const mockup = backendMockup ? {
-    id: backendMockup._id,
-    name: backendMockup.name,
-    previewFront: backendMockup.imageFront,
-    previewBack: backendMockup.imageBack,
-    preview: activeSide === 'front' ? (backendMockup.imageFront || backendMockup.image) : backendMockup.imageBack,
-    printable: { x: 150, y: 150, width: 300, height: 400 }, // Default relative box mapping
-    colors: [
-      { name: backendMockup.color || 'Black', hex: backendMockup.color === 'White' ? '#FFFFFF' : backendMockup.color === 'Red' ? '#FF0000' : backendMockup.color === 'Blue' ? '#0000FF' : backendMockup.color === 'Gray' ? '#808080' : '#000000' }
-    ],
-  } : null;
 
   const [color, setColor] = useState('black')
 
@@ -351,6 +361,7 @@ function CustomizerContent() {
             activeSide={activeSide}
             isOpen={openAccordion === 'layers'}
             onToggle={() => setOpenAccordion(openAccordion === 'layers' ? null : 'layers')}
+            printable={mockup.printable}
           />
         </div>
         <div className={`transition-all duration-300 ${openAccordion === 'precision' ? 'flex-1 min-h-[380px]' : 'h-16 shrink-0'}`}>

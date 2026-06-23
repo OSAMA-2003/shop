@@ -26,7 +26,7 @@ const createBoundBoxFunc = () => {
 }
 
 function ImageLayerNode({ node, isSelected, onSelect, onChange, printable }) {
-  const [image] = useImage(node.src, 'anonymous')
+  const [image] = useImage(node.src, node.src?.startsWith('data:') ? undefined : 'anonymous')
   const shapeRef = useRef(null)
   const trRef = useRef(null)
 
@@ -131,7 +131,7 @@ const MockupCanvas = forwardRef(({ mockup, activeSide = 'front' }, ref) => {
   const fileInputRef = useRef(null)
 
   const previewImageSrc = activeSide === 'front' ? (mockup.previewFront || mockup.preview) : (mockup.previewBack || mockup.preview)
-  const [backgroundImage] = useImage(previewImageSrc, 'anonymous')
+  const [backgroundImage] = useImage(previewImageSrc, previewImageSrc?.startsWith('data:') ? undefined : 'anonymous')
 
   const { layers, selectedId, selectLayer, updateLayer, deleteLayer, scale, addLayer } = useMockup()
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
