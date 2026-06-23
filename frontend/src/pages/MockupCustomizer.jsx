@@ -5,11 +5,11 @@ import { MockupProvider, useMockup } from '../context/MockupContext'
 import { ShopContext } from '../context/ShopContenxt'
 import MockupCanvas from '../components/MockupCanvas'
 import LayerPanel from '../components/LayerPanel'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ChevronDown, ChevronRight } from 'lucide-react'
 
 // Replaces your TransformControls to match the "PRECISION CONTROLS" panel
 // Replaces your current PrecisionControls in MockupCustomizer.jsx
-function PrecisionControls() {
+function PrecisionControls({ isOpen = true, onToggle }) {
   const { layers, selectedId, updateLayer } = useMockup()
   const selectedLayer = layers?.find((l) => l.id === selectedId)
 
@@ -27,90 +27,120 @@ function PrecisionControls() {
   };
 
   return (
-    <div className="flex flex-col  h-full bg-[#F5F2EB] border-2 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-      <h3 className="font-black text-black text-xl uppercase tracking-wider mb-4">Precision Controls</h3>
-
-      {/* Checkerboard Preview Area */}
+    <div
+      className={`flex flex-col bg-[#F5F2EB] border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all duration-300 ${isOpen ? 'h-full p-5' : 'h-16 overflow-hidden px-5 py-4 cursor-pointer hover:bg-black/5'
+        }`}
+      onClick={(e) => {
+        if (!isOpen && onToggle) {
+          onToggle();
+        }
+      }}
+    >
       <div
-        className="w-full h-32 border-2 border-black border-dashed mb-6 rounded-md relative flex items-center justify-center overflow-hidden"
-        style={{
-          backgroundImage: 'repeating-conic-gradient(#E5E5E5 0% 25%, transparent 0% 50%)',
-          backgroundSize: '16px 16px'
+        className="flex justify-between items-center mb-6 select-none cursor-pointer"
+        onClick={(e) => {
+          if (isOpen && onToggle) {
+            e.stopPropagation();
+            onToggle();
+          }
         }}
       >
-        {selectedLayer?.src && (
-          <img src={selectedLayer.src} alt="preview" className="max-h-full max-w-full object-contain" />
-        )}
+        <h3 className="font-black text-black text-xl uppercase tracking-wider">Precision Controls</h3>
+        {onToggle && <span className="font-black text-xl">{isOpen ? <ChevronDown size={24} /> : <ChevronRight size={24} />}</span>}
       </div>
 
-      <div className="space-y-6 flex-1 overflow-y-auto pr-2">
-        {/* Position */}
-        <div>
-          <label className="block text-sm font-bold text-black mb-2 uppercase tracking-wide">Position</label>
-          <div className="flex gap-4">
-            <div className="flex items-center border-2 border-black rounded-md bg-white overflow-hidden flex-1">
-              <span className="px-3 border-r-2 border-black font-bold text-sm bg-[#F5F2EB]">X:</span>
-              <input type="number" name="x" value={Math.round(selectedLayer?.x || 0)} onChange={handleChange} disabled={!selectedLayer} className="w-full px-2 py-1 text-sm outline-none bg-transparent font-mono" />
-            </div>
-            <div className="flex items-center border-2 border-black rounded-md bg-white overflow-hidden flex-1">
-              <span className="px-3 border-r-2 border-black font-bold text-sm bg-[#F5F2EB]">Y:</span>
-              <input type="number" name="y" value={Math.round(selectedLayer?.y || 0)} onChange={handleChange} disabled={!selectedLayer} className="w-full px-2 py-1 text-sm outline-none bg-transparent font-mono" />
-            </div>
+      {isOpen && (
+        <>
+          {/* Checkerboard Preview Area */}
+          <div
+            className="w-full h-32 border-2 border-black border-dashed mb-6 rounded-md relative flex items-center justify-center overflow-hidden shrink-0"
+            style={{
+              backgroundImage: 'repeating-conic-gradient(#E5E5E5 0% 25%, transparent 0% 50%)',
+              backgroundSize: '16px 16px'
+            }}
+          >
+            {selectedLayer?.src && (
+              <img src={selectedLayer.src} alt="preview" className="max-h-full max-w-full object-contain" />
+            )}
           </div>
-        </div>
 
-        {/* Scale / Size Slider */}
-        <div>
-          <label className="block text-sm font-bold text-black mb-2 uppercase tracking-wide">Scale</label>
-          <div className="flex items-center gap-4">
-            <input
-              type="range" min="0.1" max="3" step="0.05"
-              value={selectedLayer?.scaleX ?? 1}
-              onChange={handleScaleChange}
-              disabled={!selectedLayer}
-              className="flex-1 accent-[#FF5722] cursor-pointer"
-            />
-            <div className="border-2 border-black rounded-md bg-white px-2 py-1 font-mono text-sm w-16 text-center">
-              {Math.round((selectedLayer?.scaleX ?? 1) * 100)}%
-            </div>
+          <div className={`flex-1 overflow-y-auto pr-2 ${!selectedLayer ? 'flex flex-col justify-center' : 'space-y-6'}`}>
+            {!selectedLayer ? (
+              <div className="border-2 border-black border-dashed rounded-lg p-5 bg-[#E5E5E5]/50 text-center my-auto flex flex-col justify-center items-center">
+                <span className="font-black text-sm uppercase tracking-wider mb-2 text-black">No Graphic Selected</span>
+                <p className="text-xs text-black/60 font-semibold leading-relaxed">
+                  Select a graphic layer from the Layers panel or click it directly on the canvas to customize.
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Position */}
+                <div>
+                  <label className="block text-sm font-bold text-black mb-2 uppercase tracking-wide">Position</label>
+                  <div className="flex gap-4">
+                    <div className="flex items-center border-2 border-black rounded-md bg-white overflow-hidden flex-1">
+                      <span className="px-3 border-r-2 border-black font-bold text-sm bg-[#F5F2EB]">X:</span>
+                      <input type="number" name="x" value={Math.round(selectedLayer?.x || 0)} onChange={handleChange} disabled={!selectedLayer} className="w-full px-2 py-1 text-sm outline-none bg-transparent font-mono" />
+                    </div>
+                    <div className="flex items-center border-2 border-black rounded-md bg-white overflow-hidden flex-1">
+                      <span className="px-3 border-r-2 border-black font-bold text-sm bg-[#F5F2EB]">Y:</span>
+                      <input type="number" name="y" value={Math.round(selectedLayer?.y || 0)} onChange={handleChange} disabled={!selectedLayer} className="w-full px-2 py-1 text-sm outline-none bg-transparent font-mono" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Scale / Size Slider */}
+                <div>
+                  <label className="block text-sm font-bold text-black mb-2 uppercase tracking-wide">Scale</label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="range" min="0.1" max="3" step="0.05"
+                      value={selectedLayer?.scaleX ?? 1}
+                      onChange={handleScaleChange}
+                      disabled={!selectedLayer}
+                      className="flex-1 accent-[#FF5722] cursor-pointer"
+                    />
+                    <div className="border-2 border-black rounded-md bg-white px-2 py-1 font-mono text-sm w-16 text-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                      {Math.round((selectedLayer?.scaleX ?? 1) * 100)}%
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rotation */}
+                <div>
+                  <label className="block text-sm font-bold text-black mb-2 uppercase tracking-wide">Rotation</label>
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full border-2 border-black relative flex items-center justify-center bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                      <div className="w-1 h-4 bg-black absolute top-1 rounded-full" style={{ transform: `rotate(${selectedLayer?.rotation || 0}deg)`, transformOrigin: 'bottom center' }}></div>
+                    </div>
+                    <div className="flex items-center border-2 border-black rounded-md bg-white overflow-hidden w-24">
+                      <input type="number" name="rotation" value={Math.round(selectedLayer?.rotation || 0)} onChange={handleChange} disabled={!selectedLayer} className="w-full px-2 py-1 text-sm outline-none bg-transparent font-mono text-center" />
+                      <span className="pr-2 font-bold text-sm bg-white">°</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Opacity */}
+                <div>
+                  <label className="block text-sm font-bold text-black mb-2 uppercase tracking-wide">Opacity</label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="range" min="0" max="1" step="0.1" name="opacity"
+                      value={selectedLayer?.opacity ?? 1}
+                      onChange={handleChange}
+                      disabled={!selectedLayer}
+                      className="flex-1 accent-[#FF5722] cursor-pointer"
+                    />
+                    <div className="border-2 border-black rounded-md bg-white px-2 py-1 font-mono text-sm w-16 text-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                      {Math.round((selectedLayer?.opacity ?? 1) * 100)}%
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
-        </div>
-
-        {/* Rotation */}
-        <div>
-          <label className="block text-sm font-bold text-black mb-2 uppercase tracking-wide">Rotation</label>
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full border-2 border-black relative flex items-center justify-center bg-white">
-              <div className="w-1 h-4 bg-black absolute top-1 rounded-full" style={{ transform: `rotate(${selectedLayer?.rotation || 0}deg)`, transformOrigin: 'bottom center' }}></div>
-            </div>
-            <div className="flex items-center border-2 border-black rounded-md bg-white overflow-hidden w-24">
-              <input type="number" name="rotation" value={Math.round(selectedLayer?.rotation || 0)} onChange={handleChange} disabled={!selectedLayer} className="w-full px-2 py-1 text-sm outline-none bg-transparent font-mono text-center" />
-              <span className="pr-2 font-bold text-sm bg-white">°</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Opacity */}
-        <div>
-          <label className="block text-sm font-bold text-black mb-2 uppercase tracking-wide">Opacity</label>
-          <div className="flex items-center gap-4">
-            <input
-              type="range" min="0" max="1" step="0.1" name="opacity"
-              value={selectedLayer?.opacity ?? 1}
-              onChange={handleChange}
-              disabled={!selectedLayer}
-              className="flex-1 accent-[#FF5722] cursor-pointer"
-            />
-            <div className="border-2 border-black rounded-md bg-white px-2 py-1 font-mono text-sm w-16 text-center">
-              {Math.round((selectedLayer?.opacity ?? 1) * 100)}%
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex gap-4 mt-6 pt-4 border-t-2 border-black border-dashed">
-      </div>
+        </>
+      )}
     </div>
   )
 }
@@ -120,7 +150,46 @@ function CustomizerContent() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { all_mockups, addToCart, token, url, fetchCustomMockups } = useContext(ShopContext)
-  const { layers } = useMockup()
+  const { layers, selectedId, selectLayer, addLayer, deleteLayer, updateLayer } = useMockup()
+  const selectedLayer = layers?.find((l) => l.id === selectedId)
+  const sideLayers = (layers || []).filter((layer) => layer.side === activeSide)
+
+  const mobileFileRef = useRef(null)
+
+  const handleMobileUpload = (e) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const generatedId = addLayer({
+        type: 'image',
+        side: activeSide,
+        src: reader.result,
+        x: 150,
+        y: 200,
+        width: 200,
+        height: 200,
+        rotation: 0,
+        scaleX: 1,
+        scaleY: 1,
+      })
+      selectLayer(generatedId)
+    }
+    reader.readAsDataURL(files[0])
+    if (mobileFileRef.current) mobileFileRef.current.value = ''
+  }
+
+  const handleMobileChange = (e) => {
+    const { name, value } = e.target;
+    if (updateLayer && selectedId) updateLayer(selectedId, { [name]: parseFloat(value) || 0 });
+  };
+
+  const handleMobileScaleChange = (e) => {
+    const val = parseFloat(e.target.value) || 0.1;
+    if (updateLayer && selectedId) {
+      updateLayer(selectedId, { scaleX: val, scaleY: val });
+    }
+  };
 
   const frontCanvasRef = useRef(null)
   const backCanvasRef = useRef(null)
@@ -128,6 +197,8 @@ function CustomizerContent() {
   const [activeSide, setActiveSide] = useState('front')
   const [selectedSize, setSelectedSize] = useState('M')
   const [isProcessing, setIsProcessing] = useState(false)
+  const [openAccordion, setOpenAccordion] = useState('layers')
+  const [activeMobileTab, setActiveMobileTab] = useState('upload')
 
   const backendMockup = (all_mockups || []).find(m => m._id === id)
 
@@ -271,33 +342,40 @@ function CustomizerContent() {
   )
 
   return (
-    <div className="h-screen mt-20 w-full flex bg-[#F5F2EB] p-10 gap-6 font-sans text-black overflow-hidden">
+    <div className="h-[calc(100dvh-5rem)] mt-20 w-full flex flex-col lg:flex-row bg-[#F5F2EB] lg:p-10 gap-4 lg:gap-6 font-sans text-black overflow-hidden">
 
-      {/* LEFT SIDEBAR: Layers & Precision Controls */}
-      <aside className="w-[330px] flex flex-col shrink-0 gap-6 overflow-y-auto pr-2 h-full">
-        <div className="flex-1 min-h-[320px]">
-          <LayerPanel activeSide={activeSide} />
+      {/* LEFT SIDEBAR: Layers & Precision Controls (Desktop Only) */}
+      <aside className="hidden lg:flex lg:flex-col lg:w-[330px] lg:shrink-0 lg:gap-6 lg:h-full">
+        <div className={`transition-all duration-300 ${openAccordion === 'layers' ? 'flex-1 min-h-[320px]' : 'h-16 shrink-0'}`}>
+          <LayerPanel
+            activeSide={activeSide}
+            isOpen={openAccordion === 'layers'}
+            onToggle={() => setOpenAccordion(openAccordion === 'layers' ? null : 'layers')}
+          />
         </div>
-        <div className="flex-1 min-h-[380px]">
-          <PrecisionControls />
+        <div className={`transition-all duration-300 ${openAccordion === 'precision' ? 'flex-1 min-h-[380px]' : 'h-16 shrink-0'}`}>
+          <PrecisionControls
+            isOpen={openAccordion === 'precision'}
+            onToggle={() => setOpenAccordion(openAccordion === 'precision' ? null : 'precision')}
+          />
         </div>
       </aside>
 
       {/* CENTER: Canvas Workspace */}
-      <main className="flex-1 relative border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white flex flex-col">
+      <main className="flex-grow min-h-[260px] lg:min-h-0 m-4 lg:m-0 relative border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white flex flex-col">
 
         {/* VIEW TOGGLE TABS */}
         <div className="flex border-b-2 border-black shrink-0">
           <button
             onClick={() => setActiveSide('front')}
-            className={`flex-1 py-3 font-black uppercase tracking-widest text-sm transition-colors ${activeSide === 'front' ? 'bg-[#FF5722] text-black' : 'bg-[#E5E5E5] text-black/50 hover:bg-[#E5E5E5]/80 hover:text-black'}`}
+            className={`flex-1 py-3 font-black uppercase tracking-widest text-xs sm:text-sm transition-colors ${activeSide === 'front' ? 'bg-[#FF5722] text-black' : 'bg-[#E5E5E5] text-black/50 hover:bg-[#E5E5E5]/80 hover:text-black'}`}
           >
             Front View
           </button>
           <div className="w-[2px] bg-black"></div>
           <button
             onClick={() => setActiveSide('back')}
-            className={`flex-1 py-3 font-black uppercase tracking-widest text-sm transition-colors ${activeSide === 'back' ? 'bg-[#FF5722] text-black' : 'bg-[#E5E5E5] text-black/50 hover:bg-[#E5E5E5]/80 hover:text-black'}`}
+            className={`flex-1 py-3 font-black uppercase tracking-widest text-xs sm:text-sm transition-colors ${activeSide === 'back' ? 'bg-[#FF5722] text-black' : 'bg-[#E5E5E5] text-black/50 hover:bg-[#E5E5E5]/80 hover:text-black'}`}
           >
             Back View
           </button>
@@ -313,8 +391,250 @@ function CustomizerContent() {
         </div>
       </main>
 
-      {/* RIGHT SIDEBAR: Select Size & Actions */}
-      <aside className="w-[340px] flex flex-col shrink-0 gap-6 overflow-y-auto pr-2 h-full">
+      {/* MOBILE BOTTOM NAVIGATION BAR & CONTROLS (lg:hidden) */}
+      <div className="lg:hidden flex flex-col bg-white border-t-4 border-black shrink-0 z-20 w-full">
+        {/* Active Sheet Area */}
+        {activeMobileTab && (
+          <div className="h-[240px] border-b-2 border-black bg-[#F5F2EB] overflow-hidden relative">
+            
+            {/* Tab 1: Upload / Layers */}
+            {activeMobileTab === 'upload' && (
+              <div className="h-full flex flex-col p-4 bg-[#F5F2EB]">
+                <div className="flex justify-between items-center mb-2 shrink-0">
+                  <h4 className="font-black text-black text-sm uppercase tracking-wider">Upload Design / Layers</h4>
+                  <span className="text-[10px] font-mono bg-black text-[#F5F2EB] px-2 py-0.5 rounded uppercase">
+                    {activeSide} view
+                  </span>
+                </div>
+                
+                {/* Horizontal Scroll Area */}
+                <div className="flex-1 flex gap-4 overflow-x-auto py-2 items-center pr-4">
+                  {/* Upload Card */}
+                  <div 
+                    onClick={() => mobileFileRef.current?.click()}
+                    className="w-24 h-24 shrink-0 border-2 border-dashed border-black rounded-xl bg-white flex flex-col items-center justify-center cursor-pointer hover:bg-black/5 active:translate-y-0.5 transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                  >
+                    <input 
+                      ref={mobileFileRef} 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleMobileUpload} 
+                      className="hidden" 
+                    />
+                    <span className="text-3xl font-black text-[#FF5722]">+</span>
+                    <span className="text-[9px] font-black uppercase text-black/60 mt-1">Upload</span>
+                  </div>
+
+                  {/* Layers List */}
+                  {sideLayers.length === 0 ? (
+                    <div className="flex-1 flex items-center justify-center border-2 border-black border-dashed rounded-xl h-24 bg-white/50 text-center px-4">
+                      <p className="text-[10px] font-bold text-black/50 uppercase tracking-wider">No designs uploaded yet</p>
+                    </div>
+                  ) : (
+                    sideLayers.map((layer, idx) => {
+                      const isSelected = selectedId === layer.id
+                      return (
+                        <div 
+                          key={layer.id}
+                          onClick={() => selectLayer(layer.id)}
+                          className={`w-24 h-24 shrink-0 border-2 border-black rounded-xl bg-white relative overflow-hidden cursor-pointer transition-all flex items-center justify-center p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
+                            isSelected ? 'ring-4 ring-[#FF5722] scale-95' : 'hover:scale-95'
+                          }`}
+                        >
+                          <img src={layer.src} alt="layer thumbnail" className="max-h-full max-w-full object-contain" />
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteLayer(layer.id);
+                            }}
+                            className="absolute -top-1 -right-1 w-5 h-5 bg-black border border-black rounded-full flex items-center justify-center text-white text-[10px] hover:bg-red-500 font-black"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Tab 2: Precision Controls */}
+            {activeMobileTab === 'precision' && (
+              <div className="h-full p-4 overflow-y-auto bg-[#F5F2EB]">
+                <div className="flex justify-between items-center mb-2 shrink-0">
+                  <h4 className="font-black text-black text-sm uppercase tracking-wider">Precision Controls</h4>
+                </div>
+                
+                {!selectedLayer ? (
+                  <div className="h-[150px] border-2 border-black border-dashed rounded-xl bg-white/50 flex flex-col justify-center items-center p-4">
+                    <span className="font-black text-xs uppercase tracking-wider text-black mb-1">No Layer Selected</span>
+                    <p className="text-[10px] text-black/60 text-center font-semibold leading-normal max-w-xs">
+                      Tap on an uploaded design thumbnail in the Upload tab or select it directly on the canvas to configure position, scale, and rotation.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Position */}
+                    <div>
+                      <span className="block text-[10px] font-black text-black mb-1.5 uppercase tracking-wide">Position</span>
+                      <div className="flex gap-3">
+                        <div className="flex items-center border-2 border-black rounded-lg bg-white overflow-hidden flex-1 h-9">
+                          <span className="px-2 border-r-2 border-black font-bold text-xs bg-[#F5F2EB] h-full flex items-center">X:</span>
+                          <input type="number" name="x" value={Math.round(selectedLayer.x)} onChange={handleMobileChange} className="w-full px-2 text-xs outline-none bg-transparent font-mono" />
+                        </div>
+                        <div className="flex items-center border-2 border-black rounded-lg bg-white overflow-hidden flex-1 h-9">
+                          <span className="px-2 border-r-2 border-black font-bold text-xs bg-[#F5F2EB] h-full flex items-center">Y:</span>
+                          <input type="number" name="y" value={Math.round(selectedLayer.y)} onChange={handleMobileChange} className="w-full px-2 text-xs outline-none bg-transparent font-mono" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Scale */}
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1">
+                        <span className="block text-[10px] font-black text-black mb-1 uppercase tracking-wide">Scale</span>
+                        <input
+                          type="range" min="0.1" max="3" step="0.05"
+                          value={selectedLayer.scaleX}
+                          onChange={handleMobileScaleChange}
+                          className="w-full accent-[#FF5722] cursor-pointer"
+                        />
+                      </div>
+                      <div className="border-2 border-black rounded-lg bg-white px-2 py-1 font-mono text-xs w-14 text-center mt-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        {Math.round(selectedLayer.scaleX * 100)}%
+                      </div>
+                    </div>
+
+                    {/* Rotation & Opacity */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="block text-[10px] font-black text-black mb-1 uppercase tracking-wide">Rotation</span>
+                        <div className="flex items-center border-2 border-black rounded-lg bg-white overflow-hidden h-9">
+                          <input type="number" name="rotation" value={Math.round(selectedLayer.rotation || 0)} onChange={handleMobileChange} className="w-full px-2 text-xs outline-none bg-transparent font-mono text-center" />
+                          <span className="pr-2 font-bold text-xs bg-white">°</span>
+                        </div>
+                      </div>
+                      <div>
+                        <span className="block text-[10px] font-black text-black mb-1 uppercase tracking-wide">Opacity</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="range" min="0" max="1" step="0.1" name="opacity"
+                            value={selectedLayer.opacity ?? 1}
+                            onChange={handleMobileChange}
+                            className="flex-1 accent-[#FF5722] cursor-pointer"
+                          />
+                          <div className="border-2 border-black rounded-lg bg-white px-1.5 py-0.5 font-mono text-[10px] w-10 text-center shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                            {Math.round((selectedLayer.opacity ?? 1) * 100)}%
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Tab 3: Sizes */}
+            {activeMobileTab === 'sizes' && (
+              <div className="h-full p-4 flex flex-col justify-center bg-[#F5F2EB]">
+                <div className="text-center mb-4">
+                  <h4 className="font-black text-black text-sm uppercase tracking-wider mb-1">Choose Apparel Size</h4>
+                  <p className="text-[10px] text-black/50 uppercase tracking-widest font-bold">Standard unisex sizing applies</p>
+                </div>
+                <div className="flex gap-3 justify-center items-center">
+                  {availableSizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      className={`w-12 h-12 flex items-center justify-center border-[3px] border-black font-black text-sm transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-0.5 ${
+                        selectedSize === size ? 'bg-[#FF5722] text-black' : 'bg-white text-black hover:bg-black/5'
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
+        )}
+
+        {/* BOTTOM DOCKED NAVIGATION BUTTONS BAR */}
+        <nav className="h-16 flex border-b-2 border-black bg-white select-none shrink-0">
+          {/* Upload Button Tab */}
+          <button 
+            onClick={() => setActiveMobileTab(activeMobileTab === 'upload' ? null : 'upload')}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 border-r-2 border-black transition-colors ${
+              activeMobileTab === 'upload' ? 'bg-[#FF5722] text-black' : 'bg-[#F5F2EB] text-black/60 hover:text-black'
+            }`}
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <span className="text-[9px] font-black uppercase tracking-wider">Upload</span>
+          </button>
+
+          {/* Controls Button Tab */}
+          <button 
+            onClick={() => setActiveMobileTab(activeMobileTab === 'precision' ? null : 'precision')}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 border-r-2 border-black transition-colors ${
+              activeMobileTab === 'precision' ? 'bg-[#FF5722] text-black' : 'bg-[#F5F2EB] text-black/60 hover:text-black'
+            }`}
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            <span className="text-[9px] font-black uppercase tracking-wider">Controls</span>
+          </button>
+
+          {/* Sizes Button Tab */}
+          <button 
+            onClick={() => setActiveMobileTab(activeMobileTab === 'sizes' ? null : 'sizes')}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 border-r-2 border-black transition-colors ${
+              activeMobileTab === 'sizes' ? 'bg-[#FF5722] text-black' : 'bg-[#F5F2EB] text-black/60 hover:text-black'
+            }`}
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V6a2 2 0 012-2h2m12 0h-2a2 2 0 00-2 2v2M4 16v2a2 2 0 002 2h2m12 0h-2a2 2 0 01-2-2v-2m-9-4h4" />
+            </svg>
+            <span className="text-[9px] font-black uppercase tracking-wider">Sizes</span>
+          </button>
+
+          {/* Export Action Button */}
+          <button 
+            onClick={handleExportPNG}
+            disabled={isProcessing}
+            className="flex-1 flex flex-col items-center justify-center gap-1 border-r-2 border-black bg-[#F5F2EB] text-black/60 hover:text-black transition-colors disabled:opacity-50"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span className="text-[9px] font-black uppercase tracking-wider">Export</span>
+          </button>
+
+          {/* Add to Cart Action Button */}
+          <button 
+            onClick={handleAddToCart}
+            disabled={isProcessing}
+            className="flex-[1.2] flex flex-col items-center justify-center gap-1 bg-[#FF5722] text-black hover:bg-[#E64A19] transition-colors disabled:opacity-50"
+          >
+            {isProcessing ? (
+              <Loader2 className="animate-spin w-5 h-5" />
+            ) : (
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            )}
+            <span className="text-[9px] font-black uppercase tracking-wider">Cart</span>
+          </button>
+        </nav>
+
+      </div>
+
+      {/* RIGHT SIDEBAR: Select Size & Actions (Desktop Only) */}
+      <aside className="hidden lg:flex lg:flex-col lg:w-[340px] lg:shrink-0 lg:gap-6 lg:overflow-y-auto lg:pr-2 lg:h-full">
         {/* SELECT SIZE */}
         <div className="bg-[#F5F2EB] border-2 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <h3 className="font-black text-black text-lg uppercase tracking-wider mb-3">Select Size</h3>
@@ -346,21 +666,6 @@ function CustomizerContent() {
               </>
             ) : (
               'Add Design to Cart'
-            )}
-          </button>
-
-          <button
-            onClick={handleSaveClick}
-            disabled={isProcessing}
-            className="w-full bg-black hover:bg-black/90 disabled:bg-gray-700 disabled:cursor-not-allowed text-[#F5F2EB] border-2 border-black rounded-xl py-4 font-black text-lg uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all flex items-center justify-center gap-2"
-          >
-            {isProcessing ? (
-              <>
-                <Loader2 className="animate-spin w-5 h-5" />
-                Saving...
-              </>
-            ) : (
-              'Save Design'
             )}
           </button>
 

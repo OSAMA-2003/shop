@@ -1,7 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { ShopContext } from '../context/ShopContenxt';
+import toast from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,6 +17,17 @@ const Login = () => {
     password: "",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (location.state?.from) {
+      const timer = setTimeout(() => {
+        toast.error("Please log in first to continue!");
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [location.state]);
+
   const onChangeHandler = (event) => {
     const { name, value } = event.target;
     setFormData((data) => ({
@@ -25,6 +38,7 @@ const Login = () => {
   
   const onLogin = async (event) => {
     event.preventDefault();
+    setIsSubmitting(true);
 
     try {
       const res = await axios.post(`${url}/api/user/login`, formData);
@@ -32,13 +46,16 @@ const Login = () => {
       if (res.data.success) {
         localStorage.setItem("token", res.data.token);
         setToken(res.data.token);
+        toast.success("Logged in successfully!");
         navigate(from);
       } else {
-        alert(res.data.message);
+        toast.error(res.data.message);
       }
     } catch (err) {
       console.log(err);
-      alert("Server Error");
+      toast.error("Server Error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -85,9 +102,17 @@ const Login = () => {
           {/* SUBMIT BUTTON */}
           <button 
             type='submit' 
-            className='w-full bg-[#ff5500] py-4 mt-2 font-black text-2xl sm:text-3xl tracking-widest uppercase text-black hover:bg-black hover:text-[#ff5500] transition-colors rounded-none'
+            disabled={isSubmitting}
+            className='w-full bg-[#ff5500] py-4 mt-2 font-black text-2xl sm:text-3xl tracking-widest uppercase text-black hover:bg-black hover:text-[#ff5500] transition-colors rounded-none disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2'
           >
-            Enter
+            {isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin w-6 h-6 text-black" />
+                Entering...
+              </>
+            ) : (
+              'Enter'
+            )}
           </button>
 
         </form>

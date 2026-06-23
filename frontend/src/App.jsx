@@ -12,6 +12,7 @@ import Navbar from './components/Navbar'
 import ShopContextProvider from './context/ShopContenxt'
 import Footer from './components/Footer'
 import Order from './pages/Order'
+import { Toaster } from 'react-hot-toast'
 
 // Mockup generator pages
 import Mockups from './pages/Mockups'
@@ -28,10 +29,26 @@ function App() {
 
   return (
     <>
+      <Toaster 
+        position="top-center" 
+        toastOptions={{
+          style: {
+            border: '3px solid black',
+            padding: '16px',
+            color: 'black',
+            fontWeight: '900',
+            textTransform: 'uppercase',
+            borderRadius: '0',
+            background: '#F5F2EB',
+            fontFamily: "'Roboto', sans-serif",
+            boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)',
+          }
+        }}
+      />
 
-    <ShopContextProvider>
+      <ShopContextProvider>
 
-      <Navbar/>
+        <Navbar/>
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />

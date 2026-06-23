@@ -2,6 +2,8 @@ import React, { useContext, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContenxt';
 import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
 
 // 1. Define Animation Variants
 const pageVariants = {
@@ -52,6 +54,7 @@ const Product = () => {
   const [selectedSize, setSelectedSize] = useState("M");
   const [quantity, setQuantity] = useState(1);
   const [isAccordionOpen, setIsAccordionOpen] = useState(false); // Added state for the accordion
+  const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -69,15 +72,24 @@ const Product = () => {
     );
   }
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     // Redirect to login if no token, while passing current page URL to return to
     if (!token) {
       navigate('/login', { state: { from: location.pathname } });
       return;
     }
-    // Context handles adding to cart
-    addToCart(product._id, quantity, selectedSize);
-    alert(`Added ${quantity} of ${product.name} (Size: ${selectedSize}) to the cart!`);
+    
+    setIsAdding(true);
+    try {
+      // Context handles adding to cart
+      await addToCart(product._id, quantity, selectedSize);
+      toast.success(`Added ${product.name} (Size: ${selectedSize}) to the cart!`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to add to cart");
+    } finally {
+      setIsAdding(false);
+    }
   }
 
   return (
@@ -143,9 +155,17 @@ const Product = () => {
           <motion.div variants={itemVariants} className="w-full max-w-md mb-10">
             <button
               onClick={handleAddToCart}
-              className="w-full bg-[#ff5500] border-2 border-black py-4 font-bold text-lg sm:text-xl uppercase tracking-widest text-black hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]"
+              disabled={isAdding}
+              className="w-full bg-[#ff5500] border-2 border-black py-4 font-bold text-lg sm:text-xl uppercase tracking-widest text-black hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              Add to cart
+              {isAdding ? (
+                <>
+                  <Loader2 className="animate-spin w-5 h-5 text-black" />
+                  Adding...
+                </>
+              ) : (
+                'Add to cart'
+              )}
             </button>
           </motion.div>
 

@@ -2,6 +2,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useContext } from "react";
 import axios from 'axios';
 import { ShopContext } from "../context/ShopContenxt";
+import toast from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -27,13 +29,17 @@ const SignUp = () => {
     }));
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const onSignUp = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       const res = await axios.post(
@@ -44,13 +50,16 @@ const SignUp = () => {
       if (res.data.success) {
         localStorage.setItem("token", res.data.token);
         setToken(res.data.token);
+        toast.success("Account created successfully!");
         navigate(from);
       } else {
-        alert(res.data.message);
+        toast.error(res.data.message);
       }
     } catch (err) {
       console.log(err);
-      alert(err.message);
+      toast.error(err.message || "Sign Up Error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -123,9 +132,17 @@ const SignUp = () => {
           {/* SUBMIT BUTTON */}
           <button 
             type='submit' 
-            className='w-full bg-[#ff5500] py-4 mt-2 font-black text-2xl sm:text-3xl tracking-widest uppercase text-black hover:bg-black hover:text-[#ff5500] transition-colors rounded-none'
+            disabled={isSubmitting}
+            className='w-full bg-[#ff5500] py-4 mt-2 font-black text-2xl sm:text-3xl tracking-widest uppercase text-black hover:bg-black hover:text-[#ff5500] transition-colors rounded-none disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2'
           >
-            Create
+            {isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin w-6 h-6 text-black" />
+                Creating...
+              </>
+            ) : (
+              'Create'
+            )}
           </button>
         </form>
 

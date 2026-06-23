@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Loader2 } from "lucide-react";
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 // 1. Define Animation Variants
 const sectionVariants = {
@@ -54,10 +55,15 @@ const Contact = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`${formData.name}, Thank you for contacting us!`);
+    setIsSubmitting(true);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    toast.success(`${formData.name}, Thank you for contacting us!`);
     setFormData({ name: "", email: "", message: "" });
+    setIsSubmitting(false);
   };
 
   return (
@@ -187,9 +193,17 @@ const Contact = () => {
 
               <button
                 type='submit'
-                className='w-full bg-[#ff5500] border-[3px] border-black py-4 mt-2 font-black text-2xl uppercase tracking-widest text-black hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]'
+                disabled={isSubmitting}
+                className='w-full bg-[#ff5500] border-[3px] border-black py-4 mt-2 font-black text-2xl uppercase tracking-widest text-black hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2'
               >
-                Send Message
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin w-6 h-6 text-black" />
+                    Sending...
+                  </>
+                ) : (
+                  'Send Message'
+                )}
               </button>
             </form>
           </motion.div>

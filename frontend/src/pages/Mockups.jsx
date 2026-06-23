@@ -20,18 +20,18 @@ export default function Mockups() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 py-30 ">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter mb-2 leading-none">
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter mb-2 leading-none">
             <span className="text-[#ff5500]">Design</span>  Your Own Product
           </h1>
           <p className="text-gray-600">Choose a product and customize it with your design</p>
         </div>
         {loading ? (
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {[...Array(8)].map((_, index) => (
-                <CardSkeleton key={index} />
-              ))}
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
+            {[...Array(8)].map((_, index) => (
+              <CardSkeleton key={index} />
+            ))}
+          </div>
         ) : formattedMockups.length > 0 ? (
           <MockupGrid mockups={formattedMockups} />
         ) : (

@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { ShopContext } from '../context/ShopContenxt';
 import { useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 
 const Order = () => {
   const { getTotalCartAmount, placeOrder, loading, cartItems, all_products, all_mockups, customMockups } = useContext(ShopContext);
@@ -15,9 +16,18 @@ const Order = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    await placeOrder(formData); 
+    setIsSubmitting(true);
+    try {
+      await placeOrder(formData); 
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   useEffect(() => {
@@ -183,8 +193,19 @@ const Order = () => {
               </div>
             </div>
 
-            <button type="submit" className="w-full bg-[#ff5500] border-2 border-black py-4 font-black text-lg uppercase tracking-widest text-black hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]">
-              Proceed to Payment
+            <button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="w-full bg-[#ff5500] border-2 border-black py-4 font-black text-lg uppercase tracking-widest text-black hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="animate-spin w-5 h-5 text-black" />
+                  Processing...
+                </>
+              ) : (
+                'Proceed to Payment'
+              )}
             </button>
           </div>
         </form>
