@@ -5,6 +5,7 @@ import toast, { Toaster } from 'react-hot-toast';
 const MockupsList = () => {
     const url = 'https://shop-2-ms77.onrender.com';
     const [list, setList] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const toastStyle = {
         style: {
@@ -28,6 +29,8 @@ const MockupsList = () => {
             }
         } catch (error) {
             toast.error(error.message, toastStyle);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -51,6 +54,16 @@ const MockupsList = () => {
     useEffect(() => {
         fetchList();
     }, []);
+
+    if (loading) {
+        return (
+            <section className='min-h-screen flex items-center justify-center bg-[#f9f9f6] text-black px-6 md:ml-64 font-sans'>
+                <div className='flex flex-col items-center'>
+                    <h2 className='text-4xl font-black uppercase tracking-widest animate-pulse'>Loading Mockups...</h2>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className='relative  max-w-screen mx-auto bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans '>

@@ -53,12 +53,12 @@ const MockupSection = () => {
 
   return (
     <section className='relative w-full min-h-screen bg-[#f4f6f8] text-text-main py-24 px-6 sm:px-10 flex flex-col justify-center overflow-hidden'>
-      
-      <motion.div 
+
+      <motion.div
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.3 }}
         className='relative z-10 max-w-7xl mx-auto w-full'
       >
         {/* Top Header Row with Title and Scroll Controls */}
@@ -75,14 +75,14 @@ const MockupSection = () => {
           {/* Navigation Arrows */}
           {formattedMockups.length > 0 && !loading && (
             <motion.div variants={itemVariants} className="flex gap-3 self-start md:self-end">
-              <button 
+              <button
                 onClick={() => handleScroll('left')}
                 className="w-12 h-12 rounded-full border-[3px] border-black flex items-center justify-center bg-white text-black hover:bg-[#ff5500] hover:text-white transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[3px] active:translate-x-[3px] cursor-pointer"
                 aria-label="Scroll left"
               >
                 <ChevronLeft size={22} strokeWidth={3} />
               </button>
-              <button 
+              <button
                 onClick={() => handleScroll('right')}
                 className="w-12 h-12 rounded-full border-[3px] border-black flex items-center justify-center bg-white text-black hover:bg-[#ff5500] hover:text-white transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[3px] active:translate-x-[3px] cursor-pointer"
                 aria-label="Scroll right"
@@ -104,7 +104,7 @@ const MockupSection = () => {
               ))}
             </div>
           ) : formattedMockups.length > 0 ? (
-            <div 
+            <div
               ref={scrollRef}
               className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4 md:px-0"
             >
@@ -129,14 +129,14 @@ const MockupSection = () => {
 
         {/* View All Button */}
         <motion.div variants={itemVariants} className="text-center">
-          <button 
+          <button
             onClick={() => navigate('/mockups')}
             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-black text-white border-[3px] border-black font-black uppercase tracking-widest text-sm hover:bg-[#ff5500] hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px] cursor-pointer"
           >
             View All Mockups
           </button>
         </motion.div>
-        
+
       </motion.div>
     </section>
   );

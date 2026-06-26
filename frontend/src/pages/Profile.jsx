@@ -61,7 +61,8 @@ const Profile = () => {
   // User data will be fetched from the backend.
   const [userData, setUserData] = useState({
     name: '',
-    email: ''
+    email: '',
+    pic: ''
   });
 
   useEffect(() => {
@@ -95,7 +96,8 @@ const Profile = () => {
           if (profileResponse.data && profileResponse.data.success) {
             setUserData({
               name: profileResponse.data.data.name || 'Unknown',
-              email: profileResponse.data.data.email || 'No Email'
+              email: profileResponse.data.data.email || 'No Email',
+              pic: profileResponse.data.data.pic || ''
             });
           } else {
             console.error("Profile endpoint error or invalid response:", profileResponse.data);
@@ -169,8 +171,12 @@ const Profile = () => {
         <motion.div variants={cardVariants} className='bg-white border-[4px] border-black p-6 sm:p-10 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'>
           <div className='flex flex-col sm:flex-row items-center sm:items-start gap-6'>
             {/* Avatar Block */}
-            <div className='w-24 h-24 bg-[#ff5500] border-[3px] border-black flex items-center justify-center shrink-0'>
-              <User className='w-12 h-12 text-black' strokeWidth={3} />
+            <div className='w-24 h-24 bg-[#ff5500] border-[3px] border-black flex items-center justify-center shrink-0 overflow-hidden'>
+              {userData.pic ? (
+                <img src={userData.pic} alt={userData.name} className='w-full h-full object-cover' />
+              ) : (
+                <User className='w-12 h-12 text-black' strokeWidth={3} />
+              )}
             </div>
             
             {/* User Info */}

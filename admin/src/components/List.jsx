@@ -4,6 +4,7 @@ import axios from 'axios';
 
 function List() {
     const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
     const url = 'https://shop-2-ms77.onrender.com';
 
     const fetchProducts = async () => {
@@ -16,6 +17,8 @@ function List() {
             }
         } catch (err) {
             console.error(err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -38,6 +41,16 @@ function List() {
             console.error(err);
         }
     };
+
+    if (loading) {
+        return (
+            <section className='min-h-screen flex items-center justify-center bg-[#f9f9f6] text-black px-6 md:ml-64 font-sans'>
+                <div className='flex flex-col items-center'>
+                    <h2 className='text-4xl font-black uppercase tracking-widest animate-pulse'>Loading Inventory...</h2>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className='relative  max-w-screen mx-auto bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans '>

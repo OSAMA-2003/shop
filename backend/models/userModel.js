@@ -15,7 +15,16 @@ const userSchema = new mongoose.Schema({
     },
     password:{
         type:String,
-        required:true
+        required:false
+    },
+    pic:{
+        type:String,
+        default:""
+    },
+    googleId:{
+        type:String,
+        unique:true,
+        sparse:true
     },
     cartData:{
         type:Object,

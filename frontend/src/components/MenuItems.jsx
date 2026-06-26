@@ -15,7 +15,7 @@ export const menuItemsData = [
 const MenuItems = ({ setSideBarOpen, isMobile }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { cartItems, token } = useContext(ShopContext);
+    const { cartItems, token, userData } = useContext(ShopContext);
 
     const totalItems = Object.values(cartItems || {}).reduce((a, b) => a + b, 0);
 
@@ -75,7 +75,6 @@ const MenuItems = ({ setSideBarOpen, isMobile }) => {
                 </button>
             )}
 
-            {/* AUTH BUTTONS */}
             {!token ? (
                 <button
                     onClick={() => {
@@ -92,8 +91,12 @@ const MenuItems = ({ setSideBarOpen, isMobile }) => {
                         onClick={() => { navigate("/profile"); if (setSideBarOpen) setSideBarOpen(false); }}
                         className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:bg-white/50 hover:text-[#ff5500] transition-colors ${isMobile ? "w-full" : ""}`}
                     >
-                        <User className='w-5 h-5' />
-                        {isMobile && <span className="font-semibold text-base">Profile</span>}
+                        {userData?.pic ? (
+                            <img src={userData.pic} alt="Profile" className='w-7 h-7 rounded-full border-[2px] border-black object-cover shadow-sm' />
+                        ) : (
+                            <User className='w-5 h-5' />
+                        )}
+                        {isMobile && <span className="font-semibold text-base">{userData?.name || "Profile"}</span>}
                     </button>
                 </div>
             )}

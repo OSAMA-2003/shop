@@ -15,11 +15,30 @@ const ShopContextProvider = ({ children }) => {
     const [customMockups, setCustomMockups] = useState([]);
     const [cartItems, setCartItems] = useState({})
     const [token, setToken] = useState()
+    const [userData, setUserData] = useState(null)
     const [loading, setLoading] = useState(true);
     const url = "https://shop-2-ms77.onrender.com"
 
+    const fetchUserProfile = async (tokenValue) => {
+        const activeToken = tokenValue || token;
+        if (!activeToken) return;
+        try {
+            const res = await axios.get(`${url}/api/user/profile`, { headers: { token: activeToken } });
+            if (res.data.success) {
+                setUserData(res.data.data);
+            }
+        } catch (err) {
+            console.error("Error fetching user profile:", err);
+            if (err.response && err.response.status === 401) {
+                localStorage.removeItem("token");
+                setToken(null);
+                setUserData(null);
+            }
+        }
+    }
 
-    // Fetch user's cart from backend when token changes (login/logout)
+
+    // Fetch user's cart and profile from backend when token changes (login/logout)
     useEffect(() => {
         const syncCart = async () => {
             if (token) {
@@ -27,7 +46,8 @@ const ShopContextProvider = ({ children }) => {
                 try {
                     await Promise.all([
                         loadCartData(token),
-                        fetchCustomMockups(token)
+                        fetchCustomMockups(token),
+                        fetchUserProfile(token)
                     ]);
                 } catch (err) {
                     console.error("Error syncing cart data:", err);
@@ -35,9 +55,10 @@ const ShopContextProvider = ({ children }) => {
                     setLoading(false);
                 }
             } else {
-                // Clear cart state on client side only when logged out
+                // Clear cart and user state on client side only when logged out
                 setCartItems({});
                 setCustomMockups([]);
+                setUserData(null);
                 setLoading(false);
             }
         };
@@ -232,8 +253,11 @@ const ShopContextProvider = ({ children }) => {
         setToken,
         clearCart,
         setCartItems,
-        placeOrder, // Export the new function
-        loading // Export loading state
+        placeOrder,
+        loading,
+        userData,
+        setUserData,
+        fetchUserProfile
     }
 
 
