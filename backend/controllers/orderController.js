@@ -12,63 +12,64 @@ const getStripe = () => {
 // This API will be called by the frontend when the user places an order. It will create a new order in the database and then create a checkout session with Stripe and return the session url to the frontend to redirect the user to the Stripe checkout page
 
 const placeOrder = async(req,res)=>{
-    // Use environment variable for flexibility between local and production
-    const frontend_url = process.env.FRONTEND_URL || "http://localhost:5173"
-    
     try{
-        // Transform address data to include all fields clearly
-        const addressData = {
-            firstName: req.body.address.firstName,
-            lastName: req.body.address.lastName,
-            email: req.body.address.email,
-            street: req.body.address.street,
-            city: req.body.address.city,
-            state: req.body.address.state,
-            zipCode: req.body.address.zipCode,
-            country: req.body.address.country,
-            phone: req.body.address.phone,
+        let addressData;
+        try {
+            addressData = typeof req.body.address === 'string' ? JSON.parse(req.body.address) : req.body.address;
+        } catch (e) {
+            addressData = req.body.address;
         }
-        
+
+        let itemsData;
+        try {
+            itemsData = typeof req.body.items === 'string' ? JSON.parse(req.body.items) : req.body.items;
+        } catch (e) {
+            itemsData = req.body.items;
+        }
+
+        const addressMapped = {
+            firstName: addressData?.firstName || "",
+            lastName: addressData?.lastName || "",
+            email: addressData?.email || "",
+            street: addressData?.street || "",
+            city: addressData?.city || "",
+            state: addressData?.state || "",
+            zipCode: addressData?.zipCode || "",
+            country: addressData?.country || "",
+            phone: addressData?.phone || "",
+        }
+
+        let paymentScreenshotUrl = "";
+        if (req.file) {
+            paymentScreenshotUrl = req.file.path; // URL from CloudinaryStorage
+        }
+
         const newOrder = new orderModel({
             userId : req.userId,
-            items : req.body.items,
-            amount : req.body.amount,
-            address : addressData,
+            items : itemsData,
+            amount : Number(req.body.amount),
+            address : addressMapped,
+            paymentScreenshot: paymentScreenshotUrl,
+            payment: false, // Initially false, admin verifies manually
             date: new Date().toISOString()
         })
 
         await newOrder.save()
-        // Note: Cart is now cleared in verifyOrder only after successful payment
-        
-        const line_items = req.body.items.map((item)=>({
-            price_data:{
-                currency:"usd",
-                product_data:{
-                    name:item.name
-                },
-                unit_amount:Math.round(item.price * 100)
-            },
-            quantity:item.quantity
-        }))
 
-        line_items.push({
-            price_data:{
-                currency:"usd",
-                product_data:{
-                    name:"Delivery Charges"                   
-                },
-                unit_amount:2 * 100 // $2 delivery charge in cents
-            },
-            quantity:1
+        // Clear user cart now that order is placed with receipt
+        await userModel.findByIdAndUpdate(req.userId, { cartData: {} });
+
+        // Retrieve user name for notification
+        const user = await userModel.findById(req.userId);
+        const username = user ? user.name : "Customer";
+
+        await notificationsModel.create({
+            message: `A new order with id ${newOrder._id} has been placed. Waiting for payment approval from user ${username}`,
+            orderId: newOrder._id,
+            user: username
         })
 
-        const session = await getStripe().checkout.sessions.create({
-            line_items:line_items,
-            mode:"payment",
-            success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
-            cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
-        })
-        res.status(200).json({success:true, message: "Order placed successfully", session_url:session.url})
+        res.status(200).json({success:true, message: "Order placed successfully. Payment receipt uploaded.", orderId: newOrder._id})
 
     }catch(err){
         console.log(err)
@@ -157,5 +158,29 @@ const updateStatus = async(req,res)=>{
     }
 }
 
+// This API will be called by the admin to update the payment status of the order (Mark as Paid/Unpaid)
+const updatePaymentStatus = async(req,res)=>{
+    const { orderId, payment } = req.body;
+    try {
+        const order = await orderModel.findByIdAndUpdate(orderId, { payment: payment }, { new: true }).populate('userId', 'name email');
+        
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
 
-export {placeOrder, verifyOrder, userOrders, listOrders, updateStatus}
+        // Add a notification for payment verification update
+        await notificationsModel.create({
+            message: `Payment status for order ${order._id} has been updated to ${payment ? 'Paid' : 'Unpaid'} by Admin.`,
+            orderId: order._id,
+            user: order.userId?.name || "unknown"
+        });
+
+        res.status(200).json({ success: true, message: `Order payment marked as ${payment ? 'Paid' : 'Unpaid'} successfully`, data: order });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+}
+
+
+export {placeOrder, verifyOrder, userOrders, listOrders, updateStatus, updatePaymentStatus}

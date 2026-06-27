@@ -10,6 +10,7 @@ const Orders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [updatingStatusId, setUpdatingStatusId] = useState(null);
+    const [updatingPaymentId, setUpdatingPaymentId] = useState(null);
     const [downloadingZipItemId, setDownloadingZipItemId] = useState(null);
 
     const handleDownloadZip = async (order, item, itemIndex) => {
@@ -212,6 +213,44 @@ const Orders = () => {
         }
     };
 
+    const togglePaymentStatus = async (orderId, newPaymentStatus) => {
+        setUpdatingPaymentId(orderId);
+        try {
+            const res = await axios.post(`${url}/api/order/payment-status`, {
+                orderId,
+                payment: newPaymentStatus
+            });
+
+            if (res.data.success) {
+                setOrders((prev) =>
+                    prev.map((order) =>
+                        order._id === orderId
+                            ? { ...order, payment: newPaymentStatus }
+                            : order
+                    )
+                );
+                toast.success(`Payment marked as ${newPaymentStatus ? 'Paid' : 'Unpaid'}`, {
+                    style: {
+                        border: '3px solid black',
+                        padding: '16px',
+                        color: 'black',
+                        fontWeight: '900',
+                        textTransform: 'uppercase',
+                        borderRadius: '0',
+                    },
+                });
+            } else {
+                toast.error('Error updating payment status');
+            }
+
+        } catch (err) {
+            console.log(err);
+            toast.error("Server error");
+        } finally {
+            setUpdatingPaymentId(null);
+        }
+    };
+
     useEffect(() => {
         fetchOrders();
     }, []);
@@ -288,6 +327,57 @@ const Orders = () => {
                                                             : "No address provided"}
                                                     </span>
                                                 </p>
+                                            </div>
+
+                                            {/* PAYMENT INFO */}
+                                            <div className='mb-6 border-t-[3px] border-black pt-4'>
+                                                <div className='flex justify-between items-center mb-3'>
+                                                    <span className='text-xs font-black uppercase tracking-widest text-black/60'>
+                                                        Payment Verification:
+                                                    </span>
+                                                    <span className={`text-xs font-black uppercase tracking-widest px-2 py-0.5 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${order.payment ? 'bg-green-400 text-black' : 'bg-red-400 text-black'}`}>
+                                                        {order.payment ? 'Paid' : 'Unpaid'}
+                                                    </span>
+                                                </div>
+
+                                                {order.paymentScreenshot ? (
+                                                    <div className='flex items-center gap-4 mt-3 bg-[#e5e5e5]/30 p-3 border border-black/10'>
+                                                        <div className='w-16 h-16 bg-[#e5e5e5] border-2 border-black relative group overflow-hidden shrink-0'>
+                                                            <img 
+                                                                src={order.paymentScreenshot} 
+                                                                className='w-full h-full object-cover cursor-zoom-in' 
+                                                                alt="Payment receipt" 
+                                                                onClick={() => window.open(order.paymentScreenshot, '_blank')} 
+                                                            />
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleDownload(order.paymentScreenshot, `payment-receipt-${order._id.slice(-6)}.png`); }}
+                                                                className='absolute top-0 right-0 bg-white hover:bg-[#ff5500] text-black hover:text-white border-l border-b border-black p-1 transition-all rounded-none z-20 cursor-pointer'
+                                                                title="Download Receipt"
+                                                            >
+                                                                <Download className='w-3 h-3' strokeWidth={3} />
+                                                            </button>
+                                                        </div>
+                                                        <div className='flex flex-col gap-2'>
+                                                            <button
+                                                                disabled={updatingPaymentId === order._id}
+                                                                onClick={() => togglePaymentStatus(order._id, !order.payment)}
+                                                                className='flex items-center justify-center gap-2 bg-black text-white hover:bg-[#ff5500] hover:text-black border-2 border-black px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed'
+                                                            >
+                                                                {updatingPaymentId === order._id && (
+                                                                    <Loader2 className="w-3 animate-spin text-current" strokeWidth={3} />
+                                                                )}
+                                                                <span>{order.payment ? 'Mark Unpaid' : 'Approve Payment'}</span>
+                                                            </button>
+                                                            <p className='text-[8px] font-black uppercase text-black/40 leading-none'>
+                                                                Click receipt to expand
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className='text-xs font-black uppercase text-red-500 mt-2'>
+                                                        No payment screenshot uploaded
+                                                    </div>
+                                                )}
                                             </div>
 
                                             {/* ITEMS LIST */}

@@ -91,6 +91,12 @@ const MyOrders = () => {
                           {order.status || 'Processing'}
                         </span>
                       </div>
+                      <div className='flex items-center gap-2 text-sm sm:text-base font-black uppercase mt-1'>
+                        <span>Payment:</span>
+                        <span className={`px-2 py-0.5 text-xs tracking-widest border border-black ${order.payment ? 'bg-green-400 text-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]' : 'bg-red-400 text-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]'}`}>
+                          {order.payment ? 'Verified' : 'Pending Verification'}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Right Column: Date & Total */}

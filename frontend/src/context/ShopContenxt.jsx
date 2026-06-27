@@ -131,7 +131,7 @@ const ShopContextProvider = ({ children }) => {
         }, 0);
     }
 
-    const placeOrder = async (orderData) => {
+    const placeOrder = async (orderData, screenshotFile) => {
         const orderItems = [];
         Object.entries(cartItems).forEach(([cartKey, qty]) => {
             if (qty > 0) {
@@ -158,22 +158,46 @@ const ShopContextProvider = ({ children }) => {
             }
         });
 
-        const orderPayload = {
-            address: orderData,
-            items: orderItems,
-            amount: getTotalCartAmount() + 2, // +2 for delivery fee
-        };
+        const subtotal = getTotalCartAmount();
+        const shipping = 10;
+        const tax = subtotal * 0.08;
+        const totalAmount = subtotal + shipping + tax;
+
+        const formDataPayload = new FormData();
+        formDataPayload.append("address", JSON.stringify(orderData));
+        formDataPayload.append("items", JSON.stringify(orderItems));
+        formDataPayload.append("amount", totalAmount);
+        if (screenshotFile) {
+            formDataPayload.append("paymentScreenshot", screenshotFile);
+        }
 
         try {
-            const response = await axios.post(`${url}/api/order/place`, orderPayload, { headers: { token } });
+            const response = await axios.post(`${url}/api/order/place`, formDataPayload, {
+                headers: {
+                    token,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
             if (response.data.success) {
-                const { session_url } = response.data;
-                window.location.replace(session_url);
+                setCartItems({});
+                if (token) {
+                    // Clear cart on backend as well
+                    try {
+                        await axios.post(`${url}/api/cart/clear`, {}, { headers: { token } });
+                    } catch (clearErr) {
+                        console.error("Error clearing cart on backend:", clearErr);
+                    }
+                }
+                toast.success("Order placed successfully!");
+                return { success: true, orderId: response.data.orderId };
             } else {
                 toast.error("Error: " + response.data.message);
+                return { success: false, message: response.data.message };
             }
         } catch (error) {
+            console.error("Order placement error:", error);
             toast.error("An error occurred while placing your order. Please try again.");
+            return { success: false };
         }
     };
 

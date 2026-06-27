@@ -31,6 +31,10 @@ const orderSchema = new mongoose.Schema({
     payment:{
         type:Boolean,
         default:false
+    },
+    paymentScreenshot:{
+        type:String,
+        default:""
     }
     
 })
