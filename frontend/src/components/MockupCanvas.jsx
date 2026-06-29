@@ -1,366 +1,503 @@
-import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react'
-import { Stage, Layer, Image as KImage, Transformer, Rect, Text, Group, Path } from 'react-konva'
-import useImage from 'use-image'
-import { useMockup } from '../context/MockupContext'
+import React, {
+  useRef,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+  useState,
+} from "react";
 
-const TRANSFORMER_COLOR = '#FF5722'
-const transformerProps = {
-  anchorSize: 12,
-  anchorStroke: '#000',
-  anchorFill: TRANSFORMER_COLOR,
-  borderStroke: TRANSFORMER_COLOR,
-  borderStrokeWidth: 2,
-  keepRatio: true,
-  rotateEnabled: true,
-  enabledAnchors: ['top-left', 'top-right', 'bottom-right', 'bottom-left'],
-}
+import { fabric } from "fabric";
+import { useMockup } from "../context/MockupContext";
 
-const createBoundBoxFunc = () => {
-  return (oldBox, newBox) => {
-    // Avoid scaling below 10px to prevent disappearing/flipping issues
-    if (newBox.width < 10 || newBox.height < 10) {
-      return oldBox
-    }
-    return newBox
-  }
-}
+const VIRTUAL_WIDTH = 600;
+const VIRTUAL_HEIGHT = 600;
 
-function ImageLayerNode({ node, isSelected, onSelect, onChange, printable }) {
-  const [image] = useImage(node.src, node.src?.startsWith('data:') ? undefined : 'anonymous')
-  const shapeRef = useRef(null)
-  const trRef = useRef(null)
+const MockupCanvas = forwardRef(
+  ({ mockup, color, canvasSide }, ref) => {
+    const canvasRef = useRef(null);
+    const containerRef = useRef(null);
+    const fabricCanvas = useRef(null);
 
-  // Force render to populate shapeRef for Transformer on mount/load
-  const [, forceUpdate] = useState({});
-  useEffect(() => {
-    forceUpdate({});
-  }, [image]);
+    const {
+      layers,
+      selectedId,
+      selectLayer,
+      updateLayer,
+      scale,
+    } = useMockup();
 
-  useEffect(() => {
-    if (isSelected && trRef.current && shapeRef.current) {
-      trRef.current.nodes([shapeRef.current])
-      trRef.current.getLayer()?.batchDraw()
-    }
-  }, [isSelected, image])
+    const [dimensions, setDimensions] = useState({
+      width: 600,
+      height: 600,
+    });
 
-  return (
-    <React.Fragment>
-      <KImage
-        image={image}
-        x={node.x}
-        y={node.y}
-        width={node.width || 200}
-        height={node.height || 200}
-        rotation={node.rotation}
-        scaleX={node.scaleX}
-        scaleY={node.scaleY}
-        opacity={node.opacity ?? 1}
-        draggable
-        onMouseDown={(e) => {
-          e.cancelBubble = true;
-          onSelect();
-        }}
-        onTouchStart={(e) => {
-          e.cancelBubble = true;
-          onSelect();
-        }}
-        onClick={(e) => {
-          e.cancelBubble = true;
-          onSelect();
-        }}
-        onTap={(e) => {
-          e.cancelBubble = true;
-          onSelect();
-        }}
-        dragBoundFunc={(pos) => {
-          const stage = shapeRef.current?.getStage();
-          if (!stage) return pos;
+    // Keep stable references of context state/callbacks to prevent stale event handlers
+    const selectLayerRef = useRef(selectLayer);
+    const updateLayerRef = useRef(updateLayer);
+    const layersRef = useRef(layers);
+    const selectedIdRef = useRef(selectedId);
+    const canvasSideRef = useRef(canvasSide);
 
-          // Convert absolute screen coordinates to local stage coordinates
-          const transform = stage.getAbsoluteTransform().copy().invert();
-          const localPos = transform.point(pos);
+    useEffect(() => {
+      selectLayerRef.current = selectLayer;
+      updateLayerRef.current = updateLayer;
+      layersRef.current = layers;
+      selectedIdRef.current = selectedId;
+      canvasSideRef.current = canvasSide;
+    }, [selectLayer, updateLayer, layers, selectedId, canvasSide]);
 
-          const width = (node.width || 200) * (node.scaleX || 1);
-          const height = (node.height || 200) * (node.scaleY || 1);
+    // ==========================================
+    // Responsive container Resize Observer
+    // ==========================================
+    useEffect(() => {
+      if (!containerRef.current) return;
 
-          // Allow dragging anywhere within the stage canvas limits
-          const sWidth = stage.width() / stage.scaleX();
-          const sHeight = stage.height() / stage.scaleY();
+      const resizeObserver = new ResizeObserver((entries) => {
+        if (!entries || entries.length === 0) return;
+        const rect = entries[0].contentRect;
 
-          const clampedLocalX = Math.max(0, Math.min(localPos.x, sWidth - width));
-          const clampedLocalY = Math.max(0, Math.min(localPos.y, sHeight - height));
+        // Keep bounds reasonable
+        setDimensions({
+          width: Math.max(100, rect.width),
+          height: Math.max(100, rect.height),
+        });
+      });
 
-          // Convert local coordinates back to absolute coordinates for Konva
-          return stage.getAbsoluteTransform().point({ x: clampedLocalX, y: clampedLocalY });
-        }}
-        onDragEnd={(e) => {
-          onChange({
-            ...node,
-            x: e.target.x(),
-            y: e.target.y(),
-          })
-        }}
-        onTransformEnd={(e) => {
-          const shape = shapeRef.current;
-          onChange({
-            ...node,
-            x: shape.x(),
-            y: shape.y(),
-            rotation: shape.rotation(),
-            scaleX: shape.scaleX(),
-            scaleY: shape.scaleY(),
-          })
-        }}
-        ref={shapeRef}
-      />
-      {isSelected && shapeRef.current && (
-        <Transformer
-          ref={trRef}
-          nodes={[shapeRef.current]}
-          {...transformerProps}
-          boundBoxFunc={createBoundBoxFunc()}
-        />
-      )}
-    </React.Fragment>
-  )
-}
+      resizeObserver.observe(containerRef.current);
 
-const MockupCanvas = forwardRef(({ mockup, activeSide = 'front' }, ref) => {
-  const containerRef = useRef(null)
-  const stageRef = useRef(null)
-  const fileInputRef = useRef(null)
+      return () => resizeObserver.disconnect();
+    }, []);
 
-  const previewImageSrc = activeSide === 'front' ? (mockup.previewFront || mockup.preview) : (mockup.previewBack || mockup.preview)
-  const [backgroundImage] = useImage(previewImageSrc, previewImageSrc?.startsWith('data:') ? undefined : 'anonymous')
+    // ==========================================
+    // Initialize Fabric Canvas
+    // ==========================================
+    useEffect(() => {
+      // Style object controls to match the professional neo-brutalist theme
+      fabric.Object.prototype.transparentCorners = false;
+      fabric.Object.prototype.cornerColor = "#FF5722";
+      fabric.Object.prototype.cornerStrokeColor = "#000000";
+      fabric.Object.prototype.cornerSize = 10;
+      fabric.Object.prototype.cornerStyle = "circle";
+      fabric.Object.prototype.borderColor = "#FF5722";
+      fabric.Object.prototype.borderScaleFactor = 2.5;
+      fabric.Object.prototype.borderDashArray = [4, 4];
 
-  const { layers, selectedId, selectLayer, updateLayer, deleteLayer, scale, addLayer } = useMockup()
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
+      const canvas = new fabric.Canvas(canvasRef.current, {
+        width: dimensions.width,
+        height: dimensions.height,
+        preserveObjectStacking: true,
+        selection: true,
+      });
 
-  const stageWidth = mockup.printable.width + mockup.printable.x * 2
-  const stageHeight = mockup.printable.height + mockup.printable.y * 2
+      fabricCanvas.current = canvas;
 
-  // Filter layers for the current active side
-  const sideLayers = layers.filter(layer => layer.side === activeSide)
+      // Selection Handlers (using refs to prevent stale closure captures)
+      canvas.on("selection:cleared", () => {
+        selectLayerRef.current(null);
+      });
 
-  useImperativeHandle(ref, () => ({
-    exportImage: () => {
-      if (!stageRef.current) return null;
+      const handleSelection = (e) => {
+        const selectedObj = e.selected?.[0];
+        if (selectedObj && selectedObj.layerId) {
+          selectLayerRef.current(selectedObj.layerId);
+        }
+      };
 
-      // Find and hide transformers
-      const transformers = stageRef.current.find('Transformer');
-      transformers.forEach(tr => tr.hide());
+      canvas.on("selection:created", handleSelection);
+      canvas.on("selection:updated", handleSelection);
 
-      // Find and hide boundary
-      const boundary = stageRef.current.findOne('.printableBoundary');
-      if (boundary) boundary.hide();
+      // Object manipulation: sync position, rotation, and scaling to context
+      canvas.on("object:moving", (e) => {
+        const obj = e.target;
+        if (obj && obj.layerId) {
+          updateLayerRef.current(obj.layerId, {
+            x: obj.left,
+            y: obj.top,
+          });
+        }
+      });
 
-      // Find and hide upload placeholder Group
-      const uploadGroup = stageRef.current.findOne('.uploadGroup');
-      if (uploadGroup) uploadGroup.hide();
+      canvas.on("object:scaling", (e) => {
+        const obj = e.target;
+        if (obj && obj.layerId) {
+          updateLayerRef.current(obj.layerId, {
+            scaleX: obj.scaleX,
+            scaleY: obj.scaleY,
+          });
+        }
+      });
 
-      // Redraw stage to reflect hidden elements
-      stageRef.current.draw();
+      canvas.on("object:rotating", (e) => {
+        const obj = e.target;
+        if (obj && obj.layerId) {
+          updateLayerRef.current(obj.layerId, {
+            rotation: obj.angle,
+          });
+        }
+      });
 
-      // Get the data URL (Base64 PNG)
-      const dataUrl = stageRef.current.toDataURL({ pixelRatio: 2 });
+      canvas.on("object:modified", (e) => {
+        const obj = e.target;
+        if (obj && obj.layerId) {
+          updateLayerRef.current(obj.layerId, {
+            x: obj.left,
+            y: obj.top,
+            scaleX: obj.scaleX,
+            scaleY: obj.scaleY,
+            rotation: obj.angle,
+          });
+        }
+      });
 
-      // Restore the elements' visibility
-      transformers.forEach(tr => tr.show());
-      if (boundary) boundary.show();
-      if (uploadGroup) uploadGroup.show();
+      return () => {
+        canvas.dispose();
+        fabricCanvas.current = null;
+      };
+    }, []);
 
-      // Redraw stage to restore UI state
-      stageRef.current.draw();
+    // ==========================================
+    // Handle Responsive Viewport fitting & Zoom
+    // ==========================================
+    useEffect(() => {
+      if (!fabricCanvas.current) return;
+      const canvas = fabricCanvas.current;
 
-      return dataUrl;
-    }
-  }));
+      canvas.setWidth(dimensions.width);
+      canvas.setHeight(dimensions.height);
 
-  useEffect(() => {
-    function updateSize() {
-      if (containerRef.current) {
-        setContainerSize({
-          width: containerRef.current.clientWidth,
-          height: containerRef.current.clientHeight
-        })
+      // Calculate fitting zoom factor
+      const fitScale = Math.min(
+        dimensions.width / VIRTUAL_WIDTH,
+        dimensions.height / VIRTUAL_HEIGHT
+      );
+
+      const totalZoom = fitScale * (scale || 1);
+      canvas.setZoom(totalZoom);
+
+      // Center the virtual square viewport in physical canvas space
+      const viewportWidth = VIRTUAL_WIDTH * totalZoom;
+      const viewportHeight = VIRTUAL_HEIGHT * totalZoom;
+      const offsetX = (dimensions.width - viewportWidth) / 2;
+      const offsetY = (dimensions.height - viewportHeight) / 2;
+
+      canvas.viewportTransform = [totalZoom, 0, 0, totalZoom, offsetX, offsetY];
+      canvas.renderAll();
+    }, [dimensions, scale]);
+
+    // ==========================================
+    // Render/Sync Mockup Background Image
+    // ==========================================
+    const mockupImgSrc =
+      canvasSide === "front"
+        ? mockup?.previewFront || mockup?.preview
+        : mockup?.previewBack || mockup?.preview;
+
+    useEffect(() => {
+      if (!fabricCanvas.current) return;
+      const canvas = fabricCanvas.current;
+
+      if (!mockupImgSrc) {
+        const existingBg = canvas.getObjects().find((o) => o.isBackground);
+        if (existingBg) {
+          canvas.remove(existingBg);
+          canvas.renderAll();
+        }
+        return;
       }
-    }
-    updateSize()
-    window.addEventListener('resize', updateSize)
-    return () => window.removeEventListener('resize', updateSize)
-  }, [])
 
-  const checkDeselect = (e) => {
-    if (e.target === e.target.getStage() || e.target.name() === 'background') {
-      selectLayer(null)
-    }
-  }
+      fabric.Image.fromURL(
+        mockupImgSrc,
+        (img) => {
+          if (!fabricCanvas.current || fabricCanvas.current !== canvas) return;
 
-  const processFile = (file) => {
-    const reader = new FileReader()
-    reader.onload = () => {
-      const img = new window.Image()
-      img.src = reader.result
-      img.onload = () => {
-        const aspectRatio = img.width / img.height
-        const targetHeight = 200 // Base height
-        const targetWidth = targetHeight * aspectRatio // Responsive width
+          // Remove any old background objects
+          const oldBgObjects = canvas.getObjects().filter((o) => o.isBackground);
+          oldBgObjects.forEach((o) => canvas.remove(o));
 
-        const newLayerId = addLayer({
-          type: 'image',
-          side: activeSide,
-          src: reader.result,
-          // Center inside printable area
-          x: mockup.printable.x + (mockup.printable.width / 2) - (targetWidth / 2),
-          y: mockup.printable.y + (mockup.printable.height / 2) - (targetHeight / 2),
-          width: targetWidth,
-          height: targetHeight,
-          rotation: 0,
-          scaleX: 1,
-          scaleY: 1,
-        })
-        selectLayer(newLayerId)
+          img.set({
+            left: 0,
+            top: 0,
+            selectable: false,
+            evented: false,
+            isBackground: true,
+          });
+
+          img.scaleToWidth(VIRTUAL_WIDTH);
+          img.scaleToHeight(VIRTUAL_HEIGHT);
+
+          canvas.add(img);
+          canvas.sendToBack(img);
+          canvas.renderAll();
+        },
+        {
+          crossOrigin: "anonymous",
+        }
+      );
+    }, [mockupImgSrc]);
+
+    // ==========================================
+    // Render/Sync Printable Area Guidelines
+    // ==========================================
+    useEffect(() => {
+      if (!fabricCanvas.current) return;
+      const canvas = fabricCanvas.current;
+
+      // Remove existing guidelines
+      const oldPrintables = canvas.getObjects().filter((o) => o.isPrintableArea);
+      oldPrintables.forEach((o) => canvas.remove(o));
+
+      const printable = mockup?.printable || {
+        x: 150,
+        y: 150,
+        width: 300,
+        height: 400,
+      };
+
+      const rect = new fabric.Rect({
+        left: printable.x,
+        top: printable.y,
+        width: printable.width,
+        height: printable.height,
+        fill: "transparent",
+        stroke: "#FF5722",
+        strokeDashArray: [6, 4],
+        selectable: false,
+        evented: false,
+        isPrintableArea: true,
+      });
+
+      const label = new fabric.Text("PRINTABLE AREA", {
+        left: printable.x,
+        top: printable.y - 15,
+        fontSize: 10,
+        fill: "#FF5722",
+        selectable: false,
+        evented: false,
+        isPrintableArea: true,
+      });
+
+      canvas.add(rect);
+      canvas.add(label);
+
+      // Keep guidelines layered directly above background image
+      const bg = canvas.getObjects().find((o) => o.isBackground);
+      if (bg) {
+        canvas.sendToBack(label);
+        canvas.sendToBack(rect);
+        canvas.sendToBack(bg);
+      } else {
+        canvas.sendToBack(label);
+        canvas.sendToBack(rect);
       }
-    }
-    reader.readAsDataURL(file)
-  }
 
-  const handleCanvasUpload = (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+      canvas.renderAll();
+    }, [mockup?.printable]);
 
-    processFile(file)
-    if (fileInputRef.current) fileInputRef.current.value = ''
-  }
+    // ==========================================
+    // Render/Sync Design Layers
+    // ==========================================
+    useEffect(() => {
+      if (!fabricCanvas.current) return;
+      const canvas = fabricCanvas.current;
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
+      const sideLayers = layers.filter((layer) => layer.side === canvasSide);
+      const currentFabricObjects = canvas.getObjects().filter((o) => o.layerId !== undefined);
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const file = e.dataTransfer?.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      processFile(file);
-    }
-  };
+      // 1. Remove deleted layers
+      currentFabricObjects.forEach((obj) => {
+        const stillExists = sideLayers.some((l) => l.id === obj.layerId);
+        if (!stillExists) {
+          canvas.remove(obj);
+        }
+      });
 
-  const padding = 40;
-  const availableWidth = Math.max(1, containerSize.width - padding * 2);
-  const availableHeight = Math.max(1, containerSize.height - padding * 2);
-  const fitScale = containerSize.width === 0 ? 1 : Math.min(availableWidth / stageWidth, availableHeight / stageHeight);
-  const finalScale = fitScale * scale;
+      // 2. Incremental Sync or Create
+      sideLayers.forEach((layer) => {
+        const existingObj = currentFabricObjects.find((o) => o.layerId === layer.id);
 
-  return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 w-full h-full flex justify-center items-center"
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-      style={{
-        backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.1) 1px, transparent 1px)`,
-        backgroundSize: '24px 24px',
-        backgroundColor: '#F5F2EB'
-      }}
-    >
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleCanvasUpload}
-        accept="image/*"
-        className="hidden"
-      />
+        if (existingObj) {
+          // If the user is actively transforming this object, let local interaction drive coordinates
+          const isInteracting = canvas._currentTransform && canvas.getActiveObject() === existingObj;
 
-      {containerSize.width > 0 && (
-        <Stage
-          width={stageWidth * finalScale}
-          height={stageHeight * finalScale}
-          scaleX={finalScale}
-          scaleY={finalScale}
-          ref={stageRef}
-          onMouseDown={checkDeselect}
-          onTouchStart={checkDeselect}
-        >
-          <Layer>
-            <KImage
-              image={backgroundImage}
-              x={0}
-              y={0}
-              width={stageWidth}
-              height={stageHeight}
-              name="background"
-            />
+          if (!isInteracting) {
+            existingObj.set({
+              left: layer.x,
+              top: layer.y,
+              scaleX: layer.scaleX || 1,
+              scaleY: layer.scaleY || 1,
+              angle: layer.rotation || 0,
+              opacity: layer.opacity ?? 1,
+            });
 
-            <Rect
-              x={mockup.printable.x}
-              y={mockup.printable.y}
-              width={mockup.printable.width}
-              height={mockup.printable.height}
-              stroke="#FF5722"
-              strokeWidth={2}
-              dash={[8, 8]}
-              listening={false}
-              name="printableBoundary"
-            />
+            // Update specific properties
+            if (layer.type === "text" && existingObj.type === "textbox") {
+              existingObj.set({
+                text: layer.text || "",
+                fontSize: layer.fontSize || 24,
+                fill: layer.fill || "#000",
+                fontFamily: layer.fontFamily || "Arial",
+              });
+            }
 
-            {sideLayers.length === 0 && (
-              <Group
-                x={mockup.printable.x}
-                y={mockup.printable.y}
-                onMouseEnter={(e) => { e.target.getStage().container().style.cursor = 'pointer' }}
-                onMouseLeave={(e) => { e.target.getStage().container().style.cursor = 'default' }}
-                onClick={() => fileInputRef.current?.click()}
-                onTap={() => fileInputRef.current?.click()}
-                name="uploadGroup"
-              >
-                <Rect
-                  x={0} y={0}
-                  width={mockup.printable.width}
-                  height={mockup.printable.height}
-                  fill="rgba(0,0,0,0)"
-                />
+            existingObj.setCoords();
+          }
+        } else {
+          // Create new layer object
+          if (layer.type === "image") {
+            fabric.Image.fromURL(
+              layer.src,
+              (img) => {
+                if (!fabricCanvas.current || fabricCanvas.current !== canvas) return;
 
-                <Group y={mockup.printable.height / 2 - 30} listening={false}>
-                  <Path
-                    x={mockup.printable.width / 2 - 15} y={-45}
-                    data="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" fill="#FF5722" scale={{ x: 1.5, y: 1.5 }}
-                  />
-                  <Text
-                    y={0} width={mockup.printable.width}
-                    text="DRAG IMAGE HERE" align="center" fill="#FF5722" fontSize={16} fontFamily="monospace" fontStyle="bold" lineHeight={1.5}
-                  />
-                  <Path
-                    x={mockup.printable.width / 2 - 15} y={65}
-                    data="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" fill="#FF5722" scale={{ x: 1.5, y: -1.5 }}
-                  />
-                </Group>
-              </Group>
-            )}
-          </Layer>
+                // Double check it wasn't deleted during async load
+                const stillExists = layersRef.current.some(
+                  (l) => l.id === layer.id && l.side === canvasSideRef.current
+                );
+                if (!stillExists) return;
 
-          <Layer>
-            {sideLayers.map((layer) => {
-              if (layer.type === 'image') {
-                return (
-                  <ImageLayerNode
-                    key={layer.id}
-                    node={layer}
-                    isSelected={selectedId === layer.id}
-                    onSelect={() => selectLayer(layer.id)}
-                    onChange={(updated) => updateLayer(layer.id, updated)}
-                    printable={mockup.printable}
-                  />
-                )
+                img.set({
+                  left: layer.x,
+                  top: layer.y,
+                  scaleX: layer.scaleX || 1,
+                  scaleY: layer.scaleY || 1,
+                  angle: layer.rotation || 0,
+                  opacity: layer.opacity ?? 1,
+                })
+
+                img.layerId = layer.id
+
+                canvas.add(img)
+
+                // Select if it's the current selected layer
+                if (selectedIdRef.current === layer.id) {
+                  canvas.setActiveObject(img)
+                }
+
+                canvas.renderAll()
+              },
+              {
+                crossOrigin: "anonymous",
               }
-              return null
-            })}
-          </Layer>
-        </Stage>
-      )}
-    </div>
-  )
-})
+            );
+          } else if (layer.type === "text") {
+            const text = new fabric.Textbox(layer.text || "", {
+              left: layer.x,
+              top: layer.y,
+              fontSize: layer.fontSize || 24,
+              fill: layer.fill || "#000",
+              fontFamily: layer.fontFamily || "Arial",
+              angle: layer.rotation || 0,
+              scaleX: layer.scaleX || 1,
+              scaleY: layer.scaleY || 1,
+              opacity: layer.opacity ?? 1,
+            });
 
-export default MockupCanvas
+            text.layerId = layer.id;
+
+            // Inline text editor event listener
+            text.on("changed", () => {
+              updateLayerRef.current(layer.id, {
+                text: text.text,
+              });
+            });
+
+            canvas.add(text);
+
+            if (selectedIdRef.current === layer.id) {
+              canvas.setActiveObject(text);
+            }
+          }
+        }
+      });
+
+      canvas.renderAll();
+    }, [layers, canvasSide]);
+
+    // ==========================================
+    // Sync Selected ID Changes from Context
+    // ==========================================
+    useEffect(() => {
+      if (!fabricCanvas.current) return;
+      const canvas = fabricCanvas.current;
+
+      const activeObject = canvas.getActiveObject();
+      if (selectedId) {
+        const targetObj = canvas.getObjects().find((o) => o.layerId === selectedId);
+        if (targetObj && activeObject !== targetObj) {
+          canvas.setActiveObject(targetObj);
+          canvas.renderAll();
+        }
+      } else {
+        if (activeObject && activeObject.layerId) {
+          canvas.discardActiveObject();
+          canvas.renderAll();
+        }
+      }
+    }, [selectedId]);
+
+    // ==========================================
+    // Professional PNG Image Export Handle
+    // ==========================================
+    useImperativeHandle(ref, () => ({
+      exportImage: () => {
+        if (!fabricCanvas.current) return null;
+        const canvas = fabricCanvas.current;
+
+        // Save original scaling state
+        const currentZoom = canvas.getZoom();
+        const currentTransform = [...canvas.viewportTransform];
+        const currentWidth = canvas.getWidth();
+        const currentHeight = canvas.getHeight();
+
+        // 1. Reset canvas to virtual 600x600 size
+        canvas.setWidth(VIRTUAL_WIDTH);
+        canvas.setHeight(VIRTUAL_HEIGHT);
+        canvas.setZoom(1);
+        canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+
+        // 2. Hide visual guidelines (dashed box & labels)
+        const printableObjects = canvas.getObjects().filter((o) => o.isPrintableArea);
+        printableObjects.forEach((o) => o.set({ visible: false }));
+
+        // 3. Clear active selection borders/handles
+        const activeObj = canvas.getActiveObject();
+        canvas.discardActiveObject();
+        canvas.renderAll();
+
+        // 4. Export at 2x resolution (1200x1200px)
+        const dataUrl = canvas.toDataURL({
+          format: "png",
+          multiplier: 2,
+        });
+
+        // 5. Restore guidelines and selection borders
+        printableObjects.forEach((o) => o.set({ visible: true }));
+        if (activeObj) {
+          canvas.setActiveObject(activeObj);
+        }
+
+        // Restore canvas responsive sizing state
+        canvas.setWidth(currentWidth);
+        canvas.setHeight(currentHeight);
+        canvas.setZoom(currentZoom);
+        canvas.viewportTransform = currentTransform;
+        canvas.renderAll();
+
+        return dataUrl;
+      },
+    }));
+
+    return (
+      <div
+        ref={containerRef}
+        className="absolute inset-0 flex items-center justify-center overflow-hidden"
+      >
+        <canvas ref={canvasRef} />
+      </div>
+    );
+  }
+);
+
+MockupCanvas.displayName = "MockupCanvas";
+
+export default MockupCanvas;

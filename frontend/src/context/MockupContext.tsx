@@ -30,6 +30,7 @@ export interface Design {
 
 interface MockupContextType {
   layers: Layer[]
+  setLayers: React.Dispatch<React.SetStateAction<Layer[]>>
   selectedId: string | null
   history: Design[]
   historyIndex: number
@@ -145,6 +146,7 @@ export function MockupProvider({ children }: { children: React.ReactNode }) {
 
   const value: MockupContextType = {
     layers,
+    setLayers,
     selectedId,
     history,
     historyIndex,

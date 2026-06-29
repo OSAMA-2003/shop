@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { useMockup } from '../context/MockupContext'
-import { Eye, Lock, ChevronRight, ChevronDown } from 'lucide-react'
+import { Eye, ChevronRight, ChevronDown } from 'lucide-react'
 
 export default function LayerPanel({
   activeSide = 'front',
@@ -36,17 +36,21 @@ export default function LayerPanel({
           src: reader.result as string,
           x: printable.x + (printable.width / 2) - (targetWidth / 2),
           y: printable.y + (printable.height / 2) - (targetHeight / 2),
-          width: targetWidth,
-          height: targetHeight,
+          width: img.width,
+          height: img.height,
           rotation: 0,
-          scaleX: 1,
-          scaleY: 1,
+          scaleX: targetWidth / img.width,
+          scaleY: targetHeight / img.height,
         })
         selectLayer(generatedId)
       }
     }
     reader.readAsDataURL(files[0])
     if (fileRef.current) fileRef.current.value = ''
+  }
+
+  const handleLayerClick = (layerId: string) => {
+    selectLayer(layerId)
   }
 
   return (
@@ -76,14 +80,18 @@ export default function LayerPanel({
         <>
           <div className="flex-1   space-y-2 overflow-y-auto pr-2">
             {sideLayers.length === 0 ? (
-              <div className={`flex items-center justify-between border-2 border-black rounded-lg p-3 cursor-pointer ${!selectedId ? 'bg-[#FF5722] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white'}`}>
-                <div>
-                  <div className="font-bold uppercase text-sm">Graphics</div>
-                  <div className="text-xs font-mono">(None)</div>
-                </div>
-                <div className="flex gap-2 text-black">
-                  <Eye size={18} /> <Lock size={18} />
-                </div>
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  fileRef.current?.click();
+                }}
+                className="flex flex-col items-center justify-center border-2 border-dashed border-black rounded-xl p-6  hover:bg-black/5 cursor-pointer text-center transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px]"
+              >
+                <svg className="w-8 h-8 text-[#FF5722] mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <div className="font-black uppercase text-sm tracking-wider text-black">Upload </div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-black/40 mt-1">Click to select image</div>
               </div>
             ) : (
               sideLayers.map((layer, idx) => {
@@ -91,7 +99,16 @@ export default function LayerPanel({
                 return (
                   <div
                     key={layer.id}
-                    onClick={(e) => { e.stopPropagation(); selectLayer(layer.id); }}
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleLayerClick(layer.id)
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleLayerClick(layer.id)
+                    }}
                     className={`flex items-center justify-between border-2 border-black rounded-lg p-3 cursor-pointer transition-all ${isSelected ? 'bg-[#FF5722] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white hover:bg-gray-50'
                       }`}
                   >
@@ -99,8 +116,7 @@ export default function LayerPanel({
                       <div className="font-bold uppercase text-sm">Graphic {idx + 1}</div>
                       <div className="text-xs font-mono text-black/70">(Uploaded)</div>
                     </div>
-                    <div className="flex gap-2 text-black">
-                      <Eye size={18} /> <Lock size={18} />
+                    <div className="flex gap-2 text-black pointer-events-none">
                     </div>
                   </div>
                 )

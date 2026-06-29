@@ -23,7 +23,7 @@ export default function UploadPanel() {
         type: 'image',
         src: dataUrl,
         x: 150, // Starting coordinates (adjust based on your printable area)
-        y: 150, 
+        y: 150,
         width: 200, // Give it a solid starting size
         height: 200,
         rotation: 0,
