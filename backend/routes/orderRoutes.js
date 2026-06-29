@@ -4,17 +4,38 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../utils/cloudinary.js";
 import { placeOrder, verifyOrder, userOrders, listOrders, updateStatus, updatePaymentStatus } from "../controllers/orderController.js";
 import authMiddleware from "../middleware/auth.js";
+import path from "path";
+import fs from "fs";
 
 const orderRouter = express.Router()
 
-// Multer storage configuration for payment screenshots
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "ecommerce/payments",
-    allowed_formats: ["jpg", "jpeg", "png", "webp"],
-  },
-});
+// Ensure uploads folder exists for local fallback
+const uploadsDir = "./uploads";
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Multer storage configuration with disk fallback if Cloudinary is not configured
+let storage;
+if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+  storage = new CloudinaryStorage({
+    cloudinary,
+    params: {
+      folder: "ecommerce/payments",
+      allowed_formats: ["jpg", "jpeg", "png", "webp"],
+    },
+  });
+} else {
+  storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadsDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+  });
+}
 
 const upload = multer({ storage });
 

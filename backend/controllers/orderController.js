@@ -41,7 +41,7 @@ const placeOrder = async(req,res)=>{
 
         let paymentScreenshotUrl = "";
         if (req.file) {
-            paymentScreenshotUrl = req.file.path; // URL from CloudinaryStorage
+            paymentScreenshotUrl = req.file.path.replace(/\\/g, '/'); // URL from CloudinaryStorage or normalized local path
         }
 
         const newOrder = new orderModel({

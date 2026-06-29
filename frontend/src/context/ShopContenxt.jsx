@@ -17,7 +17,9 @@ const ShopContextProvider = ({ children }) => {
     const [token, setToken] = useState()
     const [userData, setUserData] = useState(null)
     const [loading, setLoading] = useState(true);
-    const url = "https://shop-2-ms77.onrender.com"
+    const url = typeof window !== 'undefined' && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+        ? "http://localhost:5000"
+        : "https://shop-2-ms77.onrender.com";
 
     const fetchUserProfile = async (tokenValue) => {
         const activeToken = tokenValue || token;
@@ -196,8 +198,9 @@ const ShopContextProvider = ({ children }) => {
             }
         } catch (error) {
             console.error("Order placement error:", error);
-            toast.error("An error occurred while placing your order. Please try again.");
-            return { success: false };
+            const backendError = error.response?.data?.message;
+            toast.error(backendError ? `Error: ${backendError}` : "An error occurred while placing your order. Please try again.");
+            return { success: false, message: backendError };
         }
     };
 

@@ -56,13 +56,12 @@ export const creatNotificationForOrder = async(orderData)=>{
     try{
         const {userId , _id} = orderData
         await notificationsModel.create({
-            message:` You have new order ${id} `,
+            message:` You have new order ${_id} `,
             orderId:_id,
             user:userId || 'unknown'
         })
     }catch(err){
-        console.log(err)
-        res.status(500).json({success:false, message:err.message})
+        console.log("Error in creatNotificationForOrder:", err);
     }
 }
         
