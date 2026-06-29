@@ -6,10 +6,11 @@ dotenv.config()
 
 const connectDB = async () => {
     try{
-        await mongoose.connect(process.env.MONGO_URL)
-        console.log("DB Connected Successfully")
+        const url = process.env.MONGO_URL || "mongodb://localhost:27017/ecommerce";
+        await mongoose.connect(url)
+        console.log("DB Connected Successfully to " + url)
     }catch(err){
-        console.error("DB Connection Failed", err.message)
+        console.error("DB Connection Failed:", err.message)
         process.exit(1)
     }
 }
