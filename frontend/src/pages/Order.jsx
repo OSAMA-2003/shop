@@ -57,10 +57,14 @@ const Order = () => {
       const res = await placeOrder(formData, screenshotFile); 
       if (res && res.success) {
         navigate('/myorders');
+      } else {
+        const errorMsg = res?.message || "An error occurred while placing your order.";
+        console.error("Order placement failed:", errorMsg);
+        alert(`Error Placing Order: ${errorMsg}`);
       }
     } catch (err) {
-      console.error(err);
-      toast.error("An error occurred. Please try again.");
+      console.error("Unexpected error in onSubmitHandler:", err);
+      alert(`Unexpected Error: ${err.message}`);
     } finally {
       setIsSubmitting(false);
     }

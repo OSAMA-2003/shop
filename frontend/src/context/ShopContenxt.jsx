@@ -17,9 +17,7 @@ const ShopContextProvider = ({ children }) => {
     const [token, setToken] = useState()
     const [userData, setUserData] = useState(null)
     const [loading, setLoading] = useState(true);
-    const url = typeof window !== 'undefined' && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-        ? "http://localhost:5000"
-        : "https://shop-2-ms77.onrender.com";
+    const url = "https://shop-2-ms77.onrender.com";
 
     const fetchUserProfile = async (tokenValue) => {
         const activeToken = tokenValue || token;
@@ -176,8 +174,7 @@ const ShopContextProvider = ({ children }) => {
         try {
             const response = await axios.post(`${url}/api/order/place`, formDataPayload, {
                 headers: {
-                    token,
-                    'Content-Type': 'multipart/form-data'
+                    token
                 }
             });
             if (response.data.success) {
@@ -198,8 +195,8 @@ const ShopContextProvider = ({ children }) => {
             }
         } catch (error) {
             console.error("Order placement error:", error);
-            const backendError = error.response?.data?.message;
-            toast.error(backendError ? `Error: ${backendError}` : "An error occurred while placing your order. Please try again.");
+            const backendError = error.response?.data?.message || error.message;
+            toast.error(`Error: ${backendError}`);
             return { success: false, message: backendError };
         }
     };
