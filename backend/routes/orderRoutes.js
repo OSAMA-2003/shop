@@ -37,7 +37,10 @@ if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && proce
   });
 }
 
-const upload = multer({ storage });
+const upload = multer({ 
+  storage, 
+  limits: { fieldSize: 50 * 1024 * 1024 } // 50MB limit for large JSON payload in formData
+});
 
 orderRouter.post('/place', authMiddleware, upload.single('paymentScreenshot'), placeOrder)
 orderRouter.post('/verify', authMiddleware, verifyOrder) // Changed to POST to accept body from frontend
