@@ -52,7 +52,7 @@ const MockupSection = () => {
   };
 
   return (
-    <section className='relative w-full min-h-screen bg-[#f4f6f8] text-text-main py-24 px-6 sm:px-10 flex flex-col justify-center overflow-hidden'>
+    <section className='relative w-full min-h-screen bg-[#f4f6f8] text-text-main  md:py-10 px-6 sm:px-10 flex flex-col justify-center overflow-hidden'>
 
       <motion.div
         variants={containerVariants}
@@ -63,7 +63,7 @@ const MockupSection = () => {
       >
         {/* Top Header Row with Title and Scroll Controls */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-          <motion.div variants={itemVariants} className="text-left">
+          <motion.div variants={itemVariants} className=" text-center md:text-left">
             <h2 className="text-6xl sm:text-7xl font-black uppercase tracking-tighter mb-4 leading-none text-black">
               <span className="text-[#ff5500]">Design</span> Your Own Product
             </h2>
@@ -74,7 +74,7 @@ const MockupSection = () => {
 
           {/* Navigation Arrows */}
           {formattedMockups.length > 0 && !loading && (
-            <motion.div variants={itemVariants} className="flex gap-3 self-start md:self-end">
+            <motion.div variants={itemVariants} className=" gap-3 self-start md:self-end hidden sm:flex">
               <button
                 onClick={() => handleScroll('left')}
                 className="w-12 h-12 rounded-full border-[3px] border-black flex items-center justify-center bg-white text-black hover:bg-[#ff5500] hover:text-white transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[3px] active:translate-x-[3px] cursor-pointer"

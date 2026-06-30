@@ -214,16 +214,23 @@ const MockupCanvas = forwardRef(
           const oldBgObjects = canvas.getObjects().filter((o) => o.isBackground);
           oldBgObjects.forEach((o) => canvas.remove(o));
 
+          // Calculate scale to fit within the virtual bounds
+          const fitScale = Math.min(
+            VIRTUAL_WIDTH / img.width,
+            VIRTUAL_HEIGHT / img.height
+          );
+
           img.set({
-            left: 0,
-            top: 0,
+            originX: "center",
+            originY: "center",
+            left: VIRTUAL_WIDTH / 2,
+            top: VIRTUAL_HEIGHT / 2,
+            scaleX: fitScale,
+            scaleY: fitScale,
             selectable: false,
             evented: false,
             isBackground: true,
           });
-
-          img.scaleToWidth(VIRTUAL_WIDTH);
-          img.scaleToHeight(VIRTUAL_HEIGHT);
 
           canvas.add(img);
           canvas.sendToBack(img);

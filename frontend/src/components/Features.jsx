@@ -59,7 +59,7 @@ const cardVariants = {
 const Features = () => {
   return (
     <section className='relative w-full bg-[#f9f9f6] text-black py-24 border-y-[4px] border-black font-sans overflow-hidden'>
-      <div className='relative z-10 max-w-7xl mx-auto px-6 sm:px-10'>
+      <div className='relative z-10 max-w-7xl mx-auto px-6 '>
 
         {/* HEADING - Animated to slide up */}
         <motion.h2
