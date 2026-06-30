@@ -126,4 +126,57 @@ const listCustomizedMockups = async (req, res) => {
     }
 };
 
-export { addMockup, listMockups, removeMockup, addCustomizedMockup, listCustomizedMockups };
+const updateMockup = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, description, price, category, color } = req.body;
+        
+        let updateData = {};
+        if (name) updateData.name = name;
+        if (description) updateData.description = description;
+        if (price) updateData.price = Number(price);
+        if (category) updateData.category = category;
+        if (color) updateData.color = color;
+
+        if (req.body.sizes) {
+            try {
+                updateData.sizes = JSON.parse(req.body.sizes);
+            } catch (e) {
+                if (typeof req.body.sizes === 'string') {
+                    updateData.sizes = req.body.sizes.split(',').map(s => s.trim());
+                } else {
+                    updateData.sizes = req.body.sizes;
+                }
+            }
+        }
+
+        const mockup = await mockupModel.findById(id);
+        
+        if (req.files) {
+            if (req.files.imageFront) {
+                if (mockup && mockup.imageFront) {
+                    const filename = mockup.imageFront.split("/").pop(); 
+                    const publicIdWithoutExt = filename.substring(0, filename.lastIndexOf('.')) || filename;
+                    try { await cloudinary.uploader.destroy(`ecommerce/${publicIdWithoutExt}`); } catch(e){}
+                }
+                updateData.imageFront = req.files.imageFront[0].path;
+            }
+            if (req.files.imageBack) {
+                if (mockup && mockup.imageBack) {
+                    const filename = mockup.imageBack.split("/").pop(); 
+                    const publicIdWithoutExt = filename.substring(0, filename.lastIndexOf('.')) || filename;
+                    try { await cloudinary.uploader.destroy(`ecommerce/${publicIdWithoutExt}`); } catch(e){}
+                }
+                updateData.imageBack = req.files.imageBack[0].path;
+            }
+        }
+
+        await mockupModel.findByIdAndUpdate(id, updateData, { new: true });
+        res.status(200).json({ success: true, message: "Mockup updated successfully" });
+    } catch (err) {
+        console.log(err);
+        res.status(400).json({ success: false, message: err.message });
+    }
+};
+
+export { addMockup, listMockups, removeMockup, addCustomizedMockup, listCustomizedMockups, updateMockup };

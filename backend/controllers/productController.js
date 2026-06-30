@@ -136,8 +136,69 @@ const removeProduct = async (req, res) => {
     }
 };
 
+const updateProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, description, price, category, color } = req.body;
+        
+        let updateData = {};
+        if (name) updateData.name = name;
+        if (description) updateData.description = description;
+        if (price) updateData.price = Number(price);
+        if (category) updateData.category = category;
+        if (color) updateData.color = color;
+
+        if (req.body.sizes) {
+            try {
+                updateData.sizes = JSON.parse(req.body.sizes);
+            } catch (e) {
+                if (typeof req.body.sizes === 'string') {
+                    updateData.sizes = req.body.sizes.split(',').map(s => s.trim());
+                } else {
+                    updateData.sizes = req.body.sizes;
+                }
+            }
+        }
+
+        if (req.file) {
+            const product = await productModel.findById(id);
+            if (product && product.image) {
+                const filename = product.image.split("/").pop(); 
+                const publicIdWithoutExt = filename.substring(0, filename.lastIndexOf('.')) || filename;
+                try {
+                    await cloudinary.uploader.destroy(`ecommerce/${publicIdWithoutExt}`);
+                } catch (cloudinaryErr) {
+                    console.log("Failed to delete old Cloudinary image:", cloudinaryErr);
+                }
+            }
+            updateData.image = req.file.path; // Cloudinary URL
+        }
+
+        await productModel.findByIdAndUpdate(id, updateData, { new: true });
+
+        res.status(200).json({
+            success: true,
+            message: "Product updated successfully"
+        });
+    } catch (err) {
+        console.log(err);
+        if (req.file && req.file.filename) {
+            try {
+                await cloudinary.uploader.destroy(req.file.filename);
+            } catch (cloudinaryErr) {
+                console.log("Failed to clean up Cloudinary image:", cloudinaryErr);
+            }
+        }
+        res.status(400).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
 export {
     addProduct,
     listProducts,
-    removeProduct
+    removeProduct,
+    updateProduct
 };

@@ -7,6 +7,7 @@ import {
   addProduct,
   removeProduct,
   listProducts,
+  updateProduct,
 } from "../controllers/productController.js";
 
 const productRouter = express.Router();
@@ -24,5 +25,6 @@ const upload = multer({ storage });
 productRouter.post("/add", upload.single("image"), addProduct);
 productRouter.delete("/remove/:id", removeProduct);
 productRouter.get("/list", listProducts);
+productRouter.put("/update/:id", upload.single("image"), updateProduct);
 
 export default productRouter;

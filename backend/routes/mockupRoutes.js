@@ -8,6 +8,7 @@ import {
   listMockups,
   addCustomizedMockup,
   listCustomizedMockups,
+  updateMockup,
 } from "../controllers/mockupController.js";
 import authMiddleware from "../middleware/auth.js";
 
@@ -29,6 +30,10 @@ mockupRouter.post("/add", upload.fields([
   ]), addMockup);
 mockupRouter.delete("/remove/:id", removeMockup);
 mockupRouter.get("/list", listMockups);
+mockupRouter.put("/update/:id", upload.fields([
+  { name: "imageFront", maxCount: 1 },
+  { name: "imageBack", maxCount: 1 }
+]), updateMockup);
 
 // Customized Mockups APIs
 mockupRouter.post("/custom/save", authMiddleware, addCustomizedMockup);

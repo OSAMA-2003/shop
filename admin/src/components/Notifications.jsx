@@ -10,7 +10,9 @@ function Notifications() {
     const fetchNotifications = async () => {
         try {
             const res = await axios.get(`${url}/api/notifications/list`);
-            setNotifications(res.data.data || []);
+            const fetchedData = res.data.data || [];
+            fetchedData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            setNotifications(fetchedData);
         } catch (err) {
             console.log(err);
         } finally {
@@ -112,6 +114,12 @@ function Notifications() {
                                     </div>
                                     <p className={`font-mono text-sm leading-relaxed ${n.isRead ? 'text-black/50' : 'text-black/80'}`}>
                                         {n.message}
+                                    </p>
+                                    <p className={`text-xs font-bold mt-2 uppercase tracking-wider ${n.isRead ? 'text-black/40' : 'text-black/60'}`}>
+                                        {new Date(n.createdAt).toLocaleString('en-US', { 
+                                            year: 'numeric', month: 'short', day: 'numeric', 
+                                            hour: '2-digit', minute: '2-digit' 
+                                        })}
                                     </p>
                                 </div>
 
