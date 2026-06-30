@@ -2,7 +2,7 @@ import express from "express";
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../utils/cloudinary.js";
-import { placeOrder, verifyOrder, userOrders, listOrders, updateStatus, updatePaymentStatus } from "../controllers/orderController.js";
+import { placeOrder, verifyOrder, userOrders, listOrders, updateStatus, updatePaymentStatus, deleteOrder } from "../controllers/orderController.js";
 import authMiddleware from "../middleware/auth.js";
 import path from "path";
 import fs from "fs";
@@ -50,5 +50,6 @@ orderRouter.post('/list', listOrders) // Added POST and removed user auth for ad
 orderRouter.get('/list', listOrders)  // Kept GET as fallback, removed user auth
 orderRouter.post('/status', updateStatus) // Removed user auth for admin access
 orderRouter.post('/payment-status', updatePaymentStatus) // Manually verify payment in admin
+orderRouter.delete('/delete/:id', deleteOrder) // Admin delete order
 
 export default orderRouter

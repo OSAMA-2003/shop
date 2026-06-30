@@ -3,7 +3,7 @@ import Add from './components/AddProduct.jsx'
 import List from './components/List.jsx'
 import Orders from './components/Orders.jsx'
 import Sidebar from './components/Sidebar.jsx'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, Navigate } from 'react-router-dom'
 import './App.css'
 import AdminLogin from './components/AdminLogin.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
@@ -12,6 +12,7 @@ import Users from './components/Users.jsx'
 import AddMockup from './components/AddMockup.jsx'
 import MockupsList from './components/MockupsList.jsx'
 import Notifications from './components/Notifications.jsx'
+import DashboardHome from './components/DashboardHome.jsx'
 
 function App() {
 
@@ -21,7 +22,20 @@ function App() {
       <Toaster/>
       <Sidebar />
       <Routes>
+        <Route path='/' element={<Navigate to='/admin' />} />
         <Route path='/admin/login' element={<AdminLogin />} />
+
+        <Route path='/admin' element={
+          <ProtectedRoute>
+            <DashboardHome />
+          </ProtectedRoute>
+        } />
+        
+        <Route path='/admin/' element={
+          <ProtectedRoute>
+            <DashboardHome />
+          </ProtectedRoute>
+        } />
        
         <Route path='/admin/products-list' element={
           <ProtectedRoute>

@@ -10,8 +10,6 @@ const AddProduct = () => {
         name: '',
         description: '',
         price: '',
-        category: 'Men',
-        color: 'Black',
     });
     const [selectedSizes, setSelectedSizes] = useState(["S", "M", "L", "XL"]);
 
@@ -51,8 +49,6 @@ const AddProduct = () => {
         formData.append('name', data.name);
         formData.append('description', data.description);
         formData.append('price', Number(data.price));
-        formData.append('category', data.category);
-        formData.append('color', data.color);
         formData.append('sizes', JSON.stringify(selectedSizes));
         if (image) formData.append('image', image);
 
@@ -66,8 +62,6 @@ const AddProduct = () => {
                     name: '',
                     description: '',
                     price: '',
-                    category: 'Men',
-                    color: 'Black',
                 });
                 setSelectedSizes(["S", "M", "L", "XL"]);
                 setImage(null);
@@ -148,39 +142,7 @@ const AddProduct = () => {
                             />
                         </div>
 
-                        {/* CATEGORY & COLOR ROW */}
-                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-                            <div className='flex flex-col'>
-                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Category *</label>
-                                <select 
-                                    name='category'
-                                    value={data.category}
-                                    onChange={onChangeHandler}
-                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-white text-black transition-colors cursor-pointer appearance-none"
-                                >
-                                    <option value="Men">Men</option>
-                                    <option value="Women">Women</option>
-                                    <option value="Kids">Kids</option>
-                                    <option value="Electronics">Electronics</option>
-                                    <option value="Cosmetics">Cosmetics</option>
-                                </select>
-                            </div>
-
-                            <div className='flex flex-col'>
-                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Color *</label>
-                                <select 
-                                    name='color'
-                                    value={data.color}
-                                    onChange={onChangeHandler}
-                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-white text-black transition-colors cursor-pointer appearance-none"
-                                >
-                                    <option value="Black">Black</option>
-                                    <option value="White">White</option>
-                                    <option value="Red">Red</option>
-                                    <option value="Blue">Blue</option>
-                                </select>
-                            </div>
-                        </div>
+                        {/* REMOVED CATEGORY & COLOR */}
 
                         {/* SIZES SELECTION */}
                         <div className='flex flex-col'>

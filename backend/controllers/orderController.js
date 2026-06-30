@@ -183,4 +183,36 @@ const updatePaymentStatus = async(req,res)=>{
 }
 
 
-export {placeOrder, verifyOrder, userOrders, listOrders, updateStatus, updatePaymentStatus}
+// This API will be called by the admin to delete an order
+const deleteOrder = async(req,res)=>{
+    try {
+        const { id } = req.params;
+        const order = await orderModel.findById(id);
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        // Clean up payment screenshot from Cloudinary if it exists
+        if (order.paymentScreenshot && order.paymentScreenshot.includes('cloudinary')) {
+            const filename = order.paymentScreenshot.split("/").pop(); 
+            const publicIdWithoutExt = filename.substring(0, filename.lastIndexOf('.')) || filename;
+            try {
+                // Adjust folder path based on where we store screenshots (ecommerce/payments)
+                await cloudinary.uploader.destroy(`ecommerce/payments/${publicIdWithoutExt}`);
+            } catch (cloudinaryErr) {
+                console.log("Failed to delete Cloudinary payment screenshot:", cloudinaryErr);
+            }
+        }
+
+        await orderModel.findByIdAndDelete(id);
+
+        res.status(200).json({ success: true, message: "Order deleted successfully" });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+}
+
+
+export {placeOrder, verifyOrder, userOrders, listOrders, updateStatus, updatePaymentStatus, deleteOrder}

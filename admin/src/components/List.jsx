@@ -54,8 +54,6 @@ function List() {
             formData.append("name", editingProduct.name);
             formData.append("description", editingProduct.description);
             formData.append("price", editingProduct.price);
-            formData.append("category", editingProduct.category);
-            formData.append("color", editingProduct.color);
             formData.append("sizes", JSON.stringify(editingProduct.sizes));
             
             if (editingProduct.newImage) {
@@ -113,11 +111,6 @@ function List() {
                                 <div>
                                     {/* IMAGE CONTAINER */}
                                     <div className='bg-[#e5e5e5] border-2 border-black p-2 mb-4 h-56 flex items-center justify-center relative group'>
-                                        {/* Category Badge */}
-                                        <div className='absolute top-2 left-2 bg-black text-[#ff5500] text-[10px] font-black uppercase px-2 py-1 z-10 border border-black'>
-                                            {product.category}
-                                        </div>
-                                        
                                         <img
                                             // Fixed image URL mapping to match your backend diskStorage setup
                                             src={product.image}
@@ -184,19 +177,9 @@ function List() {
                                         <label className="font-black uppercase tracking-widest">Description</label>
                                         <textarea required value={editingProduct.description} onChange={(e) => setEditingProduct({...editingProduct, description: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white min-h-[100px]" />
                                     </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                                        <div className="flex flex-col gap-2">
-                                            <label className="font-black uppercase tracking-widest">Price</label>
-                                            <input type="number" required value={editingProduct.price} onChange={(e) => setEditingProduct({...editingProduct, price: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
-                                        </div>
-                                        <div className="flex flex-col gap-2">
-                                            <label className="font-black uppercase tracking-widest">Category</label>
-                                            <input type="text" required value={editingProduct.category} onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
-                                        </div>
-                                        <div className="flex flex-col gap-2">
-                                            <label className="font-black uppercase tracking-widest">Color</label>
-                                            <input type="text" required value={editingProduct.color} onChange={(e) => setEditingProduct({...editingProduct, color: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
-                                        </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="font-black uppercase tracking-widest">Price</label>
+                                        <input type="number" required value={editingProduct.price} onChange={(e) => setEditingProduct({...editingProduct, price: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
                                     </div>
                                     
                                     <div className="flex flex-col gap-2">

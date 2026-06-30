@@ -10,9 +10,9 @@ const addMockup = async (req, res) => {
         });
     }
 
-    const { name, description, price, category, color } = req.body;
+    const { name, description, price } = req.body;
 
-    if (!name || !description || !price || !category || !color) {
+    if (!name || !description || !price) {
         return res.status(400).json({
             success: false,
             message: "All mockup fields are required."
@@ -37,10 +37,8 @@ const addMockup = async (req, res) => {
             name,
             description,
             price: Number(price),
-            category,
             imageFront: req.files.imageFront[0].path, // Cloudinary URL
             imageBack: req.files.imageBack[0].path, // Cloudinary URL
-            color,
             sizes: sizesArray,
         });
 
@@ -129,14 +127,12 @@ const listCustomizedMockups = async (req, res) => {
 const updateMockup = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, price, category, color } = req.body;
+        const { name, description, price } = req.body;
         
         let updateData = {};
         if (name) updateData.name = name;
         if (description) updateData.description = description;
         if (price) updateData.price = Number(price);
-        if (category) updateData.category = category;
-        if (color) updateData.color = color;
 
         if (req.body.sizes) {
             try {

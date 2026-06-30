@@ -64,8 +64,6 @@ const MockupsList = () => {
             formData.append("name", editingMockup.name);
             formData.append("description", editingMockup.description || "");
             formData.append("price", editingMockup.price);
-            formData.append("category", editingMockup.category);
-            formData.append("color", editingMockup.color);
             formData.append("sizes", JSON.stringify(editingMockup.sizes || ["S", "M", "L", "XL"]));
             
             if (editingMockup.newImageFront) formData.append("imageFront", editingMockup.newImageFront);
@@ -121,7 +119,6 @@ const MockupsList = () => {
                         <div className='hidden sm:grid grid-cols-[1.5fr_3fr_1fr_1fr_1fr] items-center py-3 px-4 border-[3px] border-black bg-[#e5e5e5] font-black uppercase tracking-widest text-sm'>
                             <b>Image</b>
                             <b>Name</b>
-                            <b>Category</b>
                             <b>Price</b>
                             <b className='text-center'>Action</b>
                         </div>
@@ -132,7 +129,7 @@ const MockupsList = () => {
                             </div>
                         ) : (
                             list.map((item, index) => (
-                                <div key={index} className='grid grid-cols-[1fr_3fr_1fr] sm:grid-cols-[1.5fr_3fr_1fr_1fr_1fr] items-center gap-4 py-3 px-4 border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]'>
+                                <div key={index} className='grid grid-cols-[1fr_3fr_1fr] sm:grid-cols-[1.5fr_3fr_1fr_1fr] items-center gap-4 py-3 px-4 border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]'>
                                     <div className='flex items-center gap-2'>
                                         <div className='w-16 h-16 sm:w-20 sm:h-20 border-2 border-black bg-[#f9f9f6] flex items-center justify-center p-1'>
                                             <img src={item.imageFront || item.image} alt={item.name} title="Front" className='max-w-full max-h-full object-contain mix-blend-multiply' />
@@ -144,7 +141,6 @@ const MockupsList = () => {
                                         )}
                                     </div>
                                     <p className='font-bold text-lg leading-tight uppercase tracking-tight'>{item.name}</p>
-                                    <p className='font-bold text-sm uppercase tracking-widest hidden sm:block'>{item.category}</p>
                                     <p className='font-black text-xl hidden sm:block'>${item.price}</p>
                                     <div className='flex gap-2 justify-self-center'>
                                         <button onClick={() => {
@@ -185,19 +181,9 @@ const MockupsList = () => {
                                         <label className="font-black uppercase tracking-widest">Description</label>
                                         <textarea required value={editingMockup.description} onChange={(e) => setEditingMockup({...editingMockup, description: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white min-h-[100px]" />
                                     </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                                        <div className="flex flex-col gap-2">
-                                            <label className="font-black uppercase tracking-widest">Price</label>
-                                            <input type="number" required value={editingMockup.price} onChange={(e) => setEditingMockup({...editingMockup, price: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
-                                        </div>
-                                        <div className="flex flex-col gap-2">
-                                            <label className="font-black uppercase tracking-widest">Category</label>
-                                            <input type="text" required value={editingMockup.category} onChange={(e) => setEditingMockup({...editingMockup, category: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
-                                        </div>
-                                        <div className="flex flex-col gap-2">
-                                            <label className="font-black uppercase tracking-widest">Color</label>
-                                            <input type="text" required value={editingMockup.color} onChange={(e) => setEditingMockup({...editingMockup, color: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
-                                        </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="font-black uppercase tracking-widest">Price</label>
+                                        <input type="number" required value={editingMockup.price} onChange={(e) => setEditingMockup({...editingMockup, price: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
                                     </div>
                                     
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

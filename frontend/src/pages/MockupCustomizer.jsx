@@ -194,7 +194,7 @@ function CustomizerContent() {
     preview: activeSide === 'front' ? (backendMockup.imageFront || backendMockup.image) : backendMockup.imageBack,
     printable: { x: 150, y: 150, width: 300, height: 400 }, // Default relative box mapping
     colors: [
-      { name: backendMockup.color || 'Black', hex: backendMockup.color === 'White' ? '#FFFFFF' : backendMockup.color === 'Red' ? '#FF0000' : backendMockup.color === 'Blue' ? '#0000FF' : backendMockup.color === 'Gray' ? '#808080' : '#000000' }
+      { name: 'Black', hex: '#000000' }
     ],
   } : null;
 

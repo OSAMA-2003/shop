@@ -46,18 +46,12 @@ const cardVariants = {
 };
 
 const Categories = () => {
-  const [selectedCategory, setSelectedCategory] = useState("All");
   const [displayCount, setDisplayCount] = useState(6);
   const { all_products, loading } = useContext(ShopContext);
   const navigate = useNavigate();
 
   // Safely fallback to empty array if all_products is undefined
-  const safeProducts = all_products || [];
-
-  const filteredProducts =
-    selectedCategory === "All"
-      ? safeProducts
-      : safeProducts.filter((p) => p.category === selectedCategory);
+  const filteredProducts = all_products || [];
 
   return (
     <section className='relative w-full min-h-screen bg-[#f4f6f8] py-24 px-6 sm:px-10 overflow-hidden'>
@@ -74,39 +68,7 @@ const Categories = () => {
           New <span className="text-[#ff5500]">Arrivals</span>
         </motion.h2>
 
-        {/* Animated Filter Buttons */}
-        <motion.div
-          variants={filterContainerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false, amount: 0.5 }}
-          className="flex flex-wrap justify-center gap-6 mb-16"
-        >
-          <motion.button
-            variants={filterItemVariants}
-            onClick={() => { setSelectedCategory("All"); setDisplayCount(6); }}
-            className={`pb-1 text-sm font-bold uppercase tracking-widest transition-all border-b-2 ${selectedCategory === "All"
-              ? "border-black text-black"
-              : "border-transparent text-gray-400 hover:text-black"
-              }`}
-          >
-            All
-          </motion.button>
-
-          {categories.map((cat) => (
-            <motion.button
-              key={cat.name}
-              variants={filterItemVariants}
-              onClick={() => { setSelectedCategory(cat.name); setDisplayCount(6); }}
-              className={`pb-1 text-sm font-bold uppercase tracking-widest transition-all border-b-2 ${selectedCategory === cat.name
-                ? "border-black text-black"
-                : "border-transparent text-gray-400 hover:text-black"
-                }`}
-            >
-              {cat.name}
-            </motion.button>
-          ))}
-        </motion.div>
+        {/* Removed Filter Buttons */}
 
         {/* Editorial Grid Layout or Coming Soon State */}
         <AnimatePresence mode="wait">
@@ -182,9 +144,6 @@ const Categories = () => {
 
                       {/* Overlay Text Content */}
                       <div className='absolute bottom-0 left-0 p-6 md:p-8 w-full text-white'>
-                        <p className='text-xs font-bold uppercase tracking-widest text-gray-300 mb-1'>
-                          {product.category}
-                        </p>
 
                         {/* Title scales based on whether it is the large card or small card */}
                         <h3 className={`font-black uppercase tracking-tight mb-2 leading-none ${isLarge ? 'text-3xl md:text-4xl lg:text-5xl' : 'text-xl md:text-2xl lg:text-3xl'

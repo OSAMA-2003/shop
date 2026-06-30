@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, Download } from "lucide-react";
+import { Loader2, Download, Trash2 } from "lucide-react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import JSZip from 'jszip';
@@ -12,6 +12,40 @@ const Orders = () => {
     const [updatingStatusId, setUpdatingStatusId] = useState(null);
     const [updatingPaymentId, setUpdatingPaymentId] = useState(null);
     const [downloadingZipItemId, setDownloadingZipItemId] = useState(null);
+    const [deletingOrderId, setDeletingOrderId] = useState(null);
+
+    const deleteOrder = async (orderId) => {
+        if (!window.confirm("Are you sure you want to delete this order? This action cannot be undone.")) return;
+        
+        setDeletingOrderId(orderId);
+        try {
+            const token = localStorage.getItem('adminToken');
+            const res = await axios.delete(`${url}/api/order/delete/${orderId}`, {
+                headers: { token }
+            });
+
+            if (res.data.success) {
+                setOrders(prev => prev.filter(order => order._id !== orderId));
+                toast.success("Order deleted successfully", {
+                    style: {
+                        border: '3px solid black',
+                        padding: '16px',
+                        color: 'black',
+                        fontWeight: '900',
+                        textTransform: 'uppercase',
+                        borderRadius: '0',
+                    },
+                });
+            } else {
+                toast.error(res.data.message || 'Error deleting order');
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Server error");
+        } finally {
+            setDeletingOrderId(null);
+        }
+    };
 
     const handleDownloadZip = async (order, item, itemIndex) => {
         const itemKey = `${order._id}-${itemIndex}`;
@@ -306,10 +340,22 @@ const Orders = () => {
                                                         {formatDateTime(order.date || order.createdAt)}
                                                     </p>
                                                 </div>
-                                                <div className='mt-2 sm:mt-0 text-right'>
+                                                <div className='mt-2 sm:mt-0 text-right flex flex-col items-end gap-2'>
                                                     <span className='text-3xl font-black text-[#ff5500]'>
                                                         ${total?.toFixed(2)}
                                                     </span>
+                                                    <button
+                                                        onClick={() => deleteOrder(order._id)}
+                                                        disabled={deletingOrderId === order._id}
+                                                        className='text-xs font-black uppercase tracking-widest bg-red-500 text-white border-[2px] border-black px-3 py-1 hover:bg-black transition-colors flex items-center gap-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px] disabled:opacity-50'
+                                                    >
+                                                        {deletingOrderId === order._id ? (
+                                                            <Loader2 className="w-3 h-3 animate-spin" strokeWidth={3} />
+                                                        ) : (
+                                                            <Trash2 className="w-3 h-3" strokeWidth={3} />
+                                                        )}
+                                                        Delete
+                                                    </button>
                                                 </div>
                                             </div>
 

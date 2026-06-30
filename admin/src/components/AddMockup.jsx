@@ -11,8 +11,6 @@ const AddMockup = () => {
         name: '',
         description: '',
         price: '',
-        category: 'T-Shirt',
-        color: 'Black',
     });
     const [selectedSizes, setSelectedSizes] = useState(["S", "M", "L", "XL"]);
 
@@ -56,8 +54,6 @@ const AddMockup = () => {
         formData.append('name', data.name);
         formData.append('description', data.description);
         formData.append('price', Number(data.price));
-        formData.append('category', data.category);
-        formData.append('color', data.color);
         formData.append('sizes', JSON.stringify(selectedSizes));
         if (imageFront) formData.append('imageFront', imageFront);
         if (imageBack) formData.append('imageBack', imageBack);
@@ -72,8 +68,6 @@ const AddMockup = () => {
                     name: '',
                     description: '',
                     price: '',
-                    category: 'T-Shirt',
-                    color: 'Black',
                 });
                 setSelectedSizes(["S", "M", "L", "XL"]);
                 setImageFront(null);
@@ -152,38 +146,7 @@ const AddMockup = () => {
                             />
                         </div>
 
-                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-                            <div className='flex flex-col'>
-                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Category *</label>
-                                <select 
-                                    name='category'
-                                    value={data.category}
-                                    onChange={onChangeHandler}
-                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-white text-black transition-colors cursor-pointer appearance-none"
-                                >
-                                    <option value="T-Shirt">T-Shirt</option>
-                                    <option value="Hoodie">Hoodie</option>
-                                    <option value="Mug">Mug</option>
-                                    <option value="Cap">Cap</option>
-                                </select>
-                            </div>
-
-                            <div className='flex flex-col'>
-                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Color *</label>
-                                <select 
-                                    name='color'
-                                    value={data.color}
-                                    onChange={onChangeHandler}
-                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-white text-black transition-colors cursor-pointer appearance-none"
-                                >
-                                    <option value="Black">Black</option>
-                                    <option value="White">White</option>
-                                    <option value="Red">Red</option>
-                                    <option value="Blue">Blue</option>
-                                    <option value="Gray">Gray</option>
-                                </select>
-                            </div>
-                        </div>
+                        {/* REMOVED CATEGORY & COLOR */}
 
                         {/* SIZES SELECTION */}
                         <div className='flex flex-col'>

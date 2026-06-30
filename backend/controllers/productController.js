@@ -9,9 +9,9 @@ const addProduct = async (req, res) => {
         });
     }
 
-    const { name, description, price, category, color } = req.body;
+    const { name, description, price } = req.body;
 
-    if (!name || !description || !price || !category || !color) {
+    if (!name || !description || !price) {
         return res.status(400).json({
             success: false,
             message: "All product fields are required."
@@ -36,9 +36,7 @@ const addProduct = async (req, res) => {
             name,
             description,
             price: Number(price),
-            category,
             image: req.file.path, // Cloudinary URL
-            color,
             sizes: sizesArray,
         });
 
@@ -139,14 +137,12 @@ const removeProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, price, category, color } = req.body;
+        const { name, description, price } = req.body;
         
         let updateData = {};
         if (name) updateData.name = name;
         if (description) updateData.description = description;
         if (price) updateData.price = Number(price);
-        if (category) updateData.category = category;
-        if (color) updateData.color = color;
 
         if (req.body.sizes) {
             try {
