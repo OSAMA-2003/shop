@@ -327,6 +327,7 @@ const MockupCanvas = forwardRef(
               scaleY: layer.scaleY || 1,
               angle: layer.rotation || 0,
               opacity: layer.opacity ?? 1,
+              globalCompositeOperation: " soft-light",
             });
 
             // Update specific properties
@@ -362,6 +363,7 @@ const MockupCanvas = forwardRef(
                   scaleY: layer.scaleY || 1,
                   angle: layer.rotation || 0,
                   opacity: layer.opacity ?? 1,
+                  globalCompositeOperation: " soft-light",
                 })
 
                 img.layerId = layer.id
@@ -390,6 +392,7 @@ const MockupCanvas = forwardRef(
               scaleX: layer.scaleX || 1,
               scaleY: layer.scaleY || 1,
               opacity: layer.opacity ?? 1,
+              globalCompositeOperation: " soft-light",
             });
 
             text.layerId = layer.id;

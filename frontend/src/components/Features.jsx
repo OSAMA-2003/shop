@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 const featuresData = [
   {
     Icon: Truck,
-    title: "Free Shipping",
-    desc: "On orders over $100 worldwide",
+    title: "Fast Shipping",
+    desc: "On orders in Egypt",
   },
   {
     Icon: ShieldCheck,
@@ -60,9 +60,9 @@ const Features = () => {
   return (
     <section className='relative w-full bg-[#f9f9f6] text-black py-24 border-y-[4px] border-black font-sans overflow-hidden'>
       <div className='relative z-10 max-w-7xl mx-auto px-6 sm:px-10'>
-        
+
         {/* HEADING - Animated to slide up */}
-        <motion.h2 
+        <motion.h2
           variants={headerVariants}
           initial="hidden"
           whileInView="visible"
@@ -73,7 +73,7 @@ const Features = () => {
         </motion.h2>
 
         {/* FEATURES GRID - Staggered container */}
-        <motion.div 
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -87,22 +87,27 @@ const Features = () => {
               overriding your awesome Tailwind hover:translate classes!
             */
             <motion.div variants={cardVariants} key={index}>
-              <div 
-                className='h-full bg-white border-[4px] border-black p-8 flex flex-col items-center text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-4px] hover:translate-x-[-4px] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all group cursor-pointer'
+              <div
+                className='relative h-full overflow-hidden bg-white border-[4px] border-black p-8 flex flex-col items-start text-left shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-4px] hover:translate-x-[-4px] hover:shadow-[10px_10px_0px_0px_#ff5500] hover:bg-black transition-all group cursor-pointer duration-300'
               >
+                {/* Background Number */}
+                <div className="absolute -bottom-6 -right-2 text-9xl font-black text-black/5 group-hover:text-[#ff5500]/20 transition-colors duration-300 pointer-events-none select-none">
+                  0{index + 1}
+                </div>
+
                 {/* ICON BOX */}
-                <div className='w-20 h-20 bg-[#e5e5e5] border-[3px] border-black flex items-center justify-center mb-6 group-hover:bg-[#ff5500] transition-colors duration-300'>
-                  <Icon className='w-10 h-10 text-black group-hover:text-white transition-colors duration-300' strokeWidth={2.5} />
+                <div className='relative w-16 h-16 bg-white border-[3px] border-black flex items-center justify-center mb-12 group-hover:bg-[#ff5500] group-hover:border-[#ff5500] transition-colors duration-300 z-10'>
+                  <Icon className='w-8 h-8 text-black group-hover:text-white transition-colors duration-300' strokeWidth={2.5} />
                 </div>
 
                 {/* TITLE & DESC */}
-                <h3 className='text-2xl font-black uppercase tracking-tight mb-3 leading-none'>
+                <h3 className='relative text-2xl font-black uppercase tracking-tight mb-3 leading-none text-black group-hover:text-white transition-colors duration-300 z-10'>
                   {title}
                 </h3>
-                <p className='font-mono text-sm font-bold text-black/70 leading-relaxed'>
+                <p className='relative font-mono text-sm font-bold text-black/70 leading-relaxed group-hover:text-gray-300 transition-colors duration-300 z-10'>
                   {desc}
                 </p>
-                
+
               </div>
             </motion.div>
           ))}
