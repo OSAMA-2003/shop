@@ -78,12 +78,17 @@ const Hero = () => {
           <h1 className='text-5xl  md:text-7xl font-black uppercase leading-[0.95] tracking-tighter flex flex-col pt-10'>
             <span className="overflow-hidden block">
               <motion.span variants={textRevealVariants} className="text-white block">
-                Redefine
+                Ignite
+              </motion.span>
+            </span>
+            <span className="overflow-hidden block">
+              <motion.span variants={textRevealVariants} className="  text-[#ff5500] block">
+                Creative
               </motion.span>
             </span>
             <span className="overflow-hidden block mt-2 pb-2">
-              <motion.span variants={textRevealVariants} className="text-[#ff5500] block">
-                Streets
+              <motion.span variants={textRevealVariants} className="text-white block">
+                Flow
               </motion.span>
             </span>
           </h1>
