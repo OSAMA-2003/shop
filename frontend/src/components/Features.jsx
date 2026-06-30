@@ -88,7 +88,7 @@ const Features = () => {
             */
             <motion.div variants={cardVariants} key={index}>
               <div
-                className='relative h-full overflow-hidden bg-white border-[4px] border-black p-8 flex flex-col items-start text-left shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-4px] hover:translate-x-[-4px] hover:shadow-[10px_10px_0px_0px_#ff5500] hover:bg-black transition-all group cursor-pointer duration-300'
+                className='relative h-full overflow-hidden bg-white border-[4px] border-black p-8 flex flex-col items-start text-left shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-4px] hover:translate-x-[-4px] hover:shadow-[7px_7px_0px_0px_#ff5500] hover:bg-black transition-all group cursor-pointer duration-300'
               >
                 {/* Background Number */}
                 <div className="absolute -bottom-6 -right-2 text-9xl font-black text-black/5 group-hover:text-[#ff5500]/20 transition-colors duration-300 pointer-events-none select-none">
