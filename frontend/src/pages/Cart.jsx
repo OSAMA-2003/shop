@@ -36,37 +36,37 @@ const itemVariants = {
 // Custom variants for items entering and leaving the cart
 const cartItemVariants = {
   hidden: { opacity: 0, scale: 0.95 },
-  visible: { 
-    opacity: 1, 
-    scale: 1, 
-    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } 
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] }
   },
-  exit: { 
-    opacity: 0, 
+  exit: {
+    opacity: 0,
     x: 50, // Slides out to the right when removed
-    transition: { duration: 0.3, ease: "easeIn" } 
+    transition: { duration: 0.3, ease: "easeIn" }
   }
 };
 
 const Cart = () => {
   const { cartItems, all_products, all_mockups, customMockups, addToCart, removeFromCart, getTotalCartAmount } = useContext(ShopContext)
   const navigate = useNavigate()
-  
+
   const total = getTotalCartAmount()
 
   const cartProducts = Object.entries(cartItems || {})
     .map(([cartKey, qty]) => {
       const [id, size] = cartKey.split('_');
-      const product = all_products.find((p) => p._id === id) 
-                    || all_mockups.find((m) => m._id === id)
-                    || (customMockups || []).find((cm) => cm._id === id);
+      const product = all_products.find((p) => p._id === id)
+        || all_mockups.find((m) => m._id === id)
+        || (customMockups || []).find((cm) => cm._id === id);
       if (!product) return null;
-      return { 
-        ...product, 
-        image: product.image || product.imageFront, 
-        size: size || 'M', 
-        quantity: qty, 
-        cartKey 
+      return {
+        ...product,
+        image: product.image || product.imageFront,
+        size: size || 'M',
+        quantity: qty,
+        cartKey
       };
     })
     .filter(Boolean);
@@ -76,14 +76,14 @@ const Cart = () => {
 
   return (
     <section className='relative w-full min-h-screen bg-[#f9f9f6] text-black pt-40 pb-10 px-6 sm:px-10 font-sans overflow-hidden'>
-      
-      <motion.div 
+
+      <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
         className='max-w-3xl mx-auto'
       >
-        
+
         {/* HEADER */}
         <motion.h1 variants={headerVariants} className='text-5xl sm:text-6xl font-black uppercase tracking-tighter mb-10'>
           Your Bag [{totalItemsCount}]
@@ -92,7 +92,7 @@ const Cart = () => {
         {cartProducts.length === 0 ? (
           <motion.div variants={itemVariants} className='text-left mt-20 space-y-6'>
             <p className='text-2xl font-black uppercase tracking-tight'>Your bag is currently empty.</p>
-            <button 
+            <button
               onClick={() => navigate("/")}
               className='bg-[#ff5500] border-2 border-black px-8 py-4 font-black uppercase tracking-widest text-black hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]'
             >
@@ -106,25 +106,25 @@ const Cart = () => {
               {/* AnimatePresence allows elements to animate out when removed from the DOM */}
               <AnimatePresence mode="popLayout">
                 {cartProducts.map((item) => (
-                  <motion.div 
+                  <motion.div
                     layout // This makes surrounding items smoothly glide to fill the empty space
                     variants={cartItemVariants}
                     initial="hidden"
                     animate="visible"
                     exit="exit"
-                    key={item.cartKey} 
+                    key={item.cartKey}
                     className='flex items-start justify-between'
                   >
                     <div className='flex gap-4 sm:gap-6 w-full'>
                       {/* Image */}
                       <div className='w-24 h-28 sm:w-32 sm:h-36 bg-[#e5e5e5] border border-black/10 shrink-0 overflow-hidden'>
-                        <img 
+                        <img
                           src={item.image}
                           alt={item.name}
-                          className='w-full h-full object-cover mix-blend-multiply transition-transform duration-500 hover:scale-110' 
+                          className='w-full h-full object-cover mix-blend-multiply transition-transform duration-500 hover:scale-110'
                         />
                       </div>
-                      
+
                       {/* Details */}
                       <div className='flex flex-col justify-start pt-1 flex-1'>
                         <h3 className='text-lg sm:text-2xl font-black uppercase leading-[1.1] tracking-tight max-w-[250px] mb-1'>
@@ -132,13 +132,13 @@ const Cart = () => {
                         </h3>
                         {/* Using a placeholder 'M' for size if your context doesn't store size yet */}
                         <p className='font-mono text-sm text-black/80 mb-1'>Size: {item.size || 'M'}</p>
-                        <p className='text-lg sm:text-xl font-bold'>${Number(item.price).toFixed(2)}</p>
+                        <p className='text-lg sm:text-xl font-bold'>{Number(item.price).toFixed(2)} EGP</p>
                       </div>
 
                       {/* Controls */}
                       <div className='flex items-start gap-2 sm:gap-3 pt-1'>
-                        <button 
-                          onClick={() => removeFromCart(item.cartKey)} 
+                        <button
+                          onClick={() => removeFromCart(item.cartKey)}
                           className='w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center border-2 border-black hover:bg-[#ff5500] hover:text-white transition-colors font-mono text-xl sm:text-2xl leading-none active:scale-90'
                         >
                           -
@@ -148,8 +148,8 @@ const Cart = () => {
                           {item.quantity}
                         </span>
 
-                        <button 
-                          onClick={() => addToCart(item._id, 1, item.size)} 
+                        <button
+                          onClick={() => addToCart(item._id, 1, item.size)}
                           className='w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center border-2 border-black hover:bg-[#ff5500] hover:text-white transition-colors font-mono text-xl sm:text-2xl leading-none active:scale-90'
                         >
                           +
@@ -168,22 +168,22 @@ const Cart = () => {
             <motion.div variants={itemVariants} className='flex flex-col gap-8'>
               <div className='flex justify-between items-end'>
                 <span className='text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none'>
-                  Subtotal
+                  Total
                 </span>
                 {/* layout added to subtotal so it updates smoothly */}
                 <motion.span layout className='text-4xl sm:text-5xl font-black text-[#ff5500] leading-none'>
-                  ${total.toFixed(2)}
+                  {total.toFixed(2)} EGP
                 </motion.span>
               </div>
 
-              <button 
+              <button
                 onClick={() => navigate("/order")}
                 className='w-full bg-[#ff5500] border-2 border-black py-5 font-black text-xl sm:text-2xl uppercase tracking-widest text-black hover:bg-black hover:text-[#ff5500] transition-colors shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[4px] hover:translate-x-[4px]'
               >
                 Checkout
               </button>
             </motion.div>
-            
+
           </>
         )}
       </motion.div>

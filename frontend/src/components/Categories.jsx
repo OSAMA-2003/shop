@@ -79,7 +79,7 @@ const Categories = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-12 auto-rows-[350px] md:auto-rows-[350px] lg:auto-rows-[400px]'
+              className='grid grid-cols-1 md:grid-cols-2 gap-16 mb-12 auto-rows-[350px] md:auto-rows-[350px] lg:auto-rows-[400px]'
             >
               {[...Array(3)].map((_, index) => {
                 const isLarge = index % 3 === 0;
@@ -152,7 +152,7 @@ const Categories = () => {
                         </h3>
 
                         <p className='text-sm md:text-base font-medium text-[#ff5500] drop-shadow-md'>
-                          ${product.price.toFixed(2)}
+                          {product.price.toFixed(2)} EGP
                         </p>
                       </div>
                     </motion.div>

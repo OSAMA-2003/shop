@@ -48,8 +48,8 @@ const itemVariants = {
 
 const Product = () => {
   const { addToCart, all_products, token } = useContext(ShopContext);
-  const { id } = useParams(); 
-  const product = all_products.find((p) => p._id === id); 
+  const { id } = useParams();
+  const product = all_products.find((p) => p._id === id);
 
   const [selectedSize, setSelectedSize] = useState("M");
   const [quantity, setQuantity] = useState(1);
@@ -61,9 +61,9 @@ const Product = () => {
   if (!product) {
     return (
       <section className="min-h-screen flex items-center justify-center bg-[#f9f9f6] text-black">
-        <motion.p 
-          initial={{ opacity: 0, y: 10 }} 
-          animate={{ opacity: 1, y: 0 }} 
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
           className="text-xl font-black uppercase tracking-widest"
         >
           Product not found
@@ -78,7 +78,7 @@ const Product = () => {
       navigate('/login', { state: { from: location.pathname } });
       return;
     }
-    
+
     setIsAdding(true);
     try {
       // Context handles adding to cart
@@ -94,17 +94,17 @@ const Product = () => {
 
   return (
     <section className="relative w-full min-h-screen bg-[#f9f9f6] text-black py-32 px-6 sm:px-10 font-sans overflow-hidden">
-      
-      <motion.div 
+
+      <motion.div
         variants={pageVariants}
         initial="hidden"
         animate="visible"
         className="max-w-7xl mx-auto flex flex-col md:flex-row gap-10 md:gap-16"
       >
-        
+
         {/* LEFT: IMAGE SECTION */}
         <motion.div variants={imageVariants} className="md:w-1/2 relative bg-[#e5e5e5] border border-black/10 aspect-[4/5] overflow-hidden group cursor-crosshair">
-          
+
           {/* Top Left "Hover to Zoom" Badge */}
           <div className="absolute top-4 left-4 flex items-center gap-2 font-mono text-[10px] sm:text-xs uppercase tracking-widest text-black/80 z-10">
             <span className="w-3 h-4 border border-black/80 rounded-sm"></span> Hover to zoom
@@ -119,7 +119,7 @@ const Product = () => {
 
         {/* RIGHT: CONTENT SECTION */}
         <motion.div variants={contentVariants} className="md:w-1/2 flex flex-col justify-start pt-2">
-          
+
           {/* Title */}
           <motion.h1 variants={itemVariants} className="text-5xl sm:text-6xl md:text-7xl font-black uppercase tracking-tighter leading-[0.95] mb-2">
             {product.name}
@@ -127,7 +127,7 @@ const Product = () => {
 
           {/* Price */}
           <motion.p variants={itemVariants} className="text-3xl sm:text-4xl font-bold tracking-tight mb-6 text-[#ff5500]">
-            ${Number(product.price).toFixed(2)}
+            {Number(product.price).toFixed(2)} EGP
           </motion.p>
 
           {/* Description */}
@@ -142,9 +142,9 @@ const Product = () => {
                 key={size}
                 onClick={() => setSelectedSize(size)}
                 className={`w-12 h-10 sm:w-14 sm:h-12 flex items-center justify-center border-2 border-black font-bold text-lg sm:text-xl transition-colors
-                ${selectedSize === size 
-                  ? "bg-[#ff5500] text-black" 
-                  : "bg-transparent text-black hover:bg-black/5"}`}
+                ${selectedSize === size
+                    ? "bg-[#ff5500] text-black"
+                    : "bg-transparent text-black hover:bg-black/5"}`}
               >
                 {size}
               </button>
@@ -171,24 +171,24 @@ const Product = () => {
 
           {/* MATERIALS & CARE ACCORDION */}
           <motion.div variants={itemVariants} className="w-full max-w-md border-t-2 border-black pt-4">
-            <div 
+            <div
               onClick={() => setIsAccordionOpen(!isAccordionOpen)}
               className="flex justify-between items-center font-bold mb-4 cursor-pointer hover:opacity-70 transition-opacity"
             >
               <span className="text-sm sm:text-base uppercase tracking-widest">Materials & Care</span>
-              <motion.span 
-                animate={{ rotate: isAccordionOpen ? 45 : 0 }} 
+              <motion.span
+                animate={{ rotate: isAccordionOpen ? 45 : 0 }}
                 transition={{ duration: 0.3 }}
                 className="text-2xl leading-none inline-block"
               >
                 +
               </motion.span>
             </div>
-            
+
             {/* Animated Drawer */}
             <AnimatePresence>
               {isAccordionOpen && (
-                <motion.div 
+                <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}

@@ -54,7 +54,7 @@ const Order = () => {
     }
     setIsSubmitting(true);
     try {
-      const res = await placeOrder(formData, screenshotFile); 
+      const res = await placeOrder(formData, screenshotFile);
       if (res && res.success) {
         navigate('/myorders');
       } else {
@@ -80,30 +80,29 @@ const Order = () => {
   const cartProducts = Object.entries(cartItems || {})
     .map(([cartKey, qty]) => {
       const [id, size] = cartKey.split('_');
-      const product = all_products.find((p) => p._id === id) 
-                    || all_mockups.find((m) => m._id === id)
-                    || (customMockups || []).find((cm) => cm._id === id);
+      const product = all_products.find((p) => p._id === id)
+        || all_mockups.find((m) => m._id === id)
+        || (customMockups || []).find((cm) => cm._id === id);
       if (!product) return null;
-      return { 
-        ...product, 
-        image: product.image || product.imageFront, 
-        size: size || 'M', 
-        quantity: qty, 
-        cartKey 
+      return {
+        ...product,
+        image: product.image || product.imageFront,
+        size: size || 'M',
+        quantity: qty,
+        cartKey
       };
     })
     .filter(Boolean);
 
   // Calculate totals to match the reference image's structure
   const subtotal = getTotalCartAmount();
-  const shipping = subtotal > 0 ? 10.00 : 0; // Standard $10 shipping
-  const taxes = subtotal > 0 ? subtotal * 0.08 : 0; // Mock 8% tax
-  const total = subtotal + shipping + taxes;
+  const shipping = subtotal > 0 ? 100.00 : 0;
+  const total = subtotal + shipping;
 
   return (
     <section className="min-h-screen bg-[#f9f9f6] text-black py-34 px-4 sm:px-10 font-sans">
       <div className="max-w-6xl mx-auto">
-        
+
         {/* Progress Bar */}
         <div className="flex border-b-2 border-black/20 mb-10 text-xs sm:text-sm font-black uppercase tracking-widest overflow-x-auto whitespace-nowrap">
           <div className={`pb-3 pr-6 ${step === 1 ? 'text-black border-b-[4px] border-[#ff5500] -mb-[3px]' : 'text-black/40'}`}>
@@ -115,46 +114,46 @@ const Order = () => {
         </div>
 
         <form onSubmit={onSubmitHandler} className="flex flex-col lg:flex-row gap-8 items-start">
-          
+
           {/* LEFT: Shipping details OR Payment details */}
           {step === 1 ? (
             <div className="flex-1 w-full bg-white border-[3px] border-black p-6 sm:p-10">
               <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter mb-8">Shipping Details</h2>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 mb-4">
                 <div className="flex flex-col">
                   <label className="text-xs font-black uppercase mb-1">First Name *</label>
-                  <input required name="firstName" value={formData.firstName} onChange={onChangeHandler} type="text" placeholder="Enter your first name" 
+                  <input required name="firstName" value={formData.firstName} onChange={onChangeHandler} type="text" placeholder="Enter your first name"
                     className="p-3 border-2 border-black rounded-none outline-none focus:ring-2 focus:ring-[#ff5500] placeholder-black/40 font-medium" />
                 </div>
                 <div className="flex flex-col">
                   <label className="text-xs font-black uppercase mb-1">Last Name *</label>
-                  <input required name="lastName" value={formData.lastName} onChange={onChangeHandler} type="text" placeholder="Enter your last name" 
+                  <input required name="lastName" value={formData.lastName} onChange={onChangeHandler} type="text" placeholder="Enter your last name"
                     className="p-3 border-2 border-black rounded-none outline-none focus:ring-2 focus:ring-[#ff5500] placeholder-black/40 font-medium" />
                 </div>
               </div>
 
               <div className="flex flex-col mb-4">
                 <label className="text-xs font-black uppercase mb-1">Email Address *</label>
-                <input required name="email" value={formData.email} onChange={onChangeHandler} type="email" placeholder="you@example.com" 
+                <input required name="email" value={formData.email} onChange={onChangeHandler} type="email" placeholder="you@example.com"
                   className="w-full p-3 border-2 border-black rounded-none outline-none focus:ring-2 focus:ring-[#ff5500] placeholder-black/40 font-medium" />
               </div>
 
               <div className="flex flex-col mb-4">
                 <label className="text-xs font-black uppercase mb-1">Street Address *</label>
-                <input required name="street" value={formData.street} onChange={onChangeHandler} type="text" placeholder="Enter street and number" 
+                <input required name="street" value={formData.street} onChange={onChangeHandler} type="text" placeholder="Enter street and number"
                   className="w-full p-3 border-2 border-black rounded-none outline-none focus:ring-2 focus:ring-[#ff5500] placeholder-black/40 font-medium" />
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 mb-4">
                 <div className="flex flex-col">
                   <label className="text-xs font-black uppercase mb-1">City *</label>
-                  <input required name="city" value={formData.city} onChange={onChangeHandler} type="text" placeholder="Enter city" 
+                  <input required name="city" value={formData.city} onChange={onChangeHandler} type="text" placeholder="Enter city"
                     className="p-3 border-2 border-black rounded-none outline-none focus:ring-2 focus:ring-[#ff5500] placeholder-black/40 font-medium" />
                 </div>
                 <div className="flex flex-col">
                   <label className="text-xs font-black uppercase mb-1">State *</label>
-                  <input required name="state" value={formData.state} onChange={onChangeHandler} type="text" placeholder="Enter state" 
+                  <input required name="state" value={formData.state} onChange={onChangeHandler} type="text" placeholder="Enter state"
                     className="p-3 border-2 border-black rounded-none outline-none focus:ring-2 focus:ring-[#ff5500] placeholder-black/40 font-medium" />
                 </div>
               </div>
@@ -162,19 +161,19 @@ const Order = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 mb-4">
                 <div className="flex flex-col">
                   <label className="text-xs font-black uppercase mb-1">Zip / Postal Code *</label>
-                  <input required name="zipCode" value={formData.zipCode} onChange={onChangeHandler} type="text" placeholder="Enter zip code" 
+                  <input required name="zipCode" value={formData.zipCode} onChange={onChangeHandler} type="text" placeholder="Enter zip code"
                     className="p-3 border-2 border-black rounded-none outline-none focus:ring-2 focus:ring-[#ff5500] placeholder-black/40 font-medium" />
                 </div>
                 <div className="flex flex-col">
                   <label className="text-xs font-black uppercase mb-1">Country *</label>
-                  <input required name="country" value={formData.country} onChange={onChangeHandler} type="text" placeholder="Enter country" 
+                  <input required name="country" value={formData.country} onChange={onChangeHandler} type="text" placeholder="Enter country"
                     className="p-3 border-2 border-black rounded-none outline-none focus:ring-2 focus:ring-[#ff5500] placeholder-black/40 font-medium" />
                 </div>
               </div>
 
               <div className="flex flex-col mb-6">
                 <label className="text-xs font-black uppercase mb-1">Phone Number *</label>
-                <input required name="phone" value={formData.phone} onChange={onChangeHandler} type="text" placeholder="Enter phone number" 
+                <input required name="phone" value={formData.phone} onChange={onChangeHandler} type="text" placeholder="Enter phone number"
                   className="w-full p-3 border-2 border-black rounded-none outline-none focus:ring-2 focus:ring-[#ff5500] placeholder-black/40 font-medium" />
               </div>
 
@@ -254,8 +253,8 @@ const Order = () => {
                 <h3 className="text-sm font-black uppercase tracking-widest text-black mb-4">
                   Upload Payment Screenshot *
                 </h3>
-                
-                <div 
+
+                <div
                   onClick={() => document.getElementById('payment-screenshot-input').click()}
                   className="border-2 border-black border-dashed rounded-none p-8 text-center cursor-pointer hover:bg-black/5 transition-colors flex flex-col items-center justify-center min-h-[160px]"
                 >
@@ -266,7 +265,7 @@ const Order = () => {
                     onChange={handleFileChange}
                     className="hidden"
                   />
-                  
+
                   {!screenshotPreview ? (
                     <>
                       <div className="w-12 h-12 border-2 border-black flex items-center justify-center bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] mb-4">
@@ -282,9 +281,9 @@ const Order = () => {
                   ) : (
                     <div className="flex flex-col items-center">
                       <div className="w-40 h-40 border-2 border-black overflow-hidden bg-white mb-4 relative shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                        <img 
-                          src={screenshotPreview} 
-                          alt="Screenshot receipt preview" 
+                        <img
+                          src={screenshotPreview}
+                          alt="Screenshot receipt preview"
                           className="w-full h-full object-contain"
                         />
                       </div>
@@ -304,7 +303,7 @@ const Order = () => {
           {/* RIGHT: ORDER SUMMARY */}
           <div className="w-full lg:w-[420px] bg-white border-[3px] border-black p-6 sm:p-8 shrink-0 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tighter mb-6">Order Summary</h2>
-            
+
             {/* Items List */}
             <div className="space-y-4 mb-6 border-b-2 border-black pb-6">
               {cartProducts.map((item) => (
@@ -318,7 +317,7 @@ const Order = () => {
                       <p className="text-xs font-bold text-black/60 uppercase mt-1">(Size {item.size || 'M'})</p>
                     </div>
                   </div>
-                  <p className="font-medium text-sm whitespace-nowrap">${Number(item.price).toFixed(2)}</p>
+                  <p className="font-medium text-sm whitespace-nowrap">{Number(item.price).toFixed(2)} EGP </p>
                 </div>
               ))}
             </div>
@@ -327,33 +326,30 @@ const Order = () => {
             <div className="space-y-2 text-xs sm:text-sm font-black uppercase mb-6">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span className="font-medium">${subtotal.toFixed(2)}</span>
+                <span className="font-medium"> {subtotal.toFixed(2)} EGP </span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping:</span>
-                <span className="font-medium">${shipping.toFixed(2)} (Standard)</span>
+                <span className="font-medium">{shipping.toFixed(2)} EGP </span>
               </div>
-              <div className="flex justify-between">
-                <span>Taxes:</span>
-                <span className="font-medium">${taxes.toFixed(2)}</span>
-              </div>
+
               <div className="flex justify-between text-base sm:text-lg mt-4 border-t-2 border-black pt-4">
                 <span>Total:</span>
-                <span>${total.toFixed(2)}</span>
+                <span>{total.toFixed(2)} EGP</span>
               </div>
             </div>
 
             {step === 1 ? (
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={handleProceedToPayment}
                 className="w-full bg-[#ff5500] border-2 border-black py-4 font-black text-lg uppercase tracking-widest text-black hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] flex items-center justify-center gap-2 cursor-pointer"
               >
                 Proceed to Payment
               </button>
             ) : (
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={isSubmitting}
                 className="w-full bg-[#ff5500] border-2 border-black py-4 font-black text-lg uppercase tracking-widest text-black hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
               >
