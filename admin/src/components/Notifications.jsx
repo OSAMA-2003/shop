@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Bell, Trash2, CheckCheck, X } from "lucide-react";
 
 function Notifications() {
-    const url = 'https://shop-2-ms77.onrender.com';
+    const url = 'https://shop-3-ocd8.onrender.com';
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -65,14 +65,14 @@ function Notifications() {
     return (
         <section className='relative w-full  min-h-screen bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans'>
             <div className='max-w-4xl mx-auto'>
-                
+
                 {/* HEADING ROW */}
                 <div className='flex flex-col sm:flex-row justify-between sm:items-end border-b-[4px] border-black pb-6 mb-10 gap-4'>
                     <h2 className='text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none flex items-center gap-3'>
-                        <Bell strokeWidth={3} className="w-10 h-10 shrink-0" /> 
+                        <Bell strokeWidth={3} className="w-10 h-10 shrink-0" />
                         Notifications
                     </h2>
-                    
+
                     {notifications.length > 0 && (
                         <button
                             onClick={clearAll}
@@ -95,10 +95,10 @@ function Notifications() {
                             <div
                                 key={n._id}
                                 className={`p-6 border-[3px] border-black flex flex-col sm:flex-row justify-between items-start gap-6 transition-all duration-300 
-                                ${n.isRead 
-                                    ? 'bg-[#e5e5e5] text-black/60 shadow-none' 
-                                    : 'bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] hover:translate-x-[-2px] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'
-                                }`}
+                                ${n.isRead
+                                        ? 'bg-[#e5e5e5] text-black/60 shadow-none'
+                                        : 'bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] hover:translate-x-[-2px] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'
+                                    }`}
                             >
                                 <div className='flex-1'>
                                     <div className='flex items-center gap-3 mb-2'>
@@ -116,9 +116,9 @@ function Notifications() {
                                         {n.message}
                                     </p>
                                     <p className={`text-xs font-bold mt-2 uppercase tracking-wider ${n.isRead ? 'text-black/40' : 'text-black/60'}`}>
-                                        {new Date(n.createdAt).toLocaleString('en-US', { 
-                                            year: 'numeric', month: 'short', day: 'numeric', 
-                                            hour: '2-digit', minute: '2-digit' 
+                                        {new Date(n.createdAt).toLocaleString('en-US', {
+                                            year: 'numeric', month: 'short', day: 'numeric',
+                                            hour: '2-digit', minute: '2-digit'
                                         })}
                                     </p>
                                 </div>

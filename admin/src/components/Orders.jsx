@@ -5,7 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 import JSZip from 'jszip';
 
 const Orders = () => {
-    const url = "https://shop-2-ms77.onrender.com";
+    const url = "https://shop-3-ocd8.onrender.com";
 
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -16,7 +16,7 @@ const Orders = () => {
 
     const deleteOrder = async (orderId) => {
         if (!window.confirm("Are you sure you want to delete this order? This action cannot be undone.")) return;
-        
+
         setDeletingOrderId(orderId);
         try {
             const token = localStorage.getItem('adminToken');
@@ -389,11 +389,11 @@ const Orders = () => {
                                                 {order.paymentScreenshot ? (
                                                     <div className='flex items-center gap-4 mt-3 bg-[#e5e5e5]/30 p-3 border border-black/10'>
                                                         <div className='w-16 h-16 bg-[#e5e5e5] border-2 border-black relative group overflow-hidden shrink-0'>
-                                                            <img 
-                                                                src={order.paymentScreenshot} 
-                                                                className='w-full h-full object-cover cursor-zoom-in' 
-                                                                alt="Payment receipt" 
-                                                                onClick={() => window.open(order.paymentScreenshot, '_blank')} 
+                                                            <img
+                                                                src={order.paymentScreenshot}
+                                                                className='w-full h-full object-cover cursor-zoom-in'
+                                                                alt="Payment receipt"
+                                                                onClick={() => window.open(order.paymentScreenshot, '_blank')}
                                                             />
                                                             <button
                                                                 onClick={(e) => { e.stopPropagation(); handleDownload(order.paymentScreenshot, `payment-receipt-${order._id.slice(-6)}.png`); }}

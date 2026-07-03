@@ -10,7 +10,7 @@ const DashboardHome = () => {
         users: 0
     });
     const [loading, setLoading] = useState(true);
-    const url = 'https://shop-2-ms77.onrender.com';
+    const url = 'https://shop-3-ocd8.onrender.com';
 
     useEffect(() => {
         const fetchStats = async () => {

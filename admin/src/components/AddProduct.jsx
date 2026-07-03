@@ -3,7 +3,7 @@ import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 
 const AddProduct = () => {
-    const url = 'https://shop-2-ms77.onrender.com';
+    const url = 'https://shop-3-ocd8.onrender.com';
     const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false); // Track loading state
     const [data, setData] = useState({
@@ -39,10 +39,10 @@ const AddProduct = () => {
 
     const onSubmitHandler = async (e) => {
         e.preventDefault();
-        
+
         // Prevent submission if already loading
-        if (loading) return; 
-        
+        if (loading) return;
+
         setLoading(true); // Start loading
 
         const formData = new FormData();
@@ -81,14 +81,14 @@ const AddProduct = () => {
 
     return (
         <section className='relative max-w-screen mx-auto p-4 w-fullbg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans '>
-            
+
             <Toaster position="top-center" />
 
             <form onSubmit={onSubmitHandler} className='max-w-3xl mx-auto'>
-                
+
                 {/* FORM CONTAINER */}
                 <div className='bg-white border-[4px] border-black p-8 sm:p-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'>
-                    
+
                     {/* HEADING */}
                     <div className='border-b-[4px] border-black pb-6 mb-8'>
                         <h2 className='text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none'>
@@ -97,12 +97,12 @@ const AddProduct = () => {
                     </div>
 
                     <div className='flex flex-col gap-6'>
-                        
+
                         {/* NAME & PRICE ROW */}
                         <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
                             <div className='flex flex-col'>
                                 <label className='text-sm font-black uppercase tracking-widest mb-2'>Product Name *</label>
-                                <input 
+                                <input
                                     type='text'
                                     name='name'
                                     placeholder='HEAVYWEIGHT TEE'
@@ -115,7 +115,7 @@ const AddProduct = () => {
 
                             <div className='flex flex-col'>
                                 <label className='text-sm font-black uppercase tracking-widest mb-2'>Price ($) *</label>
-                                <input 
+                                <input
                                     type='number'
                                     name='price'
                                     placeholder='0.00'
@@ -131,7 +131,7 @@ const AddProduct = () => {
                         {/* DESCRIPTION */}
                         <div className='flex flex-col'>
                             <label className='text-sm font-black uppercase tracking-widest mb-2'>Description *</label>
-                            <textarea 
+                            <textarea
                                 name='description'
                                 placeholder='Enter product details, materials, and fit...'
                                 value={data.description}
@@ -150,8 +150,8 @@ const AddProduct = () => {
                             <div className='flex gap-4 flex-wrap'>
                                 {["S", "M", "L", "XL", "XXL"].map((size) => (
                                     <label key={size} className="flex items-center gap-2 cursor-pointer font-bold text-sm uppercase">
-                                        <input 
-                                            type="checkbox" 
+                                        <input
+                                            type="checkbox"
                                             checked={selectedSizes.includes(size)}
                                             onChange={(e) => {
                                                 if (e.target.checked) {
@@ -171,7 +171,7 @@ const AddProduct = () => {
                         {/* IMAGE UPLOAD */}
                         <div className='flex flex-col'>
                             <label className='text-sm font-black uppercase tracking-widest mb-2'>Product Image *</label>
-                            <input 
+                            <input
                                 type='file'
                                 accept='image/*'
                                 id='imageInput'
@@ -179,28 +179,27 @@ const AddProduct = () => {
                                 required
                                 className='w-full border-[3px] border-black p-2 font-bold cursor-pointer file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-black file:uppercase file:bg-black file:text-white hover:file:bg-[#ff5500] hover:file:text-black transition-all'
                             />
-                            
+
                             {/* IMAGE PREVIEW */}
                             {image && (
                                 <div className="mt-4 border-[3px] border-black p-2 bg-[#e5e5e5] w-fit">
-                                    <img 
-                                        src={URL.createObjectURL(image)} 
-                                        alt="Preview" 
-                                        className='w-48 h-48 object-cover mix-blend-multiply' 
+                                    <img
+                                        src={URL.createObjectURL(image)}
+                                        alt="Preview"
+                                        className='w-48 h-48 object-cover mix-blend-multiply'
                                     />
                                 </div>
                             )}
                         </div>
 
                         {/* SUBMIT BUTTON */}
-                        <button 
+                        <button
                             type='submit'
                             disabled={loading}
-                            className={`w-full mt-6 border-[3px] border-black py-4 font-black text-xl uppercase tracking-widest transition-all ${
-                                loading 
-                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none translate-y-[2px] translate-x-[2px]' 
-                                : 'bg-[#ff5500] text-black hover:bg-black hover:text-[#ff5500] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]'
-                            }`}
+                            className={`w-full mt-6 border-[3px] border-black py-4 font-black text-xl uppercase tracking-widest transition-all ${loading
+                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none translate-y-[2px] translate-x-[2px]'
+                                    : 'bg-[#ff5500] text-black hover:bg-black hover:text-[#ff5500] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]'
+                                }`}
                         >
                             {loading ? "Publishing..." : "Publish Product"}
                         </button>

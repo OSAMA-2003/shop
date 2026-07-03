@@ -3,7 +3,7 @@ import axios from 'axios';
 import { User, Shield, Trash2, ArrowDown, ArrowUp } from "lucide-react";
 
 const Users = () => {
-    const url = "https://shop-2-ms77.onrender.com";
+    const url = "https://shop-3-ocd8.onrender.com";
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -74,7 +74,7 @@ const Users = () => {
     return (
         <section className='md:ml-64 min-h-screen bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans'>
             <div className='max-w-7xl mx-auto'>
-                
+
                 {/* HEADING */}
                 <div className='border-b-[4px] border-black pb-6 mb-10'>
                     <h2 className='text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none'>
@@ -93,8 +93,8 @@ const Users = () => {
                 ) : (
                     <div className='grid md:grid-cols-2 xl:grid-cols-3 gap-8'>
                         {users.map((user) => (
-                            <div 
-                                key={user._id} 
+                            <div
+                                key={user._id}
                                 className='bg-white border-[4px] border-black p-6 flex flex-col items-center text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-4px] hover:translate-x-[-4px] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all'
                             >
                                 {/* AVATAR BLOCK */}
@@ -119,27 +119,25 @@ const Users = () => {
                                 <p className='text-sm font-mono text-black/70 mb-4 truncate w-full'>
                                     {user.email}
                                 </p>
-                                
-                                <div className={`px-4 py-1 border-[3px] border-black text-sm font-black uppercase tracking-widest mb-6 ${
-                                    user.role === "admin" 
-                                        ? "bg-[#ff5500] text-black" 
-                                        : "bg-black text-white"
-                                }`}>
+
+                                <div className={`px-4 py-1 border-[3px] border-black text-sm font-black uppercase tracking-widest mb-6 ${user.role === "admin"
+                                    ? "bg-[#ff5500] text-black"
+                                    : "bg-black text-white"
+                                    }`}>
                                     {user.role === "admin" ? "Admin" : "User"}
                                 </div>
 
                                 {/* ACTIONS CONTAINER */}
                                 <div className="w-full flex flex-col gap-3 mt-auto pt-4 border-t-[3px] border-black">
-                                    
+
                                     {/* DELETE BUTTON */}
                                     <button
                                         onClick={() => deleteUser(user._id)}
                                         disabled={user.role !== "user"}
-                                        className={`flex items-center justify-center gap-2 w-full py-3 border-[3px] border-black font-black uppercase tracking-widest transition-all ${
-                                            user.role === "admin"
-                                                ? "bg-[#e5e5e5] text-black/30 border-black/30 cursor-not-allowed"
-                                                : "bg-white text-red-600 hover:bg-red-600 hover:text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
-                                        }`}
+                                        className={`flex items-center justify-center gap-2 w-full py-3 border-[3px] border-black font-black uppercase tracking-widest transition-all ${user.role === "admin"
+                                            ? "bg-[#e5e5e5] text-black/30 border-black/30 cursor-not-allowed"
+                                            : "bg-white text-red-600 hover:bg-red-600 hover:text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
+                                            }`}
                                     >
                                         <Trash2 className='w-5 h-5' strokeWidth={2.5} />
                                         Delete
@@ -149,11 +147,10 @@ const Users = () => {
                                     <button
                                         onClick={() => promoteToAdmin(user._id)}
                                         disabled={user.role !== "user"}
-                                        className={`flex items-center justify-center gap-2 w-full py-3 border-[3px] border-black font-black uppercase tracking-widest transition-all ${
-                                            user.role === "admin"
-                                                ? "hidden" // Hide promote button if already admin
-                                                : "bg-[#ff5500] text-black hover:bg-black hover:text-[#ff5500] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
-                                        }`}
+                                        className={`flex items-center justify-center gap-2 w-full py-3 border-[3px] border-black font-black uppercase tracking-widest transition-all ${user.role === "admin"
+                                            ? "hidden" // Hide promote button if already admin
+                                            : "bg-[#ff5500] text-black hover:bg-black hover:text-[#ff5500] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
+                                            }`}
                                     >
                                         <ArrowUp className='w-5 h-5' strokeWidth={3} />
                                         Make Admin
@@ -163,11 +160,10 @@ const Users = () => {
                                     <button
                                         onClick={() => demoteToUser(user._id)}
                                         disabled={user.role !== "admin"}
-                                        className={`flex items-center justify-center gap-2 w-full py-3 border-[3px] border-black font-black uppercase tracking-widest transition-all ${
-                                            user.role === "user"
-                                                ? "hidden" // Hide demote button if already user
-                                                : "bg-black text-white hover:bg-white hover:text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
-                                        }`}
+                                        className={`flex items-center justify-center gap-2 w-full py-3 border-[3px] border-black font-black uppercase tracking-widest transition-all ${user.role === "user"
+                                            ? "hidden" // Hide demote button if already user
+                                            : "bg-black text-white hover:bg-white hover:text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
+                                            }`}
                                     >
                                         <ArrowDown className='w-5 h-5' strokeWidth={3} />
                                         Revoke Admin

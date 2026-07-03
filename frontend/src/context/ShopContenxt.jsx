@@ -17,7 +17,7 @@ const ShopContextProvider = ({ children }) => {
     const [token, setToken] = useState()
     const [userData, setUserData] = useState(null)
     const [loading, setLoading] = useState(true);
-    const url = "https://shop-2-ms77.onrender.com";
+    const url = "https://shop-3-ocd8.onrender.com";
 
     const fetchUserProfile = async (tokenValue) => {
         const activeToken = tokenValue || token;

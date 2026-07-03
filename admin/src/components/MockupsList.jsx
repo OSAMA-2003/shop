@@ -4,7 +4,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { Edit2, X, Upload } from 'lucide-react';
 
 const MockupsList = () => {
-    const url = 'https://shop-2-ms77.onrender.com';
+    const url = 'https://shop-3-ocd8.onrender.com';
     const [list, setList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editingMockup, setEditingMockup] = useState(null);
@@ -65,7 +65,7 @@ const MockupsList = () => {
             formData.append("description", editingMockup.description || "");
             formData.append("price", editingMockup.price);
             formData.append("sizes", JSON.stringify(editingMockup.sizes || ["S", "M", "L", "XL"]));
-            
+
             if (editingMockup.newImageFront) formData.append("imageFront", editingMockup.newImageFront);
             if (editingMockup.newImageBack) formData.append("imageBack", editingMockup.newImageBack);
 
@@ -73,7 +73,7 @@ const MockupsList = () => {
             const res = await axios.put(`${url}/api/mockup/update/${editingMockup._id}`, formData, {
                 headers: { token }
             });
-            
+
             if (res.data.success) {
                 toast.success("Mockup updated successfully", toastStyle);
                 setEditingMockup(null);
@@ -170,22 +170,22 @@ const MockupsList = () => {
                                     <X className="w-6 h-6" strokeWidth={3} />
                                 </button>
                             </div>
-                            
+
                             <div className="overflow-y-auto p-6">
                                 <form id="editMockupForm" onSubmit={handleUpdate} className="flex flex-col gap-6">
                                     <div className="flex flex-col gap-2">
                                         <label className="font-black uppercase tracking-widest">Mockup Name</label>
-                                        <input type="text" required value={editingMockup.name} onChange={(e) => setEditingMockup({...editingMockup, name: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
+                                        <input type="text" required value={editingMockup.name} onChange={(e) => setEditingMockup({ ...editingMockup, name: e.target.value })} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         <label className="font-black uppercase tracking-widest">Description</label>
-                                        <textarea required value={editingMockup.description} onChange={(e) => setEditingMockup({...editingMockup, description: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white min-h-[100px]" />
+                                        <textarea required value={editingMockup.description} onChange={(e) => setEditingMockup({ ...editingMockup, description: e.target.value })} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white min-h-[100px]" />
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         <label className="font-black uppercase tracking-widest">Price</label>
-                                        <input type="number" required value={editingMockup.price} onChange={(e) => setEditingMockup({...editingMockup, price: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
+                                        <input type="number" required value={editingMockup.price} onChange={(e) => setEditingMockup({ ...editingMockup, price: e.target.value })} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
                                     </div>
-                                    
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="flex flex-col gap-2">
                                             <label className="font-black uppercase tracking-widest">Front Image</label>
@@ -198,8 +198,8 @@ const MockupsList = () => {
                                                     <span className="font-bold uppercase text-xs text-center">Upload new</span>
                                                     <input type="file" className="hidden" accept="image/*" onChange={(e) => {
                                                         const file = e.target.files[0];
-                                                        if(file) {
-                                                            setEditingMockup({...editingMockup, newImageFront: file});
+                                                        if (file) {
+                                                            setEditingMockup({ ...editingMockup, newImageFront: file });
                                                             setImageFrontPreview(URL.createObjectURL(file));
                                                         }
                                                     }} />
@@ -221,8 +221,8 @@ const MockupsList = () => {
                                                     <span className="font-bold uppercase text-xs text-center">Upload new</span>
                                                     <input type="file" className="hidden" accept="image/*" onChange={(e) => {
                                                         const file = e.target.files[0];
-                                                        if(file) {
-                                                            setEditingMockup({...editingMockup, newImageBack: file});
+                                                        if (file) {
+                                                            setEditingMockup({ ...editingMockup, newImageBack: file });
                                                             setImageBackPreview(URL.createObjectURL(file));
                                                         }
                                                     }} />

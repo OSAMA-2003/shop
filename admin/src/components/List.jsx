@@ -8,7 +8,7 @@ function List() {
     const [editingProduct, setEditingProduct] = useState(null);
     const [updating, setUpdating] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
-    const url = 'https://shop-2-ms77.onrender.com';
+    const url = 'https://shop-3-ocd8.onrender.com';
 
     const fetchProducts = async () => {
         try {
@@ -48,14 +48,14 @@ function List() {
     const handleUpdate = async (e) => {
         e.preventDefault();
         setUpdating(true);
-        
+
         try {
             const formData = new FormData();
             formData.append("name", editingProduct.name);
             formData.append("description", editingProduct.description);
             formData.append("price", editingProduct.price);
             formData.append("sizes", JSON.stringify(editingProduct.sizes));
-            
+
             if (editingProduct.newImage) {
                 formData.append("image", editingProduct.newImage);
             }
@@ -89,7 +89,7 @@ function List() {
     return (
         <section className='relative  max-w-screen mx-auto bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans '>
             <div className='max-w-7xl mx-auto md:pl-50 flex-wrap'>
-                
+
                 {/* HEADING */}
                 <div className='border-b-[4px] border-black pb-6 mb-10'>
                     <h2 className='text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none'>
@@ -104,8 +104,8 @@ function List() {
                 ) : (
                     <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8'>
                         {products.map((product) => (
-                            <div 
-                                key={product._id} 
+                            <div
+                                key={product._id}
                                 className='bg-white border-[4px] border-black p-5 flex flex-col justify-between shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-4px] hover:translate-x-[-4px] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all'
                             >
                                 <div>
@@ -155,7 +155,7 @@ function List() {
                         ))}
                     </div>
                 )}
-                
+
                 {/* EDIT MODAL */}
                 {editingProduct && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
@@ -166,22 +166,22 @@ function List() {
                                     <X className="w-6 h-6" strokeWidth={3} />
                                 </button>
                             </div>
-                            
+
                             <div className="overflow-y-auto p-6">
                                 <form id="editProductForm" onSubmit={handleUpdate} className="flex flex-col gap-6">
                                     <div className="flex flex-col gap-2">
                                         <label className="font-black uppercase tracking-widest">Product Name</label>
-                                        <input type="text" required value={editingProduct.name} onChange={(e) => setEditingProduct({...editingProduct, name: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
+                                        <input type="text" required value={editingProduct.name} onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         <label className="font-black uppercase tracking-widest">Description</label>
-                                        <textarea required value={editingProduct.description} onChange={(e) => setEditingProduct({...editingProduct, description: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white min-h-[100px]" />
+                                        <textarea required value={editingProduct.description} onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white min-h-[100px]" />
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         <label className="font-black uppercase tracking-widest">Price</label>
-                                        <input type="number" required value={editingProduct.price} onChange={(e) => setEditingProduct({...editingProduct, price: e.target.value})} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
+                                        <input type="number" required value={editingProduct.price} onChange={(e) => setEditingProduct({ ...editingProduct, price: e.target.value })} className="p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff5500] bg-white" />
                                     </div>
-                                    
+
                                     <div className="flex flex-col gap-2">
                                         <label className="font-black uppercase tracking-widest">Update Image</label>
                                         <div className="flex items-center gap-6">
@@ -193,8 +193,8 @@ function List() {
                                                 <span className="font-bold uppercase text-sm text-center">Click to upload new image</span>
                                                 <input type="file" className="hidden" accept="image/*" onChange={(e) => {
                                                     const file = e.target.files[0];
-                                                    if(file) {
-                                                        setEditingProduct({...editingProduct, newImage: file});
+                                                    if (file) {
+                                                        setEditingProduct({ ...editingProduct, newImage: file });
                                                         setImagePreview(URL.createObjectURL(file));
                                                     }
                                                 }} />
