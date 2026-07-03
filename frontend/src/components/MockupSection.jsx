@@ -74,7 +74,7 @@ const MockupSection = () => {
 
           {/* Navigation Arrows */}
           {formattedMockups.length > 0 && !loading && (
-            <motion.div variants={itemVariants} className=" gap-3 self-start md:self-end hidden sm:flex">
+            <motion.div variants={itemVariants} className="flex gap-3 self-start md:self-end">
               <button
                 onClick={() => handleScroll('left')}
                 className="w-12 h-12 rounded-full border-[3px] border-black flex items-center justify-center bg-white text-black hover:bg-[#ff5500] hover:text-white transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[3px] active:translate-x-[3px] cursor-pointer"

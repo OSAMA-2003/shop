@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react';
-import { categories } from "../assets/data";
 import { ShopContext } from '../context/ShopContenxt';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';

@@ -1,5 +1,4 @@
 import { createContext, useEffect, useState } from "react";
-import { all_products } from '../assets/data'
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -207,7 +206,7 @@ const ShopContextProvider = ({ children }) => {
             setProducts(res.data.data || [])
         } catch (err) {
             console.log(err)
-            setProducts(all_products)
+
         }
     }
 
