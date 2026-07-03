@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { Bell, Trash2, CheckCheck, X } from "lucide-react";
+import toast from 'react-hot-toast';
 
 function Notifications() {
     const url = 'https://shop-3-ocd8.onrender.com';
@@ -30,13 +31,65 @@ function Notifications() {
     };
 
     const clearAll = async () => {
-        if (!window.confirm("Are you sure you want to clear all notifications?")) return;
-        try {
-            await axios.delete(`${url}/api/notifications/clear`);
-            setNotifications([]);
-        } catch (err) {
-            console.log(err);
-        }
+        toast((t) => (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+                <span style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '14px' }}>
+                    🗑️ Clear all notifications?
+                </span>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                        onClick={async () => {
+                            toast.dismiss(t.id);
+                            try {
+                                await axios.delete(`${url}/api/notifications/clear`);
+                                setNotifications([]);
+                                toast.success('All notifications cleared', {
+                                    style: {
+                                        border: '3px solid black',
+                                        padding: '16px',
+                                        color: 'black',
+                                        fontWeight: '900',
+                                        textTransform: 'uppercase',
+                                        borderRadius: '0',
+                                        backgroundColor: '#f9f9f6',
+                                    },
+                                });
+                            } catch (err) {
+                                console.log(err);
+                                toast.error('Failed to clear notifications', {
+                                    style: {
+                                        border: '3px solid black',
+                                        padding: '16px',
+                                        color: '#fff',
+                                        fontWeight: '900',
+                                        textTransform: 'uppercase',
+                                        borderRadius: '0',
+                                        backgroundColor: '#dc2626',
+                                    },
+                                });
+                            }
+                        }}
+                        style={{ padding: '8px 20px', background: '#dc2626', color: 'white', border: '3px solid black', fontWeight: '900', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em', fontSize: '12px' }}
+                    >
+                        Clear All
+                    </button>
+                    <button
+                        onClick={() => toast.dismiss(t.id)}
+                        style={{ padding: '8px 20px', background: '#e5e5e5', color: 'black', border: '3px solid black', fontWeight: '900', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em', fontSize: '12px' }}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        ), {
+            duration: Infinity,
+            style: {
+                border: '3px solid black',
+                padding: '16px',
+                borderRadius: '0',
+                backgroundColor: '#f9f9f6',
+            },
+        });
     };
 
     const markAsRead = async (id) => {

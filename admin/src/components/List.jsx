@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Trash2, Edit2, X, Upload } from 'lucide-react';
+import { Trash2, Edit2, X, Upload, Loader2 } from 'lucide-react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 function List() {
     const [products, setProducts] = useState([]);
@@ -9,6 +10,30 @@ function List() {
     const [updating, setUpdating] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
     const url = 'https://shop-3-ocd8.onrender.com';
+
+    const toastStyle = {
+        style: {
+            border: '3px solid black',
+            padding: '16px',
+            color: 'black',
+            fontWeight: '900',
+            textTransform: 'uppercase',
+            borderRadius: '0',
+            backgroundColor: '#f9f9f6',
+        },
+    };
+
+    const errorToastStyle = {
+        style: {
+            border: '3px solid black',
+            padding: '16px',
+            color: '#fff',
+            fontWeight: '900',
+            textTransform: 'uppercase',
+            borderRadius: '0',
+            backgroundColor: '#dc2626',
+        },
+    };
 
     const fetchProducts = async () => {
         try {
@@ -30,19 +55,49 @@ function List() {
     }, []);
 
     const handleDelete = async (id) => {
-        // Optional: Add a confirmation dialog so you don't accidentally delete products
-        if (!window.confirm("Are you sure you want to delete this product?")) return;
-
-        try {
-            const res = await axios.delete(`${url}/api/product/remove/${id}`);
-            if (res.data.success) {
-                await fetchProducts(); // Refresh the list
-            } else {
-                alert("Error deleting product");
-            }
-        } catch (err) {
-            console.error(err);
-        }
+        toast((t) => (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+                <span style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '14px' }}>
+                    🗑️ Delete this product?
+                </span>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                        onClick={async () => {
+                            toast.dismiss(t.id);
+                            try {
+                                const res = await axios.delete(`${url}/api/product/remove/${id}`);
+                                if (res.data.success) {
+                                    toast.success('Product deleted successfully', toastStyle);
+                                    await fetchProducts();
+                                } else {
+                                    toast.error('Error deleting product', errorToastStyle);
+                                }
+                            } catch (err) {
+                                console.error(err);
+                                toast.error('Server error', errorToastStyle);
+                            }
+                        }}
+                        style={{ padding: '8px 20px', background: '#dc2626', color: 'white', border: '3px solid black', fontWeight: '900', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em', fontSize: '12px' }}
+                    >
+                        Delete
+                    </button>
+                    <button
+                        onClick={() => toast.dismiss(t.id)}
+                        style={{ padding: '8px 20px', background: '#e5e5e5', color: 'black', border: '3px solid black', fontWeight: '900', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em', fontSize: '12px' }}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        ), {
+            duration: Infinity,
+            style: {
+                border: '3px solid black',
+                padding: '16px',
+                borderRadius: '0',
+                backgroundColor: '#f9f9f6',
+            },
+        });
     };
 
     const handleUpdate = async (e) => {
@@ -62,15 +117,16 @@ function List() {
 
             const res = await axios.put(`${url}/api/product/update/${editingProduct._id}`, formData);
             if (res.data.success) {
+                toast.success('Product updated successfully', toastStyle);
                 setEditingProduct(null);
                 setImagePreview(null);
                 await fetchProducts();
             } else {
-                alert("Error updating product");
+                toast.error('Error updating product', errorToastStyle);
             }
         } catch (err) {
             console.error(err);
-            alert("Error updating product");
+            toast.error('Error updating product', errorToastStyle);
         } finally {
             setUpdating(false);
         }
@@ -206,7 +262,8 @@ function List() {
 
                             <div className="p-6 border-t-[4px] border-black shrink-0">
                                 <button type="submit" form="editProductForm" disabled={updating} className="w-full bg-[#ff5500] text-black border-[3px] border-black py-4 font-black uppercase tracking-widest text-lg hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer">
-                                    {updating ? "Saving..." : "Save Changes"}
+                                    {updating && <Loader2 className="w-6 h-6 animate-spin text-black" strokeWidth={3} />}
+                                    <span>{updating ? "Saving..." : "Save Changes"}</span>
                                 </button>
                             </div>
                         </div>

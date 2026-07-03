@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import toast, { Toaster } from 'react-hot-toast';
-import { Edit2, X, Upload } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { Edit2, X, Upload, Loader2 } from 'lucide-react';
 
 const MockupsList = () => {
     const url = 'https://shop-3-ocd8.onrender.com';
@@ -106,7 +106,6 @@ const MockupsList = () => {
 
     return (
         <section className='relative  max-w-screen mx-auto bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans '>
-            <Toaster position="top-center" />
             <div className='max-w-4xl mx-auto'>
                 <div className='bg-white border-[4px] border-black p-8 sm:p-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'>
                     <div className='border-b-[4px] border-black pb-6 mb-8 flex justify-between items-end'>
@@ -235,7 +234,8 @@ const MockupsList = () => {
 
                             <div className="p-6 border-t-[4px] border-black shrink-0">
                                 <button type="submit" form="editMockupForm" disabled={updating} className="w-full bg-[#ff5500] text-black border-[3px] border-black py-4 font-black uppercase tracking-widest text-lg hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer">
-                                    {updating ? "Saving..." : "Save Changes"}
+                                    {updating && <Loader2 className="w-6 h-6 animate-spin text-black" strokeWidth={3} />}
+                                    <span>{updating ? "Saving..." : "Save Changes"}</span>
                                 </button>
                             </div>
                         </div>

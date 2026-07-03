@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2, Download, Trash2 } from "lucide-react";
 import axios from "axios";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import JSZip from 'jszip';
 
 const Orders = () => {
@@ -14,37 +14,81 @@ const Orders = () => {
     const [downloadingZipItemId, setDownloadingZipItemId] = useState(null);
     const [deletingOrderId, setDeletingOrderId] = useState(null);
 
+    const toastStyle = {
+        style: {
+            border: '3px solid black',
+            padding: '16px',
+            color: 'black',
+            fontWeight: '900',
+            textTransform: 'uppercase',
+            borderRadius: '0',
+            backgroundColor: '#f9f9f6',
+        },
+    };
+
+    const errorToastStyle = {
+        style: {
+            border: '3px solid black',
+            padding: '16px',
+            color: '#fff',
+            fontWeight: '900',
+            textTransform: 'uppercase',
+            borderRadius: '0',
+            backgroundColor: '#dc2626',
+        },
+    };
+
     const deleteOrder = async (orderId) => {
-        if (!window.confirm("Are you sure you want to delete this order? This action cannot be undone.")) return;
+        toast((t) => (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+                <span style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '14px' }}>
+                    🗑️ Delete this order? This cannot be undone.
+                </span>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                        onClick={async () => {
+                            toast.dismiss(t.id);
+                            setDeletingOrderId(orderId);
+                            try {
+                                const token = localStorage.getItem('adminToken');
+                                const res = await axios.delete(`${url}/api/order/delete/${orderId}`, {
+                                    headers: { token }
+                                });
 
-        setDeletingOrderId(orderId);
-        try {
-            const token = localStorage.getItem('adminToken');
-            const res = await axios.delete(`${url}/api/order/delete/${orderId}`, {
-                headers: { token }
-            });
-
-            if (res.data.success) {
-                setOrders(prev => prev.filter(order => order._id !== orderId));
-                toast.success("Order deleted successfully", {
-                    style: {
-                        border: '3px solid black',
-                        padding: '16px',
-                        color: 'black',
-                        fontWeight: '900',
-                        textTransform: 'uppercase',
-                        borderRadius: '0',
-                    },
-                });
-            } else {
-                toast.error(res.data.message || 'Error deleting order');
-            }
-        } catch (err) {
-            console.error(err);
-            toast.error("Server error");
-        } finally {
-            setDeletingOrderId(null);
-        }
+                                if (res.data.success) {
+                                    setOrders(prev => prev.filter(order => order._id !== orderId));
+                                    toast.success("Order deleted successfully", toastStyle);
+                                } else {
+                                    toast.error(res.data.message || 'Error deleting order', errorToastStyle);
+                                }
+                            } catch (err) {
+                                console.error(err);
+                                toast.error("Server error", errorToastStyle);
+                            } finally {
+                                setDeletingOrderId(null);
+                            }
+                        }}
+                        style={{ padding: '8px 20px', background: '#dc2626', color: 'white', border: '3px solid black', fontWeight: '900', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em', fontSize: '12px' }}
+                    >
+                        Delete
+                    </button>
+                    <button
+                        onClick={() => toast.dismiss(t.id)}
+                        style={{ padding: '8px 20px', background: '#e5e5e5', color: 'black', border: '3px solid black', fontWeight: '900', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em', fontSize: '12px' }}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        ), {
+            duration: Infinity,
+            style: {
+                border: '3px solid black',
+                padding: '16px',
+                borderRadius: '0',
+                backgroundColor: '#f9f9f6',
+            },
+        });
     };
 
     const handleDownloadZip = async (order, item, itemIndex) => {
@@ -225,23 +269,14 @@ const Orders = () => {
                             : order
                     )
                 );
-                toast.success("Status updated", {
-                    style: {
-                        border: '3px solid black',
-                        padding: '16px',
-                        color: 'black',
-                        fontWeight: '900',
-                        textTransform: 'uppercase',
-                        borderRadius: '0',
-                    },
-                });
+                toast.success("Status updated", toastStyle);
             } else {
-                toast.error('Error updating status');
+                toast.error('Error updating status', errorToastStyle);
             }
 
         } catch (err) {
             console.log(err);
-            toast.error("Server error");
+            toast.error("Server error", errorToastStyle);
         } finally {
             setUpdatingStatusId(null);
         }
@@ -263,23 +298,14 @@ const Orders = () => {
                             : order
                     )
                 );
-                toast.success(`Payment marked as ${newPaymentStatus ? 'Paid' : 'Unpaid'}`, {
-                    style: {
-                        border: '3px solid black',
-                        padding: '16px',
-                        color: 'black',
-                        fontWeight: '900',
-                        textTransform: 'uppercase',
-                        borderRadius: '0',
-                    },
-                });
+                toast.success(`Payment marked as ${newPaymentStatus ? 'Paid' : 'Unpaid'}`, toastStyle);
             } else {
-                toast.error('Error updating payment status');
+                toast.error('Error updating payment status', errorToastStyle);
             }
 
         } catch (err) {
             console.log(err);
-            toast.error("Server error");
+            toast.error("Server error", errorToastStyle);
         } finally {
             setUpdatingPaymentId(null);
         }
@@ -301,8 +327,6 @@ const Orders = () => {
 
     return (
         <>
-            <Toaster position="top-center" />
-
             <section className='relative max-w-5xl mx-auto  text-black py-16 px-6 sm:px-10 font-sans'>
 
                 {/* HEADING */}

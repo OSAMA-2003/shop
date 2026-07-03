@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
 
 const AddProduct = () => {
     const url = 'https://shop-3-ocd8.onrender.com';
@@ -81,8 +82,6 @@ const AddProduct = () => {
 
     return (
         <section className='relative max-w-screen mx-auto p-4 w-fullbg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans '>
-
-            <Toaster position="top-center" />
 
             <form onSubmit={onSubmitHandler} className='max-w-3xl mx-auto'>
 
@@ -196,12 +195,13 @@ const AddProduct = () => {
                         <button
                             type='submit'
                             disabled={loading}
-                            className={`w-full mt-6 border-[3px] border-black py-4 font-black text-xl uppercase tracking-widest transition-all ${loading
+                            className={`w-full mt-6 border-[3px] border-black py-4 font-black text-xl uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${loading
                                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none translate-y-[2px] translate-x-[2px]'
                                     : 'bg-[#ff5500] text-black hover:bg-black hover:text-[#ff5500] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]'
                                 }`}
                         >
-                            {loading ? "Publishing..." : "Publish Product"}
+                            {loading && <Loader2 className="w-6 h-6 animate-spin text-gray-500" strokeWidth={3} />}
+                            <span>{loading ? "Publishing..." : "Publish Product"}</span>
                         </button>
 
                     </div>

@@ -1,11 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { User, Shield, Trash2, ArrowDown, ArrowUp } from "lucide-react";
+import toast from 'react-hot-toast';
 
 const Users = () => {
     const url = "https://shop-3-ocd8.onrender.com";
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const toastStyle = {
+        style: {
+            border: '3px solid black',
+            padding: '16px',
+            color: 'black',
+            fontWeight: '900',
+            textTransform: 'uppercase',
+            borderRadius: '0',
+            backgroundColor: '#f9f9f6',
+        },
+    };
+
+    const errorToastStyle = {
+        style: {
+            border: '3px solid black',
+            padding: '16px',
+            color: '#fff',
+            fontWeight: '900',
+            textTransform: 'uppercase',
+            borderRadius: '0',
+            backgroundColor: '#dc2626',
+        },
+    };
 
     const demoteToUser = async (id) => {
         try {
@@ -15,10 +40,10 @@ const Users = () => {
                     u._id === id ? { ...u, role: "user" } : u
                 )
             );
-            alert("User has been successfully demoted");
+            toast.success('User has been successfully demoted', toastStyle);
         } catch (error) {
             console.error("Error in demoting the role", error);
-            alert("An error occurred while demoting the role");
+            toast.error('Error demoting the role', errorToastStyle);
         }
     };
 
@@ -28,10 +53,10 @@ const Users = () => {
             setUsers((prev) =>
                 prev.map((u) => (u._id === id ? { ...u, role: "admin" } : u))
             );
-            alert("User has been successfully promoted to admin");
+            toast.success('User has been promoted to admin', toastStyle);
         } catch (error) {
             console.error("Error in promotion", error);
-            alert("An error occurred during promotion");
+            toast.error('Error during promotion', errorToastStyle);
         }
     };
 
@@ -51,20 +76,49 @@ const Users = () => {
     };
 
     const deleteUser = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this user?"))
-            return;
-        try {
-            const res = await axios.delete(`${url}/api/user/delete/${id}`);
-            if (res.data && res.data.success) {
-                setUsers((prev) => prev.filter((u) => u._id !== id));
-                alert("User has been deleted successfully");
-            } else {
-                alert("Deletion failed, check the server");
-            }
-        } catch (error) {
-            console.error("Error in deleting the user");
-            alert("Deletion failed");
-        }
+        toast((t) => (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+                <span style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '14px' }}>
+                    🗑️ Delete this user?
+                </span>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                        onClick={async () => {
+                            toast.dismiss(t.id);
+                            try {
+                                const res = await axios.delete(`${url}/api/user/delete/${id}`);
+                                if (res.data && res.data.success) {
+                                    setUsers((prev) => prev.filter((u) => u._id !== id));
+                                    toast.success('User deleted successfully', toastStyle);
+                                } else {
+                                    toast.error('Deletion failed, check the server', errorToastStyle);
+                                }
+                            } catch (error) {
+                                console.error("Error in deleting the user");
+                                toast.error('Deletion failed', errorToastStyle);
+                            }
+                        }}
+                        style={{ padding: '8px 20px', background: '#dc2626', color: 'white', border: '3px solid black', fontWeight: '900', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em', fontSize: '12px' }}
+                    >
+                        Delete
+                    </button>
+                    <button
+                        onClick={() => toast.dismiss(t.id)}
+                        style={{ padding: '8px 20px', background: '#e5e5e5', color: 'black', border: '3px solid black', fontWeight: '900', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em', fontSize: '12px' }}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        ), {
+            duration: Infinity,
+            style: {
+                border: '3px solid black',
+                padding: '16px',
+                borderRadius: '0',
+                backgroundColor: '#f9f9f6',
+            },
+        });
     };
 
     useEffect(() => {

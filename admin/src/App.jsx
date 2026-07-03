@@ -19,7 +19,20 @@ function App() {
   return (
     <>
 
-      <Toaster/>
+      <Toaster 
+        position="top-center" 
+        toastOptions={{
+          style: {
+            border: '3px solid black',
+            padding: '16px',
+            color: 'black',
+            fontWeight: '900',
+            textTransform: 'uppercase',
+            borderRadius: '0',
+            backgroundColor: '#f9f9f6',
+          }
+        }}
+      />
       <Sidebar />
       <Routes>
         <Route path='/' element={<Navigate to='/admin' />} />
