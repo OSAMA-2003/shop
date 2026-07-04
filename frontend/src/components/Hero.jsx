@@ -124,7 +124,7 @@ const Hero = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => {
-                document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('collection')?.scrollIntoView({ behavior: 'smooth' });
               }}
               className="inline-flex items-center  gap-2 px-10 md:px-20 py-4 hover:bg-[#ff5500] border-1 border-white text-[13px] font-black uppercase tracking-widest bg-black text-white transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
             >

@@ -44,7 +44,7 @@ const cardVariants = {
   },
 };
 
-const Categories = () => {
+const CollectionSection = () => {
   const [displayCount, setDisplayCount] = useState(6);
   const { all_products, loading } = useContext(ShopContext);
   const navigate = useNavigate();
@@ -162,26 +162,24 @@ const Categories = () => {
           )}
         </AnimatePresence>
 
-        {/* Load More Logic */}
-        {displayCount < filteredProducts.length && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: false }}
-            className='text-center mt-12'
+        {/* View All Collection Button */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: false }}
+          className='text-center mt-12'
+        >
+          <button
+            onClick={() => navigate('/collection')}
+            className='px-10 py-4 bg-black text-white border-[2px] border-black font-bold uppercase tracking-widest text-sm hover:bg-[#ff5500] transition-colors duration-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px] cursor-pointer'
           >
-            <button
-              onClick={() => setDisplayCount(prev => Math.min(prev + 6, filteredProducts.length))}
-              className='px-10 py-4 bg-black text-white border-[2px] border-black font-bold uppercase tracking-widest text-sm hover:bg-[#ff5500] transition-colors duration-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px]'
-            >
-              Load More
-            </button>
-          </motion.div>
-        )}
+            View All Collection
+          </button>
+        </motion.div>
 
       </div>
     </section>
   )
 };
 
-export default Categories;
+export default CollectionSection;

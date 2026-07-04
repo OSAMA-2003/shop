@@ -1,8 +1,8 @@
 import React, { useContext } from 'react'
-import { Link } from 'react-router-dom'
 import MockupGrid from '../components/MockupGrid'
 import { ShopContext } from '../context/ShopContenxt'
 import CardSkeleton from '../components/CardSkeleton'
+import Footer from '../components/Footer'
 
 export default function Mockups() {
   const { all_mockups, loading } = useContext(ShopContext);
@@ -13,16 +13,16 @@ export default function Mockups() {
     preview: m.imageFront || m.image,
     printable: { x: 150, y: 150, width: 300, height: 400 }, // Default mapping to canvas layout
     colors: [
-      { name: 'Black', hex: '#000000' }
+      { name: m.color || 'Black', hex: m.color === 'White' ? '#FFFFFF' : m.color === 'Red' ? '#FF0000' : m.color === 'Blue' ? '#0000FF' : m.color === 'Gray' ? '#808080' : '#000000' }
     ],
   }));
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 py-30 ">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50 flex flex-col text-black font-sans">
+      <div className="max-w-7xl mx-auto flex-grow w-full px-6 sm:px-10 pt-32 pb-20">
         <div className="mb-8 text-center">
-          <h1 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter mb-2 leading-none">
-            <span className="text-[#ff5500]">Design</span>  Your Own Product
+          <h1 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter mb-2 leading-none text-black">
+            <span className="text-[#ff5500]">Design</span> Your Own Product
           </h1>
           <p className="text-gray-600">Choose a product and customize it with your design</p>
         </div>
@@ -45,6 +45,7 @@ export default function Mockups() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   )
 }

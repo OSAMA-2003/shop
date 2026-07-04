@@ -68,16 +68,16 @@ const Footer = () => {
 
   const quickLinks = [
     { label: 'Home', to: 'home' },
-    { label: 'Collection', to: 'categories' },
+    { label: 'Collection', to: '/collection', isPage: true },
     { label: 'Mockups', to: 'mockups' },
     { label: 'Contact', to: 'contact' },
   ];
 
   const collections = [
-    { label: 'Urban Apparel', to: 'categories' },
-    { label: 'Streetwear Tees', to: 'categories' },
-    { label: 'Premium Hoodies', to: 'categories' },
-    { label: 'Accessories', to: 'categories' },
+    { label: 'Urban Apparel', to: '/collection', isPage: true },
+    { label: 'Streetwear Tees', to: '/collection', isPage: true },
+    { label: 'Premium Hoodies', to: '/collection', isPage: true },
+    { label: 'Accessories', to: '/collection', isPage: true },
   ];
 
   return (
@@ -143,9 +143,16 @@ const Footer = () => {
               Navigation
             </h3>
             <ul className="space-y-2.5">
-              {quickLinks.map(({ label, to }) => (
+              {quickLinks.map(({ label, to, isPage }) => (
                 <li key={label}>
-                  {location.pathname === '/' ? (
+                  {isPage ? (
+                    <button
+                      onClick={() => navigate(to)}
+                      className="text-gray-400 hover:text-[#ff5500] transition-colors text-left text-sm font-bold uppercase tracking-wider block py-1 cursor-pointer border-none bg-transparent"
+                    >
+                      {label}
+                    </button>
+                  ) : location.pathname === '/' ? (
                     <ScrollLink
                       to={to}
                       smooth={true}
@@ -158,7 +165,7 @@ const Footer = () => {
                   ) : (
                     <button
                       onClick={() => navigate('/')}
-                      className="text-gray-400 hover:text-[#ff5500] transition-colors text-left text-sm font-bold uppercase tracking-wider block py-1 cursor-pointer"
+                      className="text-gray-400 hover:text-[#ff5500] transition-colors text-left text-sm font-bold uppercase tracking-wider block py-1 cursor-pointer border-none bg-transparent"
                     >
                       {label}
                     </button>
@@ -174,9 +181,16 @@ const Footer = () => {
               Collections
             </h3>
             <ul className="space-y-2.5">
-              {collections.map(({ label, to }) => (
+              {collections.map(({ label, to, isPage }) => (
                 <li key={label}>
-                  {location.pathname === '/' ? (
+                  {isPage ? (
+                    <button
+                      onClick={() => navigate(to)}
+                      className="text-gray-400 hover:text-[#ff5500] transition-colors text-left text-sm font-bold uppercase tracking-wider block py-1 cursor-pointer border-none bg-transparent"
+                    >
+                      {label}
+                    </button>
+                  ) : location.pathname === '/' ? (
                     <ScrollLink
                       to={to}
                       smooth={true}
@@ -189,7 +203,7 @@ const Footer = () => {
                   ) : (
                     <button
                       onClick={() => navigate('/')}
-                      className="text-gray-400 hover:text-[#ff5500] transition-colors text-left text-sm font-bold uppercase tracking-wider block py-1 cursor-pointer"
+                      className="text-gray-400 hover:text-[#ff5500] transition-colors text-left text-sm font-bold uppercase tracking-wider block py-1 cursor-pointer border-none bg-transparent"
                     >
                       {label}
                     </button>
@@ -208,24 +222,7 @@ const Footer = () => {
               Join the underground. Get 10% off your first drop.
             </p>
 
-            <form onSubmit={handleSubscribe} className="flex flex-col gap-2 pt-1">
-              <div className="flex items-center border-[2px] border-zinc-800 focus-within:border-[#ff5500] bg-zinc-950 px-3 py-2 transition-colors">
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="YOU@EXAMPLE.COM"
-                  className="w-full bg-transparent border-none text-white text-xs font-bold font-mono uppercase focus:outline-none placeholder-zinc-600"
-                />
-                <button
-                  type="submit"
-                  aria-label="Subscribe"
-                  className="text-gray-400 hover:text-[#ff5500] transition-colors cursor-pointer"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
-            </form>
+
 
             <div className="space-y-2 pt-2">
               <div className="flex items-center gap-2.5 text-xs font-mono font-semibold text-gray-400">
@@ -249,7 +246,7 @@ const Footer = () => {
           {/* Left: Copyright */}
           <motion.div variants={itemVariants} className="text-center md:text-left">
             <p className="font-mono text-xs font-bold text-gray-500 uppercase">
-              © {new Date().getFullYear()} E-Commerce. All rights reserved.
+              © {new Date().getFullYear()} Kyandr. All rights reserved.
             </p>
           </motion.div>
 

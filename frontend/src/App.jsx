@@ -18,6 +18,7 @@ import { Toaster } from 'react-hot-toast'
 import Mockups from './pages/Mockups'
 import MockupCustomizer from './pages/MockupCustomizer'
 import Profile from './pages/Profile'
+import Collection from './pages/Collection'
 
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
         <Navbar/>
       <Routes>
         <Route path='/' element={<Home />} />
+        <Route path='/collection' element={<Collection />} />
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<SignUp />} />
         <Route path='/verify' element={<Verify />} />
