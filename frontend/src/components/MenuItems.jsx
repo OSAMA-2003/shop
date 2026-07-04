@@ -6,9 +6,8 @@ import { ShopContext } from '../context/ShopContenxt';
 
 export const menuItemsData = [
     { to: "home", label: "Home", Icon: Home },
-    { to: "categories", label: "Categories", Icon: FolderOpen },
+    { to: "categories", label: "Collection", Icon: FolderOpen },
     { to: "mockups", label: "Mockups", Icon: Shirt },
-    // { to: "shop", label: "Shop", Icon: ShoppingBag },
     { to: "contact", label: "Contact", Icon: Mail },
 ];
 

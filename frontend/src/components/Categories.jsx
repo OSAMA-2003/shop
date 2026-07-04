@@ -64,7 +64,7 @@ const Categories = () => {
           viewport={{ once: false, amount: 0.5 }}
           className='text-6xl sm:text-7xl font-black uppercase text-center tracking-tighter mb-4 leading-none'
         >
-          New <span className="text-[#ff5500]">Arrivals</span>
+          New <span className="text-[#ff5500]">Collection</span>
         </motion.h2>
 
         {/* Removed Filter Buttons */}

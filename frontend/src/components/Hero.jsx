@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import desktopHeroImage from "../assets/hero-bg3.jpg";
-import mobileHeroImage from "../assets/mobile-hero.jpg";
+import desktopHeroImage from "../assets/hero-bg.png";
+import mobileHeroImage from "../assets/mobile-hero.png";
 import { useNavigate } from 'react-router-dom';
 import logo from "../assets/logo.png";
 
@@ -114,7 +114,7 @@ const Hero = () => {
               onClick={() => {
                 document.getElementById('mockups')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="inline-flex items-start  justify-start  gap-2 px-5 md:px-20 py-4 bg-[#ff5500] border-[1px] border-black hover:border-white text-white text-sm font-black uppercase tracking-widest hover:bg-black transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
+              className="inline-flex items-start  justify-start  gap-2 px-5 md:px-20 py-4 bg-[#ff5500] border-[1px] border-black hover:border-white text-white text-[13px] font-black uppercase tracking-widest hover:bg-black transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
             >
               Explore Mockups
             </motion.button>
@@ -126,7 +126,7 @@ const Hero = () => {
               onClick={() => {
                 document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="inline-flex items-center  gap-2 px-10 md:px-20 py-4 hover:bg-[#ff5500] border-1 border-white text-sm font-black uppercase tracking-widest bg-black text-white transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
+              className="inline-flex items-center  gap-2 px-10 md:px-20 py-4 hover:bg-[#ff5500] border-1 border-white text-[13px] font-black uppercase tracking-widest bg-black text-white transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
             >
               View Collections
             </motion.button>
