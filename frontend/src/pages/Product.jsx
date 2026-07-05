@@ -88,8 +88,8 @@ const Product = () => {
     try {
       await addToCart(product._id, quantity, selectedSize);
       toast.success(
-        isRTL 
-          ? `تم إضافة ${dispName} (مقاس: ${selectedSize}) إلى السلة!` 
+        isRTL
+          ? `تم إضافة ${dispName} (مقاس: ${selectedSize}) إلى السلة!`
           : `Added ${dispName} (Size: ${selectedSize}) to the cart!`
       );
     } catch (err) {
@@ -123,15 +123,15 @@ const Product = () => {
         </motion.div>
 
         {/* RIGHT: CONTENT SECTION */}
-        <motion.div variants={contentVariants} className={`md:w-1/2 flex flex-col justify-start pt-2 ${isRTL ? 'items-end text-right' : 'items-start text-left'}`}>
+        <motion.div variants={contentVariants} className={`md:w-1/2 flex flex-col justify-start pt-2 ${isRTL ? 'items-start' : 'items-start text-left'}`}>
           {/* Title */}
-          <motion.h1 variants={itemVariants} className="text-5xl sm:text-6xl md:text-7xl font-black uppercase tracking-tighter leading-[0.95] mb-2 w-full">
+          <motion.h1 variants={itemVariants} className="text-5xl sm:text-6xl md:text-7xl font-black uppercase tracking-tighter  mb-2 w-full">
             {dispName}
           </motion.h1>
 
           {/* Price */}
-          <motion.p variants={itemVariants} className="text-3xl sm:text-4xl font-bold tracking-tight mb-6 text-[#ff5500]">
-            {Number(product.price).toFixed(2)} {t('dashboard.egp')}
+          <motion.p variants={itemVariants} className="text-3xl sm:text-4xl font-bold tracking-tight my-6 text-[#ff5500]">
+            {Number(product.price).toFixed(2)} EGP
           </motion.p>
 
           {/* Description */}

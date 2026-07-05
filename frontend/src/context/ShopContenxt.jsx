@@ -158,9 +158,8 @@ const ShopContextProvider = ({ children }) => {
         });
 
         const subtotal = getTotalCartAmount();
-        const shipping = 10;
-        const tax = subtotal * 0.08;
-        const totalAmount = subtotal + shipping + tax;
+        const shipping = subtotal > 0 ? 100 : 0;
+        const totalAmount = subtotal + shipping;
 
         const formDataPayload = new FormData();
         formDataPayload.append("address", JSON.stringify(orderData));

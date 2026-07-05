@@ -1,6 +1,9 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import notificationsModel from "../models/notificationsModel.js";
+import productModel from "../models/productModel.js";
+import mockupModel from "../models/mockupModel.js";
+import customizedMockupModel from "../models/customizedMockupModel.js";
 import Stripe from "stripe";
 
 const getStripe = () => {
@@ -44,10 +47,27 @@ const placeOrder = async(req,res)=>{
             paymentScreenshotUrl = req.file.path.replace(/\\/g, '/'); // URL from CloudinaryStorage or normalized local path
         }
 
+        // Securely calculate total amount on the backend
+        let calculatedSubtotal = 0;
+        for (const item of itemsData) {
+            let dbItem = null;
+            const itemId = item._id || item.id;
+            if (itemId) {
+                dbItem = await productModel.findById(itemId)
+                    || await mockupModel.findById(itemId)
+                    || await customizedMockupModel.findById(itemId);
+            }
+            const price = dbItem ? dbItem.price : Number(item.price || 0);
+            calculatedSubtotal += price * (item.quantity || 1);
+        }
+
+        const shipping = calculatedSubtotal > 0 ? 100 : 0;
+        const totalAmount = calculatedSubtotal + shipping;
+
         const newOrder = new orderModel({
             userId : req.userId,
             items : itemsData,
-            amount : Number(req.body.amount),
+            amount : totalAmount,
             address : addressMapped,
             paymentScreenshot: paymentScreenshotUrl,
             payment: false, // Initially false, admin verifies manually
