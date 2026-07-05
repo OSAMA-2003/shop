@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Loader2 } from "lucide-react";
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 // 1. Define Animation Variants
 const sectionVariants = {
@@ -24,7 +25,6 @@ const headerVariants = {
   },
 };
 
-// Left column items slide in from the left
 const leftCardVariants = {
   hidden: { x: -40, opacity: 0 },
   visible: {
@@ -34,7 +34,6 @@ const leftCardVariants = {
   },
 };
 
-// Right column form slides in from the right
 const rightFormVariants = {
   hidden: { x: 40, opacity: 0 },
   visible: {
@@ -45,6 +44,9 @@ const rightFormVariants = {
 };
 
 const Contact = () => {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -61,7 +63,7 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
     await new Promise((resolve) => setTimeout(resolve, 800));
-    toast.success(`${formData.name}, Thank you for contacting us!`);
+    toast.success(isRTL ? `${formData.name}، شكراً لتواصلك معنا!` : `${formData.name}, Thank you for contacting us!`);
     setFormData({ name: "", email: "", message: "" });
     setIsSubmitting(false);
   };
@@ -78,12 +80,11 @@ const Contact = () => {
         
         {/* HEADING */}
         <motion.div variants={headerVariants} className='mb-16'>
-          <h2 className=' text-center text-6xl sm:text-7xl font-black uppercase tracking-tighter mb-4 leading-none'>
-            Contact <span className="text-[#ff5500]">Us</span>
+          <h2 className='text-center text-6xl sm:text-7xl font-black uppercase tracking-tighter mb-4 leading-none'>
+            {t('contact.title')} <span className="text-[#ff5500]">{t('contact.accentTitle')}</span>
           </h2>
           <p className='font-mono text-lg font-bold text-black/70 max-w-2xl mx-auto text-center'>
-            {/* Added a small placeholder text to complement the heading */}
-            Drop us a line. We typically respond within 24 hours.
+            {t('contact.subtitle')}
           </p>
         </motion.div>
 
@@ -93,54 +94,54 @@ const Contact = () => {
           {/* LEFT: INFO CARDS */}
           <div className='space-y-6'>
             
-            {/* Address Card Wrapper */}
+            {/* Address Card */}
             <motion.div variants={leftCardVariants}>
-              <div className='flex items-center gap-6 bg-white border-[4px] border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all'>
+              <div className={`flex items-center gap-6 bg-white border-[4px] border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}>
                 <div className='w-16 h-16 shrink-0 bg-[#e5e5e5] border-[3px] border-black flex items-center justify-center'>
                   <MapPin className='w-8 h-8 text-black' strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h4 className='font-black uppercase tracking-widest text-xl mb-1'>Address</h4>
-                  <p className='font-mono font-bold text-sm text-black/70'>Imagination Street, Future City 123</p>
+                  <h4 className='font-black uppercase tracking-widest text-xl mb-1'>{t('contact.addressLabel')}</h4>
+                  <p className='font-mono font-bold text-sm text-black/70'>{t('contact.addressVal')}</p>
                 </div>
               </div>
             </motion.div>
 
-            {/* Phone Card Wrapper */}
+            {/* Phone Card */}
             <motion.div variants={leftCardVariants}>
-              <div className='flex items-center gap-6 bg-white border-[4px] border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all'>
-                <div className='w-16 h-16 shrink-0  border-[3px] bg-[#e5e5e5] border-black flex items-center justify-center'>
+              <div className={`flex items-center gap-6 bg-white border-[4px] border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}>
+                <div className='w-16 h-16 shrink-0 border-[3px] bg-[#e5e5e5] border-black flex items-center justify-center'>
                   <Phone className='w-8 h-8 text-black' strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h4 className='font-black uppercase tracking-widest text-xl mb-1'>Phone</h4>
-                  <p className='font-mono font-bold text-sm text-black/70'>+123 456 7890</p>
+                  <h4 className='font-black uppercase tracking-widest text-xl mb-1'>{t('contact.phoneLabel')}</h4>
+                  <p className='font-mono font-bold text-sm text-black/70'>{t('contact.phoneVal')}</p>
                 </div>
               </div>
             </motion.div>
 
-            {/* Email Card Wrapper */}
+            {/* Email Card */}
             <motion.div variants={leftCardVariants}>
-              <div className='flex items-center gap-6 bg-white border-[4px] border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all'>
+              <div className={`flex items-center gap-6 bg-white border-[4px] border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}>
                 <div className='w-16 h-16 shrink-0 bg-[#e5e5e5] border-[3px] border-black flex items-center justify-center'>
                   <Mail className='w-8 h-8 text-black' strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h4 className='font-black uppercase tracking-widest text-xl mb-1'>Email</h4>
-                  <p className='font-mono font-bold text-sm text-black/70'>support@ecommerce.com</p>
+                  <h4 className='font-black uppercase tracking-widest text-xl mb-1'>{t('contact.emailLabel')}</h4>
+                  <p className='font-mono font-bold text-sm text-black/70'>{t('contact.emailVal')}</p>
                 </div>
               </div>
             </motion.div>
 
-            {/* Whatsapp Card Wrapper */}
+            {/* Whatsapp Card */}
             <motion.div variants={leftCardVariants}>
-              <div className='flex items-center gap-6 bg-white border-[4px] border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all'>
-                <div className='w-16  h-16 bg-[#137901] shrink-0  border-[3px] border-black flex items-center justify-center'>
+              <div className={`flex items-center gap-6 bg-white border-[4px] border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}>
+                <div className='w-16 h-16 bg-[#137901] shrink-0 border-[3px] border-black flex items-center justify-center'>
                   <Phone className='w-8 h-8 text-white' strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h4 className='font-black  uppercase tracking-widest text-xl mb-1'>Whatsapp</h4>
-                  <p className='font-mono font-bold text-sm text-black/70'>0102931414</p>
+                  <h4 className='font-black uppercase tracking-widest text-xl mb-1'>{t('contact.whatsappLabel')}</h4>
+                  <p className='font-mono font-bold text-sm text-black/70'>{t('contact.whatsappVal')}</p>
                 </div>
               </div>
             </motion.div>
@@ -152,57 +153,57 @@ const Contact = () => {
               onSubmit={handleSubmit} 
               className='h-full bg-white border-[4px] border-black p-8 sm:p-10 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-6'
             >
-              <div className='flex flex-col'>
-                <label className='text-sm font-black uppercase tracking-widest mb-2'>Name *</label>
+              <div className={`flex flex-col ${isRTL ? 'items-end' : 'items-start'}`}>
+                <label className='text-sm font-black uppercase tracking-widest mb-2'>{t('contact.nameField')}</label>
                 <input
                   type='text'
                   name="name"
-                  placeholder='ENTER YOUR NAME'
+                  placeholder={t('contact.namePlaceholder')}
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className='w-full border-[3px] border-black p-4 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors'
+                  className={`w-full border-[3px] border-black p-4 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors ${isRTL ? 'text-right' : 'text-left'}`}
                 />
               </div>
 
-              <div className='flex flex-col'>
-                <label className='text-sm font-black uppercase tracking-widest mb-2'>Email *</label>
+              <div className={`flex flex-col ${isRTL ? 'items-end' : 'items-start'}`}>
+                <label className='text-sm font-black uppercase tracking-widest mb-2'>{t('contact.emailField')}</label>
                 <input
                   type='email'
                   name="email"
-                  placeholder='YOU@EXAMPLE.COM'
+                  placeholder={t('contact.emailPlaceholder')}
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className='w-full border-[3px] border-black p-4 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors'
+                  className={`w-full border-[3px] border-black p-4 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors ${isRTL ? 'text-right' : 'text-left'}`}
                 />
               </div>
 
-              <div className='flex flex-col flex-grow'>
-                <label className='text-sm font-black uppercase tracking-widest mb-2'>Message *</label>
+              <div className={`flex flex-col flex-grow ${isRTL ? 'items-end' : 'items-start'}`}>
+                <label className='text-sm font-black uppercase tracking-widest mb-2'>{t('contact.messageField')}</label>
                 <textarea
                   name='message'
-                  placeholder='HOW CAN WE HELP?'
+                  placeholder={t('contact.messagePlaceholder')}
                   value={formData.message}
                   onChange={handleChange}
                   required
                   rows={5}
-                  className='w-full h-full min-h-[150px] border-[3px] border-black p-4 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors resize-none'
+                  className={`w-full h-full min-h-[150px] border-[3px] border-black p-4 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors resize-none ${isRTL ? 'text-right' : 'text-left'}`}
                 ></textarea>
               </div>
 
               <button
                 type='submit'
                 disabled={isSubmitting}
-                className='w-full bg-[#ff5500] border-[3px] border-black py-4 mt-2 font-black text-2xl uppercase tracking-widest text-black hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2'
+                className='w-full bg-[#ff5500] border-[3px] border-black py-4 mt-2 font-black text-2xl uppercase tracking-widest text-black hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer'
               >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="animate-spin w-6 h-6 text-black" />
-                    Sending...
+                    {t('contact.sendingBtn')}
                   </>
                 ) : (
-                  'Send Message'
+                  t('contact.sendBtn')
                 )}
               </button>
             </form>

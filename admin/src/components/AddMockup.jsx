@@ -9,8 +9,10 @@ const AddMockup = () => {
     const [imageBack, setImageBack] = useState(null);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState({
-        name: '',
-        description: '',
+        name_en: '',
+        name_ar: '',
+        description_en: '',
+        description_ar: '',
         price: '',
     });
     const [selectedSizes, setSelectedSizes] = useState(["S", "M", "L", "XL"]);
@@ -52,8 +54,13 @@ const AddMockup = () => {
         setLoading(true);
 
         const formData = new FormData();
-        formData.append('name', data.name);
-        formData.append('description', data.description);
+        // Send fallback values for standard name/description so legacy code works
+        formData.append('name', data.name_en);
+        formData.append('name_en', data.name_en);
+        formData.append('name_ar', data.name_ar);
+        formData.append('description', data.description_en);
+        formData.append('description_en', data.description_en);
+        formData.append('description_ar', data.description_ar);
         formData.append('price', Number(data.price));
         formData.append('sizes', JSON.stringify(selectedSizes));
         if (imageFront) formData.append('imageFront', imageFront);
@@ -66,8 +73,10 @@ const AddMockup = () => {
             });
             if (res.data.success) {
                 setData({
-                    name: '',
-                    description: '',
+                    name_en: '',
+                    name_ar: '',
+                    description_en: '',
+                    description_ar: '',
                     price: '',
                 });
                 setSelectedSizes(["S", "M", "L", "XL"]);
@@ -89,28 +98,25 @@ const AddMockup = () => {
     };
 
     return (
-        <section className='relative max-w-screen mx-auto p-4 w-fullbg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans '>
-
+        <section className='relative max-w-screen mx-auto p-4 w-full bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans '>
             <form onSubmit={onSubmitHandler} className='max-w-3xl mx-auto'>
-
                 <div className='bg-white border-[4px] border-black p-8 sm:p-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'>
-
                     <div className='border-b-[4px] border-black pb-6 mb-8'>
                         <h2 className='text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none'>
-                            Add Mockup
+                            Add New Mockup Canvas
                         </h2>
                     </div>
 
                     <div className='flex flex-col gap-6'>
-
+                        {/* NAMES ROW */}
                         <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
                             <div className='flex flex-col'>
-                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Mockup Name *</label>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Mockup Name (English) *</label>
                                 <input
                                     type='text'
-                                    name='name'
-                                    placeholder='e.g., T-Shirt Front'
-                                    value={data.name}
+                                    name='name_en'
+                                    placeholder='e.g. Oversized Hoodie Mockup'
+                                    value={data.name_en}
                                     onChange={onChangeHandler}
                                     required
                                     className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors"
@@ -118,34 +124,64 @@ const AddMockup = () => {
                             </div>
 
                             <div className='flex flex-col'>
-                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Price ($) *</label>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Mockup Name (Arabic) *</label>
                                 <input
-                                    type='number'
-                                    name='price'
-                                    placeholder='0.00'
-                                    value={data.price}
+                                    type='text'
+                                    name='name_ar'
+                                    placeholder='مثال: هودي اوفر سايز موك اب'
+                                    value={data.name_ar}
                                     onChange={onChangeHandler}
                                     required
-                                    min="0"
-                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors"
+                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors text-right"
+                                    dir="rtl"
                                 />
                             </div>
                         </div>
 
-                        <div className='flex flex-col'>
-                            <label className='text-sm font-black uppercase tracking-widest mb-2'>Description *</label>
-                            <textarea
-                                name='description'
-                                placeholder='Enter mockup details...'
-                                value={data.description}
-                                onChange={onChangeHandler}
-                                required
-                                rows="3"
-                                className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors resize-none"
-                            />
+                        {/* DESCRIPTION ROW */}
+                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+                            <div className='flex flex-col'>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Mockup Description (English) *</label>
+                                <textarea
+                                    name='description_en'
+                                    placeholder='Detailed description of the mockup canvas in English'
+                                    value={data.description_en}
+                                    onChange={onChangeHandler}
+                                    required
+                                    rows="3"
+                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors resize-none"
+                                />
+                            </div>
+
+                            <div className='flex flex-col'>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Mockup Description (Arabic) *</label>
+                                <textarea
+                                    name='description_ar'
+                                    placeholder='وصف تفصيلي للموك اب باللغة العربية'
+                                    value={data.description_ar}
+                                    onChange={onChangeHandler}
+                                    required
+                                    rows="3"
+                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors resize-none text-right"
+                                    dir="rtl"
+                                />
+                            </div>
                         </div>
 
-                        {/* REMOVED CATEGORY & COLOR */}
+                        {/* PRICE */}
+                        <div className='flex flex-col'>
+                            <label className='text-sm font-black uppercase tracking-widest mb-2'>Price (EGP) *</label>
+                            <input
+                                type='number'
+                                name='price'
+                                placeholder='e.g. 500'
+                                value={data.price}
+                                onChange={onChangeHandler}
+                                required
+                                min="0"
+                                className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors"
+                            />
+                        </div>
 
                         {/* SIZES SELECTION */}
                         <div className='flex flex-col'>
@@ -171,9 +207,10 @@ const AddMockup = () => {
                             </div>
                         </div>
 
+                        {/* IMAGES UPLOADS */}
                         <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
                             <div className='flex flex-col'>
-                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Front Mockup Image *</label>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Upload Front Image *</label>
                                 <input
                                     type='file'
                                     accept='image/*'
@@ -195,7 +232,7 @@ const AddMockup = () => {
                             </div>
 
                             <div className='flex flex-col'>
-                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Back Mockup Image *</label>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Upload Back Image *</label>
                                 <input
                                     type='file'
                                     accept='image/*'
@@ -217,23 +254,29 @@ const AddMockup = () => {
                             </div>
                         </div>
 
+                        {/* SUBMIT BUTTON */}
                         <button
                             type='submit'
                             disabled={loading}
-                            className={`w-full mt-6 border-[3px] border-black py-4 font-black text-xl uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${loading
-                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none translate-y-[2px] translate-x-[2px]'
-                                : 'bg-[#ff5500] text-black hover:bg-black hover:text-[#ff5500] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]'
-                                }`}
+                            className={`w-full mt-6 border-[3px] border-black py-4 font-black text-xl uppercase tracking-widest transition-all flex items-center justify-center gap-2 cursor-pointer ${loading
+                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none translate-y-[2px] translate-x-[2px]'
+                                    : 'bg-[#ff5500] text-black hover:bg-black hover:text-[#ff5500] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]'
+                            }`}
                         >
-                            {loading && <Loader2 className="w-6 h-6 animate-spin text-gray-500" strokeWidth={3} />}
-                            <span>{loading ? "Publishing..." : "Publish Mockup"}</span>
+                            {loading ? (
+                                <>
+                                    <Loader2 className="w-6 h-6 animate-spin text-black" />
+                                    Saving...
+                                </>
+                            ) : (
+                                "Add Mockup"
+                            )}
                         </button>
-
                     </div>
                 </div>
             </form>
         </section>
     );
-}
+};
 
 export default AddMockup;

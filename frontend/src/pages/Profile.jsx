@@ -4,6 +4,7 @@ import { ShopContext } from '../context/ShopContenxt';
 import { User, Mail, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // 1. Define Animation Variants
 const pageVariants = {
@@ -53,12 +54,13 @@ const imageItemVariants = {
 };
 
 const Profile = () => {
+  const { t, i18n } = useTranslation();
   const { url, token, setToken } = useContext(ShopContext);
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const isRTL = i18n.language === 'ar';
 
-  // User data will be fetched from the backend.
   const [userData, setUserData] = useState({
     name: '',
     email: '',
@@ -109,7 +111,7 @@ const Profile = () => {
             setToken(false);
             navigate("/login");
           } else {
-            console.error("Failed to fetch profile data. Ensure backend is restarted and route exists:", err.response?.data || err.message);
+            console.error("Failed to fetch profile data:", err.response?.data || err.message);
           }
         }
       } finally {
@@ -118,22 +120,22 @@ const Profile = () => {
     };
 
     fetchData();
-  }, [token, navigate, url]);
+  }, [token, navigate, url, setToken]);
 
   if (loading) {
     return (
-      <motion.section 
-        initial={{ opacity: 0 }} 
-        animate={{ opacity: 1 }} 
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className='min-h-screen flex items-center justify-center bg-[#f9f9f6] text-black px-6 font-sans'
       >
-        <motion.h2 
+        <motion.h2
           animate={{ opacity: [0.3, 1, 0.3] }}
           transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
           className='text-3xl md:text-5xl font-black uppercase tracking-widest'
         >
-          Loading Profile...
+          {isRTL ? "جاري تحميل الحساب..." : "Loading Profile..."}
         </motion.h2>
       </motion.section>
     );
@@ -146,9 +148,23 @@ const Profile = () => {
     return 'bg-[#ff5500] text-black border-2 border-black';
   };
 
+  const translateStatus = (status) => {
+    const s = status?.toLowerCase() || '';
+    if (isRTL) {
+      if (s === 'delivered') return 'تم التوصيل';
+      if (s === 'cancelled') return 'تم الإلغاء';
+      if (s === 'shipped') return 'تم الشحن';
+      return 'قيد المراجعة';
+    }
+    return status || 'Pending';
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
+    if (isRTL) {
+      return date.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
   };
 
@@ -160,16 +176,15 @@ const Profile = () => {
 
   return (
     <section className='bg-[#f9f9f6] min-h-screen px-4 sm:px-3 py-32 font-sans text-black overflow-hidden'>
-      <motion.div 
+      <motion.div
         variants={pageVariants}
         initial="hidden"
         animate="visible"
         className='max-w-7xl mx-auto space-y-16'
       >
-        
         {/* USER PROFILE CARD */}
-        <motion.div variants={cardVariants} className='bg-white border-[4px] border-black p-6 sm:p-10 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'>
-          <div className='flex flex-col sm:flex-row items-center sm:items-start gap-6'>
+        <motion.div variants={cardVariants} className={`bg-white border-[4px] border-black p-6 sm:p-10 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
+          <div className={`flex flex-col sm:flex-row items-center sm:items-start gap-6 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
             {/* Avatar Block */}
             <div className='w-24 h-24 bg-[#ff5500] border-[3px] border-black flex items-center justify-center shrink-0 overflow-hidden'>
               {userData.pic ? (
@@ -178,13 +193,13 @@ const Profile = () => {
                 <User className='w-12 h-12 text-black' strokeWidth={3} />
               )}
             </div>
-            
+
             {/* User Info */}
-            <div className='text-center sm:text-left flex-1 pt-2'>
+            <div className={`flex-1 pt-2 ${isRTL ? 'text-center sm:text-right' : 'text-center sm:text-left'}`}>
               <h1 className='text-4xl sm:text-5xl font-black uppercase tracking-tighter mb-2 leading-none'>
                 {userData.name}
               </h1>
-              <div className='flex items-center justify-center sm:justify-start gap-2 font-mono text-sm sm:text-base text-black/80 mt-4'>
+              <div className={`flex items-center justify-center sm:justify-start gap-2 font-mono text-sm sm:text-base text-black/80 mt-4 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
                 <Mail className='w-5 h-5' strokeWidth={2} />
                 <p>{userData.email}</p>
               </div>
@@ -192,32 +207,32 @@ const Profile = () => {
           </div>
 
           {/* Logout Button */}
-          <button 
-            onClick={handleLogout} 
-            className='bg-white border-2 border-black px-6 py-3 font-black uppercase tracking-widest text-black flex items-center gap-2 hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]'
+          <button
+            onClick={handleLogout}
+            className='bg-white border-2 border-black px-6 py-3 font-black uppercase tracking-widest text-black flex items-center gap-2 hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] cursor-pointer'
           >
             <LogOut className='w-5 h-5' strokeWidth={2.5} />
-            Log Out
+            {t('profile.logout')}
           </button>
         </motion.div>
 
         {/* ORDERS SECTION */}
         <div>
           {/* Heavy Section Header */}
-          <motion.div variants={headerVariants} className='border-b-[6px] border-black pb-4 mb-10'>
+          <motion.div variants={headerVariants} className={`border-b-[6px] border-black pb-4 mb-10 ${isRTL ? 'text-right' : 'text-left'}`}>
             <h2 className='text-4xl sm:text-5xl font-black uppercase tracking-tighter'>
-              My Orders
+              {t('profile.ordersTitle')}
             </h2>
           </motion.div>
 
           {orders.length === 0 ? (
             <motion.div variants={cardVariants} className='bg-white border-[4px] border-black p-10 text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]'>
-              <p className='text-2xl font-black uppercase tracking-tight mb-8'>No orders found.</p>
-              <button 
-                onClick={() => navigate("/")} 
-                className='bg-[#ff5500] border-2 border-black px-8 py-4 font-black uppercase tracking-widest text-black hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]'
+              <p className='text-2xl font-black uppercase tracking-tight mb-8'>{t('profile.noOrders')}</p>
+              <button
+                onClick={() => navigate("/")}
+                className='bg-[#ff5500] border-2 border-black px-8 py-4 font-black uppercase tracking-widest text-black hover:bg-black hover:text-[#ff5500] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] cursor-pointer'
               >
-                Start Shopping
+                {t('cart.shopNow')}
               </button>
             </motion.div>
           ) : (
@@ -226,74 +241,75 @@ const Profile = () => {
                 const total = order.items?.reduce(
                   (sum, item) => sum + (item.price * (item.quantity || 1)), 0
                 ) || 0;
-                
+
                 return (
-                  <motion.div 
+                  <motion.div
                     variants={cardVariants}
-                    key={order._id} 
+                    key={order._id}
                     className='bg-white border-[4px] border-black p-6 flex flex-col justify-between shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]'
                   >
-                    
                     {/* ORDER HEADER */}
-                    <div className='flex flex-col sm:flex-row justify-between gap-4 mb-6 border-b-[3px] border-black pb-6'>
-                      {/* Left Column: Order ID & Status */}
-                      <div className='flex flex-col gap-3'>
+                    <div className={`flex flex-col sm:flex-row justify-between gap-4 mb-6 border-b-[3px] border-black pb-6 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
+                      {/* Left/Right Column: Order ID & Status */}
+                      <div className={`flex flex-col gap-3 ${isRTL ? 'items-end' : 'items-start'}`}>
                         <h3 className='text-xl sm:text-2xl font-black uppercase tracking-tight leading-none'>
-                          Order #{order._id.slice(-6).toUpperCase()}
+                          {isRTL ? `طلب #${order._id.slice(-6).toUpperCase()}` : `Order #${order._id.slice(-6).toUpperCase()}`}
                         </h3>
-                        <div className='flex items-center gap-2 text-sm sm:text-base font-black uppercase'>
-                          <span>Status:</span>
+                        <div className={`flex items-center gap-2 text-sm sm:text-base font-black uppercase ${isRTL ? 'flex-row-reverse' : ''}`}>
+                          <span>{isRTL ? 'الحالة:' : 'Status:'}</span>
                           <span className={`px-3 py-1 text-xs tracking-widest ${getStatusBadge(order.status)}`}>
-                            {order.status || 'Processing'}
+                            {translateStatus(order.status)}
                           </span>
                         </div>
                       </div>
 
-                      {/* Right Column: Date & Total */}
-                      <div className='flex flex-col gap-2 sm:text-right'>
+                      {/* Right/Left Column: Date & Total */}
+                      <div className={`flex flex-col gap-2 ${isRTL ? 'sm:text-left' : 'sm:text-right'}`}>
                         <p className='text-sm sm:text-base font-bold uppercase text-black/60 tracking-tight'>
-                          Date: {formatDate(order.date)}
+                          {isRTL ? 'التاريخ:' : 'Date:'} {formatDate(order.date)}
                         </p>
                         <p className='text-sm sm:text-base font-black uppercase tracking-tight'>
-                          Total: <span className='text-xl sm:text-2xl'>${total.toFixed(2)}</span>
+                          {isRTL ? 'الإجمالي:' : 'Total:'} <span className='text-xl sm:text-2xl text-[#ff5500]'>{total.toFixed(2)} EGP</span>
                         </p>
                       </div>
                     </div>
 
-                    {/* ORDER IMAGES GRID - Staggered sub-animation */}
-                    <motion.div 
+                    {/* ORDER IMAGES GRID */}
+                    <motion.div
                       variants={imageContainerVariants}
                       initial="hidden"
                       whileInView="visible"
                       viewport={{ once: true }}
-                      className='flex flex-wrap gap-4'
+                      className={`flex flex-wrap gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}
                     >
-                      {order.items?.map((item, index) => (
-                        <motion.div 
-                          variants={imageItemVariants}
-                          key={`${item._id}-${index}`} 
-                          className='w-24 h-28 sm:w-28 sm:h-32 bg-[#e5e5e5] border-2 border-black flex items-center justify-center p-2 relative group'
-                        >
-                          {/* Brutalist Quantity Badge */}
-                          {item.quantity > 1 && (
-                            <div className='absolute -top-3 -right-3 bg-black text-[#ff5500] border-2 border-black text-xs font-black w-8 h-8 flex items-center justify-center z-10'>
-                              x{item.quantity}
-                            </div>
-                          )}
-                          
-                          {item.image && (
-                            <img 
-                              src={item.image}
-                              alt={item.name}
-                              className='w-full h-full object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-110'
-                            />
-                          )}
-                        </motion.div>
-                      ))}
-                    </motion.div>
+                      {order.items?.map((item, index) => {
+                        const dispItemName = item['name_' + i18n.language] || item.name;
+                        return (
+                          <motion.div
+                            variants={imageItemVariants}
+                            key={`${item._id}-${index}`}
+                            className='w-24 h-28 sm:w-28 sm:h-32 bg-[#e5e5e5] border-2 border-black flex items-center justify-center p-2 relative group'
+                          >
+                            {/* Quantity Badge */}
+                            {item.quantity > 1 && (
+                              <div className='absolute -top-3 -right-3 bg-black text-[#ff5500] border-2 border-black text-xs font-black w-8 h-8 flex items-center justify-center z-10'>
+                                x{item.quantity}
+                              </div>
+                            )}
 
+                            {item.image && (
+                              <img
+                                src={item.image}
+                                alt={dispItemName}
+                                className='w-full h-full object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-110'
+                              />
+                            )}
+                          </motion.div>
+                        );
+                      })}
+                    </motion.div>
                   </motion.div>
-                )
+                );
               })}
             </div>
           )}

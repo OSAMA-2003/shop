@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import './App.css'
 import Login from './components/Login'
 import Home from './pages/Home'
@@ -23,13 +24,14 @@ import Collection from './pages/Collection'
 
 function App() {
   const location = useLocation();
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
   return (
-    <>
+    <div dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
       <Toaster 
         position="top-center" 
         toastOptions={{
@@ -41,7 +43,7 @@ function App() {
             textTransform: 'uppercase',
             borderRadius: '0',
             background: '#F5F2EB',
-            fontFamily: "'Roboto', sans-serif",
+            fontFamily: i18n.language === 'ar' ? "'Cairo', sans-serif" : "'Roboto', sans-serif",
             boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)',
           }
         }}
@@ -66,7 +68,7 @@ function App() {
       </Routes>
     </ShopContextProvider>
    
-    </>
+    </div>
   )
 }
 

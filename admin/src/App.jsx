@@ -3,7 +3,7 @@ import Add from './components/AddProduct.jsx'
 import List from './components/List.jsx'
 import Orders from './components/Orders.jsx'
 import Sidebar from './components/Sidebar.jsx'
-import { Route, Routes, Navigate } from 'react-router-dom'
+import { Route, Routes, Navigate, useLocation } from 'react-router-dom'
 import './App.css'
 import AdminLogin from './components/AdminLogin.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
@@ -15,9 +15,11 @@ import Notifications from './components/Notifications.jsx'
 import DashboardHome from './components/DashboardHome.jsx'
 
 function App() {
+  const location = useLocation();
+  const showSidebar = !location.pathname.includes('/admin/login');
 
   return (
-    <>
+    <div>
 
       <Toaster 
         position="top-center" 
@@ -33,8 +35,9 @@ function App() {
           }
         }}
       />
-      <Sidebar />
-      <Routes>
+      {showSidebar && <Sidebar />}
+      <div className={showSidebar ? 'md:ml-64' : ''}>
+        <Routes>
         <Route path='/' element={<Navigate to='/admin' />} />
         <Route path='/admin/login' element={<AdminLogin />} />
 
@@ -95,12 +98,8 @@ function App() {
 
 
       </Routes>
-
-
-      
-
-
-    </>
+      </div>
+    </div>
   )
 }
 

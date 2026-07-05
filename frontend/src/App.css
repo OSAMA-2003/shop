@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -9,6 +9,10 @@
 body {
   background-color: rgb(236, 236, 236);
   font-family: 'Roboto', sans-serif !important;
+}
+
+[dir="rtl"], [dir="rtl"] * {
+  font-family: 'Cairo', sans-serif !important;
 }
 
 button {

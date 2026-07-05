@@ -31,7 +31,7 @@ function Notifications() {
     };
 
     const clearAll = async () => {
-        toast((t) => (
+        toast((toastRef) => (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
                 <span style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '14px' }}>
                     🗑️ Clear all notifications?
@@ -39,7 +39,7 @@ function Notifications() {
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <button
                         onClick={async () => {
-                            toast.dismiss(t.id);
+                            toast.dismiss(toastRef.id);
                             try {
                                 await axios.delete(`${url}/api/notifications/clear`);
                                 setNotifications([]);
@@ -74,7 +74,7 @@ function Notifications() {
                         Clear All
                     </button>
                     <button
-                        onClick={() => toast.dismiss(t.id)}
+                        onClick={() => toast.dismiss(toastRef.id)}
                         style={{ padding: '8px 20px', background: '#e5e5e5', color: 'black', border: '3px solid black', fontWeight: '900', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em', fontSize: '12px' }}
                     >
                         Cancel
@@ -107,7 +107,7 @@ function Notifications() {
 
     if (loading) {
         return (
-            <section className='min-h-screen flex items-center justify-center bg-[#f9f9f6] text-black  font-sans'>
+            <section className='min-h-screen flex items-center justify-center bg-[#f9f9f6] text-black font-sans'>
                 <div className='bg-white border-[4px] border-black p-10 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'>
                     <h2 className='text-2xl sm:text-3xl font-black uppercase tracking-widest animate-pulse'>Loading Notifications...</h2>
                 </div>
@@ -116,7 +116,7 @@ function Notifications() {
     }
 
     return (
-        <section className='relative w-full  min-h-screen bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans'>
+        <section className='relative w-full min-h-screen bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans'>
             <div className='max-w-4xl mx-auto'>
 
                 {/* HEADING ROW */}
@@ -129,7 +129,7 @@ function Notifications() {
                     {notifications.length > 0 && (
                         <button
                             onClick={clearAll}
-                            className='flex items-center justify-center gap-2 px-6 py-3 bg-white border-[3px] border-black text-black font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]'
+                            className='flex items-center justify-center gap-2 px-6 py-3 bg-white border-[3px] border-black text-black font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] cursor-pointer'
                         >
                             <Trash2 className='w-5 h-5' strokeWidth={2.5} />
                             Clear All
@@ -155,7 +155,6 @@ function Notifications() {
                             >
                                 <div className='flex-1'>
                                     <div className='flex items-center gap-3 mb-2'>
-                                        {/* UNREAD BADGE */}
                                         {!n.isRead && (
                                             <span className='bg-[#ff5500] text-black px-2 py-0.5 text-[10px] font-black uppercase border-2 border-black tracking-widest'>
                                                 New
@@ -182,7 +181,7 @@ function Notifications() {
                                         <button
                                             onClick={() => markAsRead(n._id)}
                                             title="Mark as read"
-                                            className='flex-1 sm:flex-none flex items-center justify-center p-3 border-2 border-black bg-white text-black hover:bg-[#4ade80] hover:text-black transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]'
+                                            className='flex-1 sm:flex-none flex items-center justify-center p-3 border-2 border-black bg-white text-black hover:bg-[#4ade80] hover:text-black transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer'
                                         >
                                             <CheckCheck className='w-5 h-5' strokeWidth={2.5} />
                                         </button>
@@ -190,7 +189,7 @@ function Notifications() {
                                     <button
                                         onClick={() => deleteNotification(n._id)}
                                         title="Delete"
-                                        className='flex-1 sm:flex-none flex items-center justify-center p-3 border-2 border-black bg-white text-black hover:bg-red-600 hover:text-white transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]'
+                                        className='flex-1 sm:flex-none flex items-center justify-center p-3 border-2 border-black bg-white text-black hover:bg-red-600 hover:text-white transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer'
                                     >
                                         <X className='w-5 h-5' strokeWidth={3} />
                                     </button>

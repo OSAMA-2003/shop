@@ -39,7 +39,7 @@ const Orders = () => {
     };
 
     const deleteOrder = async (orderId) => {
-        toast((t) => (
+        toast((toastRef) => (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
                 <span style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '14px' }}>
                     🗑️ Delete this order? This cannot be undone.
@@ -47,7 +47,7 @@ const Orders = () => {
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <button
                         onClick={async () => {
-                            toast.dismiss(t.id);
+                            toast.dismiss(toastRef.id);
                             setDeletingOrderId(orderId);
                             try {
                                 const token = localStorage.getItem('adminToken');
@@ -73,7 +73,7 @@ const Orders = () => {
                         Delete
                     </button>
                     <button
-                        onClick={() => toast.dismiss(t.id)}
+                        onClick={() => toast.dismiss(toastRef.id)}
                         style={{ padding: '8px 20px', background: '#e5e5e5', color: 'black', border: '3px solid black', fontWeight: '900', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em', fontSize: '12px' }}
                     >
                         Cancel
@@ -115,7 +115,6 @@ const Orders = () => {
         try {
             let fileCount = 0;
 
-            // Helper to download url to arrayBuffer or blob
             const urlToPromise = async (url) => {
                 if (url.startsWith('data:')) {
                     const res = await fetch(url);
@@ -126,7 +125,6 @@ const Orders = () => {
                 return response.blob();
             };
 
-            // 1. Add Front Preview
             if (item.imageFront) {
                 try {
                     const blob = await urlToPromise(item.imageFront);
@@ -137,7 +135,6 @@ const Orders = () => {
                 }
             }
 
-            // 2. Add Back Preview
             if (item.imageBack) {
                 try {
                     const blob = await urlToPromise(item.imageBack);
@@ -148,7 +145,6 @@ const Orders = () => {
                 }
             }
 
-            // 3. Add Uploaded Assets
             if (item.uploadedImages && item.uploadedImages.length > 0) {
                 for (let i = 0; i < item.uploadedImages.length; i++) {
                     try {
@@ -216,7 +212,6 @@ const Orders = () => {
         }
     };
 
-    // Format date to show Date + Hour/Minute
     const formatDateTime = (dateString) => {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
@@ -235,7 +230,6 @@ const Orders = () => {
         try {
             const res = await axios.get(`${url}/api/order/list`);
             if (res.data.success) {
-                // SORTING: Newest to Oldest based on 'date' or 'createdAt'
                 const sortedOrders = res.data.data.sort((a, b) => {
                     const dateA = new Date(a.date || a.createdAt);
                     const dateB = new Date(b.date || b.createdAt);
@@ -273,7 +267,6 @@ const Orders = () => {
             } else {
                 toast.error('Error updating status', errorToastStyle);
             }
-
         } catch (err) {
             console.log(err);
             toast.error("Server error", errorToastStyle);
@@ -302,7 +295,6 @@ const Orders = () => {
             } else {
                 toast.error('Error updating payment status', errorToastStyle);
             }
-
         } catch (err) {
             console.log(err);
             toast.error("Server error", errorToastStyle);
@@ -317,7 +309,7 @@ const Orders = () => {
 
     if (loading) {
         return (
-            <section className='min-h-screen flex items-center justify-center bg-[#f9f9f6] text-black px-6 md:ml-64 font-sans'>
+            <section className='min-h-screen flex items-center justify-center bg-[#f9f9f6] text-black px-6 font-sans'>
                 <div className='flex flex-col items-center'>
                     <h2 className='text-4xl font-black uppercase tracking-widest animate-pulse'>Loading Orders...</h2>
                 </div>
@@ -326,138 +318,138 @@ const Orders = () => {
     }
 
     return (
-        <>
-            <section className='relative max-w-5xl mx-auto  text-black py-16 px-6 sm:px-10 font-sans'>
+        <section className='relative max-w-5xl mx-auto text-black py-16 px-6 sm:px-10 font-sans'>
+            {/* HEADING */}
+            <div className='max-w-screen mx-auto border-b-[4px] border-black pb-6 mb-10'>
+                <h2 className='text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none'>
+                    Customer Orders
+                </h2>
+            </div>
 
-                {/* HEADING */}
-                <div className='max-w-screen mx-auto border-b-[4px] border-black pb-6 mb-10'>
-                    <h2 className='text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none'>
-                        Customer Orders
-                    </h2>
-                </div>
+            <div className='max-w-screen mx-auto'>
+                {orders.length === 0 ? (
+                    <div className='bg-white border-[4px] border-black p-10 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'>
+                        <p className='text-2xl font-black uppercase tracking-tight'>No orders found.</p>
+                    </div>
+                ) : (
+                    <div className='grid gap-8 lg:grid-cols-2'>
+                        {orders.map((order) => {
+                            const total = order.items?.reduce(
+                                (sum, item) => sum + item.price * (item.quantity || 1), 0
+                            );
 
-                <div className='max-w-screen mx-auto'>
-                    {orders.length === 0 ? (
-                        <div className='bg-white border-[4px] border-black p-10 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'>
-                            <p className='text-2xl font-black uppercase tracking-tight'>No orders found.</p>
-                        </div>
-                    ) : (
-                        <div className='grid gap-8 lg:grid-cols-2'>
-                            {orders.map((order) => {
-                                const total = order.items?.reduce(
-                                    (sum, item) => sum + item.price * (item.quantity || 1), 0
-                                );
-
-                                return (
-                                    <div
-                                        key={order._id}
-                                        className='bg-white border-[4px] border-black p-6 sm:p-8 flex flex-col justify-between shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-4px] hover:translate-x-[-4px] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all'
-                                    >
-                                        <div>
-                                            {/* ORDER HEADER */}
-                                            <div className='flex flex-col sm:flex-row justify-between sm:items-end border-b-[3px] border-black pb-4 mb-6'>
-                                                <div>
-                                                    <h2 className='text-2xl font-black uppercase tracking-tighter'>
-                                                        #{order._id.slice(-6).toUpperCase()}
-                                                    </h2>
-                                                    <p className='text-sm font-bold text-black/60 tracking-widest mt-1'>
-                                                        {formatDateTime(order.date || order.createdAt)}
-                                                    </p>
-                                                </div>
-                                                <div className='mt-2 sm:mt-0 text-right flex flex-col items-end gap-2'>
-                                                    <span className='text-3xl font-black text-[#ff5500]'>
-                                                        ${total?.toFixed(2)}
-                                                    </span>
-                                                    <button
-                                                        onClick={() => deleteOrder(order._id)}
-                                                        disabled={deletingOrderId === order._id}
-                                                        className='text-xs font-black uppercase tracking-widest bg-red-500 text-white border-[2px] border-black px-3 py-1 hover:bg-black transition-colors flex items-center gap-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px] disabled:opacity-50'
-                                                    >
-                                                        {deletingOrderId === order._id ? (
-                                                            <Loader2 className="w-3 h-3 animate-spin" strokeWidth={3} />
-                                                        ) : (
-                                                            <Trash2 className="w-3 h-3" strokeWidth={3} />
-                                                        )}
-                                                        Delete
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* CUSTOMER INFO */}
-                                            <div className='mb-6 space-y-2'>
-                                                <p className='text-sm uppercase'>
-                                                    <span className='font-black tracking-widest mr-2'>Customer:</span>
-                                                    <span className='font-bold'>{order.userId?.name || 'Unknown'}</span>
-                                                </p>
-                                                <p className='text-sm uppercase leading-relaxed'>
-                                                    <span className='font-black tracking-widest mr-2'>Address:</span>
-                                                    <span className='font-bold'>
-                                                        {order.address
-                                                            ? `${order.address.firstName} ${order.address.lastName}, ${order.address.street}, ${order.address.city}, ${order.address.state} ${order.address.zipCode}, ${order.address.country} — Ph: ${order.address.phone}`
-                                                            : "No address provided"}
-                                                    </span>
+                            return (
+                                <div
+                                    key={order._id}
+                                    className='bg-white border-[4px] border-black p-6 sm:p-8 flex flex-col justify-between shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-4px] hover:translate-x-[-4px] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all'
+                                >
+                                    <div>
+                                        {/* ORDER HEADER */}
+                                        <div className='flex flex-col sm:flex-row justify-between sm:items-end border-b-[3px] border-black pb-4 mb-6'>
+                                            <div>
+                                                <h2 className='text-2xl font-black uppercase tracking-tighter'>
+                                                    #{order._id.slice(-6).toUpperCase()}
+                                                </h2>
+                                                <p className='text-sm font-bold text-black/60 tracking-widest mt-1'>
+                                                    {formatDateTime(order.date || order.createdAt)}
                                                 </p>
                                             </div>
+                                            <div className='mt-2 sm:mt-0 flex flex-col items-end gap-2'>
+                                                <span className='text-3xl font-black text-[#ff5500]'>
+                                                    {total?.toFixed(2)} EGP
+                                                </span>
+                                                <button
+                                                    onClick={() => deleteOrder(order._id)}
+                                                    disabled={deletingOrderId === order._id}
+                                                    className='text-xs font-black uppercase tracking-widest bg-red-500 text-white border-[2px] border-black px-3 py-1 hover:bg-black transition-colors flex items-center gap-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px] disabled:opacity-50 cursor-pointer'
+                                                >
+                                                    {deletingOrderId === order._id ? (
+                                                        <Loader2 className="w-3 h-3 animate-spin" strokeWidth={3} />
+                                                    ) : (
+                                                        <Trash2 className="w-3 h-3" strokeWidth={3} />
+                                                    )}
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>
 
-                                            {/* PAYMENT INFO */}
-                                            <div className='mb-6 border-t-[3px] border-black pt-4'>
-                                                <div className='flex justify-between items-center mb-3'>
-                                                    <span className='text-xs font-black uppercase tracking-widest text-black/60'>
-                                                        Payment Verification:
-                                                    </span>
-                                                    <span className={`text-xs font-black uppercase tracking-widest px-2 py-0.5 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${order.payment ? 'bg-green-400 text-black' : 'bg-red-400 text-black'}`}>
-                                                        {order.payment ? 'Paid' : 'Unpaid'}
-                                                    </span>
-                                                </div>
+                                        {/* CUSTOMER INFO */}
+                                        <div className='mb-6 space-y-2'>
+                                            <p className='text-sm uppercase'>
+                                                <span className='font-black tracking-widest mr-2'>Customer:</span>
+                                                <span className='font-bold'>{order.userId?.name || 'Unknown'}</span>
+                                            </p>
+                                            <p className='text-sm uppercase leading-relaxed'>
+                                                <span className='font-black tracking-widest mr-2'>Address:</span>
+                                                <span className='font-bold'>
+                                                    {order.address
+                                                        ? `${order.address.firstName} ${order.address.lastName}, ${order.address.street}, ${order.address.city}, ${order.address.state} ${order.address.zipCode}, ${order.address.country} — Ph: ${order.address.phone}`
+                                                        : "No address provided"}
+                                                </span>
+                                            </p>
+                                        </div>
 
-                                                {order.paymentScreenshot ? (
-                                                    <div className='flex items-center gap-4 mt-3 bg-[#e5e5e5]/30 p-3 border border-black/10'>
-                                                        <div className='w-16 h-16 bg-[#e5e5e5] border-2 border-black relative group overflow-hidden shrink-0'>
-                                                            <img
-                                                                src={order.paymentScreenshot}
-                                                                className='w-full h-full object-cover cursor-zoom-in'
-                                                                alt="Payment receipt"
-                                                                onClick={() => window.open(order.paymentScreenshot, '_blank')}
-                                                            />
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); handleDownload(order.paymentScreenshot, `payment-receipt-${order._id.slice(-6)}.png`); }}
-                                                                className='absolute top-0 right-0 bg-white hover:bg-[#ff5500] text-black hover:text-white border-l border-b border-black p-1 transition-all rounded-none z-20 cursor-pointer'
-                                                                title="Download Receipt"
-                                                            >
-                                                                <Download className='w-3 h-3' strokeWidth={3} />
-                                                            </button>
-                                                        </div>
-                                                        <div className='flex flex-col gap-2'>
-                                                            <button
-                                                                disabled={updatingPaymentId === order._id}
-                                                                onClick={() => togglePaymentStatus(order._id, !order.payment)}
-                                                                className='flex items-center justify-center gap-2 bg-black text-white hover:bg-[#ff5500] hover:text-black border-2 border-black px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed'
-                                                            >
-                                                                {updatingPaymentId === order._id && (
-                                                                    <Loader2 className="w-3 animate-spin text-current" strokeWidth={3} />
-                                                                )}
-                                                                <span>{order.payment ? 'Mark Unpaid' : 'Approve Payment'}</span>
-                                                            </button>
-                                                            <p className='text-[8px] font-black uppercase text-black/40 leading-none'>
-                                                                Click receipt to expand
-                                                            </p>
-                                                        </div>
+                                        {/* PAYMENT INFO */}
+                                        <div className='mb-6 border-t-[3px] border-black pt-4'>
+                                            <div className='flex justify-between items-center mb-3'>
+                                                <span className='text-xs font-black uppercase tracking-widest text-black/60'>
+                                                    Payment Verification:
+                                                </span>
+                                                <span className={`text-xs font-black uppercase tracking-widest px-2 py-0.5 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${order.payment ? 'bg-green-400 text-black' : 'bg-red-400 text-black'}`}>
+                                                    {order.payment ? 'Paid' : 'Unpaid'}
+                                                </span>
+                                            </div>
+
+                                            {order.paymentScreenshot ? (
+                                                <div className='flex items-center gap-4 mt-3 bg-[#e5e5e5]/30 p-3 border border-black/10'>
+                                                    <div className='w-16 h-16 bg-[#e5e5e5] border-2 border-black relative group overflow-hidden shrink-0'>
+                                                        <img
+                                                            src={order.paymentScreenshot}
+                                                            className='w-full h-full object-cover cursor-zoom-in'
+                                                            alt="Payment receipt"
+                                                            onClick={() => window.open(order.paymentScreenshot, '_blank')}
+                                                        />
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); handleDownload(order.paymentScreenshot, `payment-receipt-${order._id.slice(-6)}.png`); }}
+                                                            className='absolute top-0 right-0 bg-white hover:bg-[#ff5500] text-black hover:text-white border-l border-b border-black p-1 transition-all rounded-none z-20 cursor-pointer'
+                                                            title="Download Receipt"
+                                                        >
+                                                            <Download className='w-3 h-3' strokeWidth={3} />
+                                                        </button>
                                                     </div>
-                                                ) : (
-                                                    <div className='text-xs font-black uppercase text-red-500 mt-2'>
-                                                        No payment screenshot uploaded
+                                                    <div className='flex flex-col gap-2'>
+                                                        <button
+                                                            disabled={updatingPaymentId === order._id}
+                                                            onClick={() => togglePaymentStatus(order._id, !order.payment)}
+                                                            className='flex items-center justify-center gap-2 bg-black text-white hover:bg-[#ff5500] hover:text-black border-2 border-black px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed'
+                                                        >
+                                                            {updatingPaymentId === order._id && (
+                                                                <Loader2 className="w-3 animate-spin text-current" strokeWidth={3} />
+                                                            )}
+                                                            <span>{order.payment ? 'Mark Unpaid' : 'Approve Payment'}</span>
+                                                        </button>
+                                                        <p className='text-[8px] font-black uppercase text-black/40 leading-none'>
+                                                            Click receipt to expand
+                                                        </p>
                                                     </div>
-                                                )}
-                                            </div>
+                                                </div>
+                                            ) : (
+                                                <div className='text-xs font-black uppercase text-red-500 mt-2'>
+                                                    No payment screenshot uploaded
+                                                </div>
+                                            )}
+                                        </div>
 
-                                            {/* ITEMS LIST */}
-                                            <div className='border-t-[3px] border-black pt-4 mb-6'>
-                                                <p className='text-xs font-black uppercase tracking-widest text-black/60 mb-4'>
-                                                    {order.items?.length || 0} Product{order.items && order.items.length > 1 ? "s" : ""}
-                                                </p>
+                                        {/* ITEMS LIST */}
+                                        <div className='border-t-[3px] border-black pt-4 mb-6'>
+                                            <p className='text-xs font-black uppercase tracking-widest text-black/60 mb-4'>
+                                                {order.items?.length || 0} Product{order.items && order.items.length > 1 ? "s" : ""}
+                                            </p>
 
-                                                <div className='space-y-3'>
-                                                    {order.items?.map((item, index) => (
+                                            <div className='space-y-3'>
+                                                {order.items?.map((item, index) => {
+                                                    const dispItemName = item.name_en || item.name;
+                                                    return (
                                                         <div key={`${item._id}-${index}`} className='flex justify-between items-start gap-4 p-2 hover:bg-black/5'>
                                                             <div className='flex items-start gap-4'>
                                                                 {item.image && (
@@ -465,13 +457,13 @@ const Orders = () => {
                                                                         <img
                                                                             src={item.image}
                                                                             className='w-full h-full object-contain mix-blend-multiply'
-                                                                            alt={item.name}
+                                                                            alt={dispItemName}
                                                                         />
                                                                     </div>
                                                                 )}
                                                                 <div className='flex flex-col'>
                                                                     <p className='font-black uppercase text-sm leading-tight'>
-                                                                        {item.name}
+                                                                        {dispItemName}
                                                                     </p>
                                                                     <div className='flex gap-3 mt-1'>
                                                                         <p className='text-xs font-bold uppercase'>Size: {item.size || 'M'}</p>
@@ -480,8 +472,7 @@ const Orders = () => {
                                                                     {item.imageFront && item.imageBack && (
                                                                         <div className='mt-3 space-y-2'>
                                                                             <div className='flex items-center gap-3 justify-between'>
-                                                                                <p className='text-[10px] font-black  tracking-wider text-black/50'>Custom Print Preview (Front / Back):</p>
-
+                                                                                <p className='text-[10px] font-black tracking-wider text-black/50'>Custom Print Preview (Front / Back):</p>
                                                                             </div>
                                                                             <div className='flex gap-3'>
                                                                                 <div className='w-20 h-20 bg-[#e5e5e5] border-2 border-black relative group overflow-hidden'>
@@ -512,8 +503,7 @@ const Orders = () => {
                                                                     {item.uploadedImages && item.uploadedImages.length > 0 && (
                                                                         <div className='mt-3 space-y-2'>
                                                                             <div className='flex items-center gap-3 justify-between'>
-                                                                                <p className='text-[10px] font-black  tracking-wider text-black/50'>Uploaded Assets ({item.uploadedImages.length}):</p>
-
+                                                                                <p className='text-[10px] font-black tracking-wider text-black/50'>Uploaded Assets ({item.uploadedImages.length}):</p>
                                                                             </div>
                                                                             <div className='flex flex-wrap gap-2'>
                                                                                 {item.uploadedImages.map((imgSrc, imgIdx) => (
@@ -555,42 +545,42 @@ const Orders = () => {
                                                                 </div>
                                                             </div>
                                                             <p className='font-black text-lg'>
-                                                                ${(item.price * (item.quantity || 1)).toFixed(2)}
+                                                                {(item.price * (item.quantity || 1)).toFixed(2)} EGP
                                                             </p>
                                                         </div>
-                                                    ))}
-                                                </div>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
-
-                                        {/* STATUS UPDATER */}
-                                        <div className='mt-auto flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#e5e5e5] p-4 border-[3px] border-black'>
-                                            <span className='font-black uppercase tracking-widest text-sm shrink-0 flex items-center gap-2'>
-                                                {updatingStatusId === order._id && (
-                                                    <Loader2 className="w-4 h-4 animate-spin text-black" strokeWidth={3} />
-                                                )}
-                                                Order Status:
-                                            </span>
-                                            <select
-                                                disabled={updatingStatusId === order._id}
-                                                value={order.status}
-                                                onChange={(e) => updateStatus(order._id, e.target.value)}
-                                                className='w-full sm:w-auto border-[3px] border-black rounded-none px-4 py-2 bg-white text-black font-black uppercase tracking-widest cursor-pointer focus:outline-none focus:border-[#ff5500] transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
-                                            >
-                                                <option value='pending'>Pending</option>
-                                                <option value='on the way'>On The Way</option>
-                                                <option value='delivered'>Delivered</option>
-                                            </select>
-                                        </div>
                                     </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
-            </section>
-        </>
+
+                                    {/* STATUS UPDATER */}
+                                    <div className='mt-auto flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#e5e5e5] p-4 border-[3px] border-black'>
+                                        <span className='font-black uppercase tracking-widest text-sm shrink-0 flex items-center gap-2'>
+                                            {updatingStatusId === order._id && (
+                                                <Loader2 className="w-4 h-4 animate-spin text-black" strokeWidth={3} />
+                                            )}
+                                            Order Status:
+                                        </span>
+                                        <select
+                                            disabled={updatingStatusId === order._id}
+                                            value={order.status}
+                                            onChange={(e) => updateStatus(order._id, e.target.value)}
+                                            className='w-full sm:w-auto border-[3px] border-black rounded-none px-4 py-2 bg-white text-black font-black uppercase tracking-widest cursor-pointer focus:outline-none focus:border-[#ff5500] transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                                        >
+                                            <option value='pending'>Pending</option>
+                                            <option value='on the way'>On The Way</option>
+                                            <option value='delivered'>Delivered</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+        </section>
     );
-}
+};
 
 export default Orders;

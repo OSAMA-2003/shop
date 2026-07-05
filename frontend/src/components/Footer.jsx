@@ -7,7 +7,6 @@ import {
   Mail,
   Phone,
   MapPin,
-  Send,
   ArrowUp
 } from 'lucide-react';
 import {
@@ -17,10 +16,9 @@ import {
   FaYoutube
 } from 'react-icons/fa';
 import { FaXTwitter } from "react-icons/fa6";
-
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
-// 1. Define Animation Variants
 const footerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -42,6 +40,7 @@ const itemVariants = {
 };
 
 const Footer = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -67,17 +66,17 @@ const Footer = () => {
   ];
 
   const quickLinks = [
-    { label: 'Home', to: 'home' },
-    { label: 'Collection', to: '/collection', isPage: true },
-    { label: 'Mockups', to: 'mockups' },
-    { label: 'Contact', to: 'contact' },
+    { labelKey: 'nav.home', to: 'home' },
+    { labelKey: 'nav.collection', to: '/collection', isPage: true },
+    { labelKey: 'nav.mockups', to: 'mockups' },
+    { labelKey: 'nav.contact', to: 'contact' },
   ];
 
   const collections = [
-    { label: 'Urban Apparel', to: '/collection', isPage: true },
-    { label: 'Streetwear Tees', to: '/collection', isPage: true },
-    { label: 'Premium Hoodies', to: '/collection', isPage: true },
-    { label: 'Accessories', to: '/collection', isPage: true },
+    { labelKey: 'footer.urbanApparel', to: '/collection', isPage: true },
+    { labelKey: 'footer.streetwearTees', to: '/collection', isPage: true },
+    { labelKey: 'footer.premiumHoodies', to: '/collection', isPage: true },
+    { labelKey: 'footer.accessories', to: '/collection', isPage: true },
   ];
 
   return (
@@ -107,7 +106,7 @@ const Footer = () => {
                 className="w-16 h-auto object-contain cursor-pointer hover:scale-105 transition-transform border border-zinc-800 p-1 bg-zinc-950/50 rounded-lg"
               />
               <div>
-                <h2 className="text-2xl font-black  tracking-tighter leading-none">
+                <h2 className="text-2xl font-black tracking-tighter leading-none text-white">
                   <span className="text-[#ff5500]">K</span>yandr
                 </h2>
                 <p className="text-[10px] font-mono font-bold tracking-widest text-[#ff5500] uppercase mt-1">
@@ -117,10 +116,10 @@ const Footer = () => {
             </div>
 
             <p className="text-sm font-semibold font-mono text-gray-400 leading-relaxed max-w-sm pt-2">
-              Not just clothes, it’s your vibe. Stay bold, stay Kyandr.
+              {t('footer.brandTagline')}
             </p>
 
-            {/* Social Media Accounts with Lucide Icons */}
+            {/* Social Media Accounts */}
             <div className="flex flex-wrap gap-2.5 pt-2">
               {socials.map(({ Icon, url, label }) => (
                 <a
@@ -140,17 +139,17 @@ const Footer = () => {
           {/* Column 2: Quick Links */}
           <motion.div variants={itemVariants} className="space-y-4">
             <h3 className="text-lg font-black uppercase tracking-widest text-[#ff5500] border-b border-zinc-800 pb-2">
-              Navigation
+              {t('footer.navigationTitle')}
             </h3>
             <ul className="space-y-2.5">
-              {quickLinks.map(({ label, to, isPage }) => (
-                <li key={label}>
+              {quickLinks.map(({ labelKey, to, isPage }) => (
+                <li key={labelKey}>
                   {isPage ? (
                     <button
                       onClick={() => navigate(to)}
                       className="text-gray-400 hover:text-[#ff5500] transition-colors text-left text-sm font-bold uppercase tracking-wider block py-1 cursor-pointer border-none bg-transparent"
                     >
-                      {label}
+                      {t(labelKey)}
                     </button>
                   ) : location.pathname === '/' ? (
                     <ScrollLink
@@ -160,14 +159,14 @@ const Footer = () => {
                       offset={-80}
                       className="text-gray-400 hover:text-[#ff5500] transition-colors cursor-pointer text-sm font-bold uppercase tracking-wider block py-1"
                     >
-                      {label}
+                      {t(labelKey)}
                     </ScrollLink>
                   ) : (
                     <button
                       onClick={() => navigate('/')}
                       className="text-gray-400 hover:text-[#ff5500] transition-colors text-left text-sm font-bold uppercase tracking-wider block py-1 cursor-pointer border-none bg-transparent"
                     >
-                      {label}
+                      {t(labelKey)}
                     </button>
                   )}
                 </li>
@@ -178,17 +177,17 @@ const Footer = () => {
           {/* Column 3: Collections */}
           <motion.div variants={itemVariants} className="space-y-4">
             <h3 className="text-lg font-black uppercase tracking-widest text-[#ff5500] border-b border-zinc-800 pb-2">
-              Collections
+              {t('footer.collectionsTitle')}
             </h3>
             <ul className="space-y-2.5">
-              {collections.map(({ label, to, isPage }) => (
-                <li key={label}>
+              {collections.map(({ labelKey, to, isPage }) => (
+                <li key={labelKey}>
                   {isPage ? (
                     <button
                       onClick={() => navigate(to)}
                       className="text-gray-400 hover:text-[#ff5500] transition-colors text-left text-sm font-bold uppercase tracking-wider block py-1 cursor-pointer border-none bg-transparent"
                     >
-                      {label}
+                      {t(labelKey)}
                     </button>
                   ) : location.pathname === '/' ? (
                     <ScrollLink
@@ -198,14 +197,14 @@ const Footer = () => {
                       offset={-80}
                       className="text-gray-400 hover:text-[#ff5500] transition-colors cursor-pointer text-sm font-bold uppercase tracking-wider block py-1"
                     >
-                      {label}
+                      {t(labelKey)}
                     </ScrollLink>
                   ) : (
                     <button
                       onClick={() => navigate('/')}
                       className="text-gray-400 hover:text-[#ff5500] transition-colors text-left text-sm font-bold uppercase tracking-wider block py-1 cursor-pointer border-none bg-transparent"
                     >
-                      {label}
+                      {t(labelKey)}
                     </button>
                   )}
                 </li>
@@ -216,18 +215,16 @@ const Footer = () => {
           {/* Column 4: Contact & Newsletter */}
           <motion.div variants={itemVariants} className="space-y-4">
             <h3 className="text-lg font-black uppercase tracking-widest text-[#ff5500] border-b border-zinc-800 pb-2">
-              Newsletter
+              {t('footer.newsletterTitle')}
             </h3>
             <p className="text-sm font-semibold font-mono text-gray-400">
-              Join the underground. Get 10% off your first drop.
+              {t('footer.newsletterSubtitle')}
             </p>
-
-
 
             <div className="space-y-2 pt-2">
               <div className="flex items-center gap-2.5 text-xs font-mono font-semibold text-gray-400">
                 <Mail className="w-4 h-4 text-[#ff5500]" />
-                <span>support@ecommerce.com</span>
+                <span>support@kyandr.com</span>
               </div>
               <div className="flex items-center gap-2.5 text-xs font-mono font-semibold text-gray-400">
                 <Phone className="w-4 h-4 text-[#ff5500]" />
@@ -246,31 +243,18 @@ const Footer = () => {
           {/* Left: Copyright */}
           <motion.div variants={itemVariants} className="text-center md:text-left">
             <p className="font-mono text-xs font-bold text-gray-500 uppercase">
-              © {new Date().getFullYear()} Kyandr. All rights reserved.
+              © {new Date().getFullYear()} Kyandr. {t('footer.copyright')}
             </p>
           </motion.div>
 
-          {/* Right: Payment Icons & Back to Top */}
-          <motion.div variants={itemVariants} className="flex flex-wrap items-center justify-center gap-6">
-            {/* Visual Payment Badges (Clean Neo-Brutalist Placeholders) */}
-            <div className="flex gap-2">
-              {['VISA', 'MC', 'PP', 'AP'].map((badge) => (
-                <span
-                  key={badge}
-                  className="px-2 py-0.5 border border-zinc-800 bg-zinc-950 font-mono text-[9px] font-black uppercase tracking-widest text-zinc-500"
-                >
-                  {badge}
-                </span>
-              ))}
-            </div>
-
-            {/* Back to top button */}
+          {/* Right: Scroll to Top */}
+          <motion.div variants={itemVariants} className="flex justify-center md:justify-end">
             <button
               onClick={scrollToTop}
-              className="p-2 bg-zinc-900 border-[2px] border-zinc-800 text-gray-400 hover:text-white hover:bg-[#ff5500] hover:border-black transition-all cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)] active:translate-y-0.5 active:shadow-none"
-              aria-label="Back to top"
+              className="flex items-center justify-center w-12 h-12 bg-zinc-900 border-[2px] border-zinc-800 text-[#f9f9f6] hover:bg-[#ff5500] hover:text-black hover:border-black hover:-translate-y-1 active:translate-y-0 active:translate-x-0 transition-all duration-300 shadow-[2px_2px_0px_0px_rgba(255,85,0,0.25)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rounded-none cursor-pointer"
+              aria-label="Scroll to top"
             >
-              <ArrowUp className="w-4 h-4" />
+              <ArrowUp className="w-5 h-5" strokeWidth={3} />
             </button>
           </motion.div>
         </div>

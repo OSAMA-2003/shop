@@ -10,7 +10,7 @@ const addMockup = async (req, res) => {
         });
     }
 
-    const { name, description, price } = req.body;
+    const { name, name_ar, name_en, description, description_ar, description_en, price } = req.body;
 
     if (!name || !description || !price) {
         return res.status(400).json({
@@ -35,7 +35,11 @@ const addMockup = async (req, res) => {
 
         const mockup = new mockupModel({
             name,
+            name_ar: name_ar || name,
+            name_en: name_en || name,
             description,
+            description_ar: description_ar || description,
+            description_en: description_en || description,
             price: Number(price),
             imageFront: req.files.imageFront[0].path, // Cloudinary URL
             imageBack: req.files.imageBack[0].path, // Cloudinary URL
@@ -127,11 +131,15 @@ const listCustomizedMockups = async (req, res) => {
 const updateMockup = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, price } = req.body;
+        const { name, name_ar, name_en, description, description_ar, description_en, price } = req.body;
         
         let updateData = {};
         if (name) updateData.name = name;
+        if (name_ar) updateData.name_ar = name_ar;
+        if (name_en) updateData.name_en = name_en;
         if (description) updateData.description = description;
+        if (description_ar) updateData.description_ar = description_ar;
+        if (description_en) updateData.description_en = description_en;
         if (price) updateData.price = Number(price);
 
         if (req.body.sizes) {

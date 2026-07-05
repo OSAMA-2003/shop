@@ -123,7 +123,7 @@ const AdminLogin = () => {
                     <button
                         type='submit'
                         disabled={loading}
-                        className='w-full bg-[#ff5500] py-4 mt-4 font-black text-2xl sm:text-3xl tracking-widest uppercase text-black hover:bg-black hover:text-[#ff5500] transition-colors rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
+                        className='w-full bg-[#ff5500] py-4 mt-4 font-black text-2xl sm:text-3xl tracking-widest uppercase text-black hover:bg-black hover:text-[#ff5500] transition-colors rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer'
                     >
                         {loading && <Loader2 className="w-6 h-6 animate-spin text-black" strokeWidth={3} />}
                         <span>{loading ? "Accessing..." : "Access"}</span>

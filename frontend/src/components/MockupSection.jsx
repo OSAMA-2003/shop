@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import MockupCard from './MockupCard';
 import CardSkeleton from './CardSkeleton';
+import { useTranslation } from 'react-i18next';
 
 // Animation Variants
 const containerVariants = {
@@ -28,14 +29,16 @@ const itemVariants = {
 };
 
 const MockupSection = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { all_mockups, loading } = useContext(ShopContext);
   const scrollRef = useRef(null);
+  const isRTL = i18n.language === 'ar';
 
   // Formatting items for the MockupCard component
   const formattedMockups = (all_mockups || []).slice(0, 8).map(m => ({
     id: m._id,
-    name: m.name,
+    name: m['name_' + i18n.language] || m.name,
     preview: m.imageFront || m.image,
     printable: { x: 150, y: 150, width: 300, height: 400 },
     colors: [
@@ -45,15 +48,14 @@ const MockupSection = () => {
 
   const handleScroll = (direction) => {
     if (scrollRef.current) {
-      const cardWidth = 344; // Approx width sm:320px + gap:24px
+      const cardWidth = 344;
       const scrollAmount = direction === 'left' ? -cardWidth * 2 : cardWidth * 2;
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
   return (
-    <section className='relative w-full min-h-screen bg-[#f4f6f8] text-text-main  md:py-10 px-6 sm:px-10 flex flex-col justify-center overflow-hidden'>
-
+    <section className='relative w-full min-h-screen bg-[#f4f6f8] text-text-main py-10 px-6 sm:px-10 flex flex-col justify-center overflow-hidden'>
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -62,32 +64,36 @@ const MockupSection = () => {
         className='relative z-10 max-w-7xl mx-auto w-full'
       >
         {/* Top Header Row with Title and Scroll Controls */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-          <motion.div variants={itemVariants} className=" text-center md:text-left">
+        <div className={`flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 `}>
+          <motion.div variants={itemVariants} className={`flex-1 ${isRTL ? 'text-right' : 'text-left'}`}>
             <h2 className="text-6xl sm:text-7xl font-black uppercase tracking-tighter mb-4 leading-none text-black">
-              <span className="text-[#ff5500]">Design</span> Your Own Product
+              {isRTL ? (
+                <>صمم <span className="text-[#ff5500]">منتجك</span> بنفسك</>
+              ) : (
+                <><span className="text-[#ff5500]">Design</span> Your Own Product</>
+              )}
             </h2>
             <p className="text-gray-500 text-lg max-w-2xl leading-relaxed font-medium">
-              Bring your designs to life! Choose a product mockup and customize it with your own graphics, text, and colors.
+              {t('mockups.subtitle')}
             </p>
           </motion.div>
 
           {/* Navigation Arrows */}
           {formattedMockups.length > 0 && !loading && (
-            <motion.div variants={itemVariants} className="flex gap-3 self-start md:self-end">
+            <motion.div variants={itemVariants} className={`flex gap-3 self-start md:self-end`}>
               <button
-                onClick={() => handleScroll('left')}
+                onClick={() => handleScroll(isRTL ? 'right' : 'left')}
                 className="w-12 h-12 rounded-full border-[3px] border-black flex items-center justify-center bg-white text-black hover:bg-[#ff5500] hover:text-white transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[3px] active:translate-x-[3px] cursor-pointer"
                 aria-label="Scroll left"
               >
-                <ChevronLeft size={22} strokeWidth={3} />
+                <ChevronLeft size={22} strokeWidth={3} className={isRTL ? 'rotate-180' : ''} />
               </button>
               <button
-                onClick={() => handleScroll('right')}
+                onClick={() => handleScroll(isRTL ? 'left' : 'right')}
                 className="w-12 h-12 rounded-full border-[3px] border-black flex items-center justify-center bg-white text-black hover:bg-[#ff5500] hover:text-white transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[3px] active:translate-x-[3px] cursor-pointer"
                 aria-label="Scroll right"
               >
-                <ChevronRight size={22} strokeWidth={3} />
+                <ChevronRight size={22} strokeWidth={3} className={isRTL ? 'rotate-180' : ''} />
               </button>
             </motion.div>
           )}
@@ -115,13 +121,12 @@ const MockupSection = () => {
               ))}
             </div>
           ) : (
-            /* Brutalist Coming Soon Block if empty */
             <div className="w-full py-24 flex flex-col items-center justify-center text-center border-[4px] border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-black">
-                Mockups <span className="text-[#ff5500]">Coming Soon</span>
+                {isRTL ? <>النماذج <span className="text-[#ff5500]">قريباً</span></> : <>Mockups <span className="text-[#ff5500]">Coming Soon</span></>}
               </h3>
               <p className="mt-4 text-sm font-bold uppercase tracking-widest text-gray-500">
-                The lab is currently cooking up new canvases. Stay tuned.
+                {t('mockups.comingSoon')}
               </p>
             </div>
           )}
@@ -133,7 +138,7 @@ const MockupSection = () => {
             onClick={() => navigate('/mockups')}
             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-black text-white border-[3px] border-black font-black uppercase tracking-widest text-sm hover:bg-[#ff5500] hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px] cursor-pointer"
           >
-            View All Mockups
+            {t('mockups.viewAll')}
           </button>
         </motion.div>
 

@@ -4,8 +4,11 @@ import { useNavigate } from "react-router-dom";
 import MenuItems from './MenuItems';
 import logo from '../assets/logo.png';
 import { ShopContext } from '../context/ShopContenxt';
+import { useTranslation } from 'react-i18next';
 
 const Navbar = () => {
+    const { i18n } = useTranslation();
+    const isRTL = i18n.language === 'ar';
     const [sidebarOpen, setSideBarOpen] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
     const [isAtTop, setIsAtTop] = useState(true);
@@ -69,8 +72,22 @@ const Navbar = () => {
                         />
 
                     </div>
-                    <div className='flex-1 flex justify-end'>
+                    <div className='flex-grow flex justify-end items-center gap-5'>
                         <MenuItems isMobile={false} />
+                        <div className="flex border-2 border-black p-0.5 bg-[#e5e5e5] rounded-full pointer-events-auto shrink-0">
+                            <button
+                                onClick={() => i18n.changeLanguage('en')}
+                                className={`px-3 py-1 rounded-full font-black text-xs transition-all cursor-pointer ${i18n.language === 'en' ? 'bg-[#ff5500] text-black border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]' : 'text-black/60 hover:text-black'}`}
+                            >
+                                EN
+                            </button>
+                            <button
+                                onClick={() => i18n.changeLanguage('ar')}
+                                className={`px-3 py-1 rounded-full font-black text-xs transition-all cursor-pointer ${i18n.language === 'ar' ? 'bg-[#ff5500] text-black border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]' : 'text-black/60 hover:text-black'}`}
+                            >
+                                AR
+                            </button>
+                        </div>
                     </div>
                 </header>
             </div>
@@ -91,7 +108,22 @@ const Navbar = () => {
                     </div>
 
                     {/* Right side: Cart and Hamburger Menu */}
-                    <div className='flex items-center gap-5'>
+                    <div className='flex items-center gap-4'>
+                        {/* Mobile Language Switcher */}
+                        <div className="flex border-[2px] border-black p-0.5 bg-[#e5e5e5] rounded-full shrink-0">
+                            <button
+                                onClick={() => i18n.changeLanguage('en')}
+                                className={`px-2 py-0.5 rounded-full font-black text-[10px] cursor-pointer ${i18n.language === 'en' ? 'bg-[#ff5500] text-black border border-black' : 'text-black/60'}`}
+                            >
+                                EN
+                            </button>
+                            <button
+                                onClick={() => i18n.changeLanguage('ar')}
+                                className={`px-2 py-0.5 rounded-full font-black text-[10px] cursor-pointer ${i18n.language === 'ar' ? 'bg-[#ff5500] text-black border border-black' : 'text-black/60'}`}
+                            >
+                                AR
+                            </button>
+                        </div>
                         {/* Mobile Cart Icon */}
                         <button
                             onClick={() => navigate('/cart')}
@@ -117,7 +149,7 @@ const Navbar = () => {
             </div>
 
             {/* MOBILE SIDEBAR */}
-            <aside className={`fixed top-0 right-0 h-full w-72 bg-[#f8fafc] border-l border-white/50 shadow-2xl transform transition-transform duration-500 z-[70] flex flex-col ${sidebarOpen ? "translate-x-0" : "translate-x-full"}`}>
+            <aside className={`fixed top-0 right-0 border-l h-full w-72 bg-[#f8fafc] border-white/50 shadow-2xl transform transition-transform duration-500 z-[70] flex flex-col ${sidebarOpen ? "translate-x-0" : "translate-x-full"}`}>
                 <div className='flex justify-end p-5'>
                     <button
                         onClick={() => setSideBarOpen(false)}

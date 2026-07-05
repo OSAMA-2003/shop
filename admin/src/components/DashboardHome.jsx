@@ -28,7 +28,6 @@ const DashboardHome = () => {
                 const ordersData = ordersRes.data.data || [];
                 const usersData = usersRes.data.data || [];
 
-                // Calculate total sales from paid orders
                 const totalSales = ordersData
                     .filter(order => order.payment === true)
                     .reduce((sum, order) => sum + (order.amount || 0), 0);
@@ -48,8 +47,9 @@ const DashboardHome = () => {
 
         fetchStats();
     }, []);
+
     return (
-        <section className='relative max-w-screen mx-auto p-4 w-full bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans md:ml-20'>
+        <section className='relative max-w-screen mx-auto p-4 w-full bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans'>
             <div className='max-w-5xl mx-auto'>
                 {/* HEADING */}
                 <div className='border-b-[4px] border-black pb-6 mb-8'>

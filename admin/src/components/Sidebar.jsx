@@ -11,9 +11,9 @@ const Sidebar = () => {
         { to: '/admin/mockups', label: 'Add Mockup', Icon: PlusCircle },
         { to: '/admin/products-list', label: 'Products List', Icon: List },
         { to: '/admin/mockups-list', label: 'Mockups List', Icon: List },
-        { to: '/admin/orders', label: 'Customer Orders', Icon: ClipboardCheck },
+        { to: '/admin/orders', label: 'Orders', Icon: ClipboardCheck },
         { to: '/admin/user', label: 'Users', Icon: Users },
-        { to: '/admin/notifications', label: "Notifications", Icon: Bell }
+        { to: '/admin/notifications', label: 'Notifications', Icon: Bell }
     ];
 
     const handleLogout = () => {
@@ -26,14 +26,14 @@ const Sidebar = () => {
             {/* MOBILE TOGGLE BUTTON */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className='md:hidden fixed top-4 left-4 z-50 bg-[#ff5500] border-[3px] border-black p-2 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] active:translate-y-[4px] active:translate-x-[4px] transition-all focus:outline-none rounded-none'
+                className="md:hidden fixed top-4 z-50 bg-[#ff5500] border-[3px] border-black p-2 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] active:translate-y-[4px] active:translate-x-[4px] transition-all focus:outline-none rounded-none left-4"
             >
                 {isOpen ? <X className='w-6 h-6' strokeWidth={3} /> : <Menu className='w-6 h-6' strokeWidth={3} />}
             </button>
 
             {/* SIDEBAR */}
             <aside
-                className={`fixed top-0 left-0 h-full w-64 bg-[#f9f9f6] text-black border-r-[4px] border-black z-40 transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
+                className={`fixed top-0 left-0 border-r-[4px] h-full w-64 bg-[#f9f9f6] text-black border-black z-40 transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
             >
                 <div className='flex flex-col h-full justify-between py-10 px-6'>
 
@@ -73,7 +73,7 @@ const Sidebar = () => {
                         className='flex items-center gap-3 justify-center mt-6 w-full px-4 py-4 bg-black text-[#ff5500] border-[3px] border-black font-black uppercase tracking-widest hover:bg-[#ff5500] hover:text-black transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]'
                     >
                         <LogOut className='w-5 h-5' strokeWidth={3} />
-                        <span>Logout</span>
+                        <span>Log Out</span>
                     </button>
 
                 </div>

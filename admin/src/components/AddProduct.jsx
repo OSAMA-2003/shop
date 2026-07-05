@@ -6,15 +6,16 @@ import { Loader2 } from 'lucide-react';
 const AddProduct = () => {
     const url = 'https://shop-3-ocd8.onrender.com';
     const [image, setImage] = useState(null);
-    const [loading, setLoading] = useState(false); // Track loading state
+    const [loading, setLoading] = useState(false);
     const [data, setData] = useState({
-        name: '',
-        description: '',
+        name_en: '',
+        name_ar: '',
+        description_en: '',
+        description_ar: '',
         price: '',
     });
     const [selectedSizes, setSelectedSizes] = useState(["S", "M", "L", "XL"]);
 
-    // Custom styles for brutalist toast notifications
     const toastStyle = {
         style: {
             border: '3px solid black',
@@ -41,14 +42,18 @@ const AddProduct = () => {
     const onSubmitHandler = async (e) => {
         e.preventDefault();
 
-        // Prevent submission if already loading
         if (loading) return;
 
-        setLoading(true); // Start loading
+        setLoading(true);
 
         const formData = new FormData();
-        formData.append('name', data.name);
-        formData.append('description', data.description);
+        // Send fallback values for standard name/description so legacy code works
+        formData.append('name', data.name_en);
+        formData.append('name_en', data.name_en);
+        formData.append('name_ar', data.name_ar);
+        formData.append('description', data.description_en);
+        formData.append('description_en', data.description_en);
+        formData.append('description_ar', data.description_ar);
         formData.append('price', Number(data.price));
         formData.append('sizes', JSON.stringify(selectedSizes));
         if (image) formData.append('image', image);
@@ -60,8 +65,10 @@ const AddProduct = () => {
             });
             if (res.data.success) {
                 setData({
-                    name: '',
-                    description: '',
+                    name_en: '',
+                    name_ar: '',
+                    description_en: '',
+                    description_ar: '',
                     price: '',
                 });
                 setSelectedSizes(["S", "M", "L", "XL"]);
@@ -76,36 +83,32 @@ const AddProduct = () => {
             const errorMessage = err.response?.data?.message || err.message || "Something went wrong";
             toast.error(`Error: ${errorMessage}`, toastStyle);
         } finally {
-            setLoading(false); // Stop loading regardless of success or failure
+            setLoading(false);
         }
     };
 
     return (
-        <section className='relative max-w-screen mx-auto p-4 w-fullbg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans '>
-
+        <section className='relative max-w-screen mx-auto p-4 w-full bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans '>
             <form onSubmit={onSubmitHandler} className='max-w-3xl mx-auto'>
-
                 {/* FORM CONTAINER */}
                 <div className='bg-white border-[4px] border-black p-8 sm:p-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'>
-
                     {/* HEADING */}
                     <div className='border-b-[4px] border-black pb-6 mb-8'>
                         <h2 className='text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none'>
-                            Add Product
+                            Add New Product
                         </h2>
                     </div>
 
                     <div className='flex flex-col gap-6'>
-
-                        {/* NAME & PRICE ROW */}
+                        {/* NAMES ROW */}
                         <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
                             <div className='flex flex-col'>
-                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Product Name *</label>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Product Name (English) *</label>
                                 <input
                                     type='text'
-                                    name='name'
-                                    placeholder='HEAVYWEIGHT TEE'
-                                    value={data.name}
+                                    name='name_en'
+                                    placeholder='e.g. Classic T-Shirt'
+                                    value={data.name_en}
                                     onChange={onChangeHandler}
                                     required
                                     className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors"
@@ -113,35 +116,64 @@ const AddProduct = () => {
                             </div>
 
                             <div className='flex flex-col'>
-                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Price ($) *</label>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Product Name (Arabic) *</label>
                                 <input
-                                    type='number'
-                                    name='price'
-                                    placeholder='0.00'
-                                    value={data.price}
+                                    type='text'
+                                    name='name_ar'
+                                    placeholder='مثال: تيشرت كلاسيك'
+                                    value={data.name_ar}
                                     onChange={onChangeHandler}
                                     required
-                                    min="0"
-                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors"
+                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors text-right"
+                                    dir="rtl"
                                 />
                             </div>
                         </div>
 
-                        {/* DESCRIPTION */}
-                        <div className='flex flex-col'>
-                            <label className='text-sm font-black uppercase tracking-widest mb-2'>Description *</label>
-                            <textarea
-                                name='description'
-                                placeholder='Enter product details, materials, and fit...'
-                                value={data.description}
-                                onChange={onChangeHandler}
-                                required
-                                rows="3"
-                                className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors resize-none"
-                            />
+                        {/* DESCRIPTION ROW */}
+                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+                            <div className='flex flex-col'>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Product Description (English) *</label>
+                                <textarea
+                                    name='description_en'
+                                    placeholder='Detailed description of the product in English'
+                                    value={data.description_en}
+                                    onChange={onChangeHandler}
+                                    required
+                                    rows="3"
+                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors resize-none"
+                                />
+                            </div>
+
+                            <div className='flex flex-col'>
+                                <label className='text-sm font-black uppercase tracking-widest mb-2'>Product Description (Arabic) *</label>
+                                <textarea
+                                    name='description_ar'
+                                    placeholder='وصف تفصيلي للمنتج باللغة العربية'
+                                    value={data.description_ar}
+                                    onChange={onChangeHandler}
+                                    required
+                                    rows="3"
+                                    className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors resize-none text-right"
+                                    dir="rtl"
+                                />
+                            </div>
                         </div>
 
-                        {/* REMOVED CATEGORY & COLOR */}
+                        {/* PRICE */}
+                        <div className='flex flex-col'>
+                            <label className='text-sm font-black uppercase tracking-widest mb-2'>Price (EGP) *</label>
+                            <input
+                                type='number'
+                                name='price'
+                                placeholder='e.g. 350'
+                                value={data.price}
+                                onChange={onChangeHandler}
+                                required
+                                min="0"
+                                className="w-full border-[3px] border-black p-3 outline-none focus:ring-0 focus:border-[#ff5500] font-bold rounded-none bg-transparent text-black placeholder-black/30 transition-colors"
+                            />
+                        </div>
 
                         {/* SIZES SELECTION */}
                         <div className='flex flex-col'>
@@ -195,20 +227,25 @@ const AddProduct = () => {
                         <button
                             type='submit'
                             disabled={loading}
-                            className={`w-full mt-6 border-[3px] border-black py-4 font-black text-xl uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${loading
+                            className={`w-full mt-6 border-[3px] border-black py-4 font-black text-xl uppercase tracking-widest transition-all flex items-center justify-center gap-2 cursor-pointer ${loading
                                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none translate-y-[2px] translate-x-[2px]'
                                     : 'bg-[#ff5500] text-black hover:bg-black hover:text-[#ff5500] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px]'
-                                }`}
+                            }`}
                         >
-                            {loading && <Loader2 className="w-6 h-6 animate-spin text-gray-500" strokeWidth={3} />}
-                            <span>{loading ? "Publishing..." : "Publish Product"}</span>
+                            {loading ? (
+                                <>
+                                    <Loader2 className="w-6 h-6 animate-spin text-black" />
+                                    Saving...
+                                </>
+                            ) : (
+                                "Add Product"
+                            )}
                         </button>
-
                     </div>
                 </div>
             </form>
         </section>
     );
-}
+};
 
 export default AddProduct;

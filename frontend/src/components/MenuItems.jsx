@@ -3,15 +3,17 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Home, FolderOpen, ShoppingBag, Mail, ShoppingCart, User, Shirt } from "lucide-react";
 import { Link as ScrollLink } from "react-scroll";
 import { ShopContext } from '../context/ShopContenxt';
+import { useTranslation } from 'react-i18next';
 
 export const menuItemsData = [
-    { to: "home", label: "Home", Icon: Home },
-    { to: "/collection", label: "Collection", Icon: FolderOpen, isPage: true },
-    { to: "/mockups", label: "Mockups", Icon: Shirt, isPage: true },
-    { to: "contact", label: "Contact", Icon: Mail },
+    { to: "home", labelKey: "nav.home", Icon: Home },
+    { to: "/collection", labelKey: "nav.collection", Icon: FolderOpen, isPage: true },
+    { to: "/mockups", labelKey: "nav.mockups", Icon: Shirt, isPage: true },
+    { to: "contact", labelKey: "nav.contact", Icon: Mail },
 ];
 
 const MenuItems = ({ setSideBarOpen, isMobile }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
     const { cartItems, token, userData } = useContext(ShopContext);
@@ -22,7 +24,7 @@ const MenuItems = ({ setSideBarOpen, isMobile }) => {
         <div className={`flex md:justify-center lg:justify-end ${isMobile ? "flex-col space-y-4 items-start pt-4" : "flex-row w-full items-center gap-2 lg:gap-4"}`}>
 
             {/* NAVIGATION LINKS */}
-            {menuItemsData.map(({ to, label, Icon, isPage }) =>
+            {menuItemsData.map(({ to, labelKey, Icon, isPage }) =>
                 isPage ? (
                     <button
                         key={to}
@@ -33,7 +35,7 @@ const MenuItems = ({ setSideBarOpen, isMobile }) => {
                         className="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all shrink-0 w-full md:w-auto text-gray-600 hover:bg-white/50 hover:text-[#ff5500] cursor-pointer"
                     >
                         <Icon className="w-5 h-5" />
-                        <span className="font-semibold text-base">{label}</span>
+                        <span className="font-semibold text-base">{t(labelKey)}</span>
                     </button>
                 ) : location.pathname === "/" ? (
                     <ScrollLink
@@ -48,7 +50,7 @@ const MenuItems = ({ setSideBarOpen, isMobile }) => {
                         activeClass="bg-white !text-[#ff5500] shadow-sm border border-white/50 font-bold"
                     >
                         <Icon className="w-5 h-5" />
-                        <span className='font-semibold text-base'>{label}</span>
+                        <span className='font-semibold text-base'>{t(labelKey)}</span>
                     </ScrollLink>
                 ) : (
                     <button
@@ -57,10 +59,10 @@ const MenuItems = ({ setSideBarOpen, isMobile }) => {
                             navigate("/");
                             if (setSideBarOpen) setSideBarOpen(false);
                         }}
-                        className="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all shrink-0 w-full md:w-auto text-gray-600 hover:bg-white/50 hover:text-[#ff5500]"
+                        className="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all shrink-0 w-full md:w-auto text-gray-600 hover:bg-white/50 hover:text-[#ff5500] cursor-pointer"
                     >
                         <Icon className="w-5 h-5" />
-                        <span className="font-semibold text-base">{label}</span>
+                        <span className="font-semibold text-base">{t(labelKey)}</span>
                     </button>
                 )
             )}
@@ -75,7 +77,7 @@ const MenuItems = ({ setSideBarOpen, isMobile }) => {
                         navigate("/cart");
                         if (setSideBarOpen) setSideBarOpen(false);
                     }}
-                    className="relative flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-gray-600 hover:bg-white/50 hover:text-[#ff5500]"
+                    className="relative flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-gray-600 hover:bg-white/50 hover:text-[#ff5500] cursor-pointer"
                 >
                     <ShoppingCart className='w-5 h-5' />
                     {totalItems > 0 && (
@@ -92,22 +94,22 @@ const MenuItems = ({ setSideBarOpen, isMobile }) => {
                         navigate("/login");
                         if (setSideBarOpen) setSideBarOpen(false);
                     }}
-                    className='bg-[#ff5500]  px-4 font-bold text-lg  uppercase text-white hover:bg-black hover:text-[#ff5500] transition-colors rounded-xl'
+                    className='bg-[#ff5500] px-4 py-2 font-bold text-lg uppercase text-white hover:bg-black hover:text-[#ff5500] transition-colors rounded-xl cursor-pointer'
                 >
-                    Login
+                    {t('nav.login')}
                 </button>
             ) : (
                 <div className={`flex ${isMobile ? 'flex-col w-full gap-2' : 'items-center gap-2'}`}>
                     <button
                         onClick={() => { navigate("/profile"); if (setSideBarOpen) setSideBarOpen(false); }}
-                        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:bg-white/50 hover:text-[#ff5500] transition-colors ${isMobile ? "w-full" : ""}`}
+                        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:bg-white/50 hover:text-[#ff5500] transition-colors cursor-pointer ${isMobile ? "w-full" : ""}`}
                     >
                         {userData?.pic ? (
                             <img src={userData.pic} alt="Profile" className='w-7 h-7 rounded-full border-[2px] border-black object-cover shadow-sm' />
                         ) : (
                             <User className='w-5 h-5' />
                         )}
-                        {isMobile && <span className="font-semibold text-base">{userData?.name || "Profile"}</span>}
+                        <span className="font-semibold text-base">{isMobile ? (userData?.name || t('nav.profile')) : t('nav.profile')}</span>
                     </button>
                 </div>
             )}

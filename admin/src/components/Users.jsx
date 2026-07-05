@@ -76,7 +76,7 @@ const Users = () => {
     };
 
     const deleteUser = async (id) => {
-        toast((t) => (
+        toast((toastRef) => (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
                 <span style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '14px' }}>
                     🗑️ Delete this user?
@@ -84,7 +84,7 @@ const Users = () => {
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <button
                         onClick={async () => {
-                            toast.dismiss(t.id);
+                            toast.dismiss(toastRef.id);
                             try {
                                 const res = await axios.delete(`${url}/api/user/delete/${id}`);
                                 if (res.data && res.data.success) {
@@ -103,7 +103,7 @@ const Users = () => {
                         Delete
                     </button>
                     <button
-                        onClick={() => toast.dismiss(t.id)}
+                        onClick={() => toast.dismiss(toastRef.id)}
                         style={{ padding: '8px 20px', background: '#e5e5e5', color: 'black', border: '3px solid black', fontWeight: '900', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em', fontSize: '12px' }}
                     >
                         Cancel
@@ -126,7 +126,7 @@ const Users = () => {
     }, []);
 
     return (
-        <section className='md:ml-64 min-h-screen bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans'>
+        <section className='min-h-screen bg-[#f9f9f6] text-black py-16 px-6 sm:px-10 font-sans'>
             <div className='max-w-7xl mx-auto'>
 
                 {/* HEADING */}
@@ -158,10 +158,9 @@ const Users = () => {
                                     ) : (
                                         <User className='w-12 h-12 text-black' strokeWidth={2.5} />
                                     )}
-                                    {/* Small Absolute Role Indicator */}
                                     {user.role === "admin" && (
-                                        <div className="absolute top-0 right-0 bg-[#ff5500] border-l-[3px] border-b-[3px] border-black p-1">
-                                            <Shield className="w-4 h-4 text-black" strokeWidth={3} />
+                                        <div className="absolute top-0 right-0 bg-[#ff5500] border-l-[3px] border-b-[3px] border-black p-1 text-black">
+                                            <Shield className="w-4 h-4" strokeWidth={3} />
                                         </div>
                                     )}
                                 </div>
@@ -188,7 +187,7 @@ const Users = () => {
                                     <button
                                         onClick={() => deleteUser(user._id)}
                                         disabled={user.role !== "user"}
-                                        className={`flex items-center justify-center gap-2 w-full py-3 border-[3px] border-black font-black uppercase tracking-widest transition-all ${user.role === "admin"
+                                        className={`flex items-center justify-center gap-2 w-full py-3 border-[3px] border-black font-black uppercase tracking-widest transition-all cursor-pointer ${user.role === "admin"
                                             ? "bg-[#e5e5e5] text-black/30 border-black/30 cursor-not-allowed"
                                             : "bg-white text-red-600 hover:bg-red-600 hover:text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
                                             }`}
@@ -201,8 +200,8 @@ const Users = () => {
                                     <button
                                         onClick={() => promoteToAdmin(user._id)}
                                         disabled={user.role !== "user"}
-                                        className={`flex items-center justify-center gap-2 w-full py-3 border-[3px] border-black font-black uppercase tracking-widest transition-all ${user.role === "admin"
-                                            ? "hidden" // Hide promote button if already admin
+                                        className={`flex items-center justify-center gap-2 w-full py-3 border-[3px] border-black font-black uppercase tracking-widest transition-all cursor-pointer ${user.role === "admin"
+                                            ? "hidden"
                                             : "bg-[#ff5500] text-black hover:bg-black hover:text-[#ff5500] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
                                             }`}
                                     >
@@ -214,8 +213,8 @@ const Users = () => {
                                     <button
                                         onClick={() => demoteToUser(user._id)}
                                         disabled={user.role !== "admin"}
-                                        className={`flex items-center justify-center gap-2 w-full py-3 border-[3px] border-black font-black uppercase tracking-widest transition-all ${user.role === "user"
-                                            ? "hidden" // Hide demote button if already user
+                                        className={`flex items-center justify-center gap-2 w-full py-3 border-[3px] border-black font-black uppercase tracking-widest transition-all cursor-pointer ${user.role === "user"
+                                            ? "hidden"
                                             : "bg-black text-white hover:bg-white hover:text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
                                             }`}
                                     >
