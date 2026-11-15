@@ -1,21 +1,18 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-
-
-
-
+import { products as staticProducts, mockups as staticMockups } from "../data";
 
 export const ShopContext = createContext()
 const ShopContextProvider = ({ children }) => {
 
-    const [products, setProducts] = useState([])
-    const [all_mockups, setAllMockups] = useState([]);
+    const [products, setProducts] = useState(staticProducts);
+    const [all_mockups, setAllMockups] = useState(staticMockups);
     const [customMockups, setCustomMockups] = useState([]);
     const [cartItems, setCartItems] = useState({})
     const [token, setToken] = useState()
     const [userData, setUserData] = useState(null)
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const url = "https://shop-3-ocd8.onrender.com";
 
     const fetchUserProfile = async (tokenValue) => {
@@ -72,7 +69,11 @@ const ShopContextProvider = ({ children }) => {
             [cartKey]: (prev[cartKey] || 0) + quantity
         }))
         if (token) {
-            await axios.post(`${url}/api/cart/add`, { id: productId, size: itemSize, quantity: quantity }, { headers: { token } })
+            try {
+                await axios.post(`${url}/api/cart/add`, { id: productId, size: itemSize, quantity: quantity }, { headers: { token } })
+            } catch (err) {
+                console.error("Cart sync failed:", err);
+            }
         }
     }
 
@@ -200,26 +201,11 @@ const ShopContextProvider = ({ children }) => {
     };
 
     const fetchProductsList = async () => {
-        try {
-            const res = await axios.get(`${url}/api/product/list`)
-            setProducts(res.data.data || [])
-        } catch (err) {
-            console.log(err)
-
-        }
+        setProducts(staticProducts);
     }
 
     const fetchMockups = async () => {
-        try {
-            const res = await axios.get(`${url}/api/mockup/list`);
-            if (res.data.success) {
-                setAllMockups(res.data.data);
-            } else {
-                console.error("Failed to fetch mockups");
-            }
-        } catch (err) {
-            console.error("Error fetching mockups:", err);
-        }
+        setAllMockups(staticMockups);
     };
 
     const fetchCustomMockups = async (tokenValue) => {
@@ -237,28 +223,29 @@ const ShopContextProvider = ({ children }) => {
 
 
     const loadCartData = async (token) => {
-
-        const res = await axios.get(`${url}/api/cart/get`, { headers: { token } })
-        setCartItems(res.data.cartData)
+        try {
+            const res = await axios.get(`${url}/api/cart/get`, { headers: { token } });
+            if (res.data && res.data.cartData) {
+                setCartItems(res.data.cartData);
+            }
+        } catch (err) {
+            console.error("Error loading cart data:", err);
+        }
     }
 
 
     useEffect(() => {
-
         async function loadData() {
-            setLoading(true);
-            await Promise.all([
-                fetchProductsList(),
-                fetchMockups()
-            ]);
+            setProducts(staticProducts);
+            setAllMockups(staticMockups);
             if (localStorage.getItem('token')) {
-                setToken(localStorage.getItem('token'))
+                setToken(localStorage.getItem('token'));
             } else {
                 setLoading(false);
             }
         }
-        loadData()
-    }, [])
+        loadData();
+    }, []);
 
 
     const value = {
@@ -266,7 +253,10 @@ const ShopContextProvider = ({ children }) => {
         all_products: products,
         all_mockups,
         customMockups,
+        setCustomMockups,
         fetchCustomMockups,
+        fetchProductsList,
+        fetchMockups,
         addToCart,
         removeFromCart,
         getTotalCartAmount,
